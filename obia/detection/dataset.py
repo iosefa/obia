@@ -1,39 +1,39 @@
-"""
-Tree Detection Dataset
-----------------------
-
-This module contains a custom PyTorch Dataset implementation for tree detection tasks.
-"""
 import os
 import json
-import cv2
 import torch
+import numpy as np
 from torch.utils.data import Dataset
+import rasterio
 
 
 class TreeDetectionDataset(Dataset):
     """
-    A custom Dataset for object detection (tree crowns, etc.).
-    Expects annotation structure like:
-        {
-          "image_1": {
-            "file_name": "image_1.jpg",
-            "boxes": [[x1, y1, x2, y2], [x1, y1, x2, y2], ...],
-            "labels": [1, 1, ...]
-          },
-          "image_2": {
-            ...
-          }
-        }
-    """
+    Represents a dataset for tree detection tasks.
 
-    def __init__(self, images_dir, annotations_path, transforms=None):
+    This class handles loading, preprocessing, and transforming tree detection
+    datasets. Images and annotations are loaded and preprocessed for deep learning
+    models. It supports geometric and color augmentations if transforms are provided,
+    and optional scaling of pixel values.
+
+    :ivar images_dir: Path to the directory containing image files.
+    :type images_dir: str
+    :ivar annotations: Parsed annotations for the dataset, loaded from the JSON file.
+    :type annotations: dict
+    :ivar image_ids: List of image IDs corresponding to the keys in the annotations.
+    :type image_ids: list
+    :ivar transforms: A callable for data augmentation and transformations. It must support
+        the `image`, `bboxes`, and `labels` keys for input and output.
+    :type transforms: callable, optional
+    :ivar do_scale: Whether to scale image pixel values to the range 0-255.
+    :type do_scale: bool
+    """
+    def __init__(self, images_dir, annotations_path, transforms=None, do_scale=True):
         self.images_dir = images_dir
         self.transforms = transforms
+        self.do_scale = do_scale
 
         with open(annotations_path, "r") as f:
             self.annotations = json.load(f)
-
         self.image_ids = list(self.annotations.keys())
 
     def __len__(self):
@@ -42,26 +42,36 @@ class TreeDetectionDataset(Dataset):
     def __getitem__(self, idx):
         image_id = self.image_ids[idx]
         ann = self.annotations[image_id]
-
-        # Load and convert the image
         image_path = os.path.join(self.images_dir, ann["file_name"])
-        image = cv2.imread(image_path)
-        image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 
-        # IMPORTANT: Keep boxes/labels as lists for Albumentations
-        boxes = ann["boxes"]   # e.g. [[x1, y1, x2, y2], ...]
-        labels = ann["labels"] # e.g. [1, 1, ...]
+        with rasterio.open(image_path) as src:
+            image_array = src.read()
 
-        # Apply Albumentations transforms if provided
+        image_array = np.transpose(image_array, (1, 2, 0))
+
+        if self.do_scale:
+            data_min = image_array.min()
+            data_max = image_array.max()
+            if data_max > data_min:
+                image_array = 255.0 * (image_array - data_min) / (data_max - data_min + 1e-8)
+            image_array = np.clip(image_array, 0, 255).astype(np.uint8)
+
+        boxes = ann["boxes"]
+        labels = ann["labels"]
+
         if self.transforms is not None:
-            augmented = self.transforms(image=image, bboxes=boxes, labels=labels)
-            image = augmented["image"]
+            augmented = self.transforms(
+                image=image_array,
+                bboxes=boxes,
+                labels=labels
+            )
+            image_array = augmented["image"]
             boxes = augmented["bboxes"]
             labels = augmented["labels"]
 
-        # Convert to tensors AFTER augmentation
-        boxes = torch.tensor(boxes, dtype=torch.float32)
-        labels = torch.tensor(labels, dtype=torch.int64)
+        image_tensor = torch.tensor(image_array, dtype=torch.float32).permute(2, 0, 1)
+        boxes_tensor = torch.tensor(boxes, dtype=torch.float32)
+        labels_tensor = torch.tensor(labels, dtype=torch.int64)
 
-        target = {"boxes": boxes, "labels": labels}
-        return image, target
+        target = {"boxes": boxes_tensor, "labels": labels_tensor}
+        return image_tensor, target

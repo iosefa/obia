@@ -2,19 +2,18 @@
 Training Script for a RetinaNet-based Detection Model
 -----------------------------------------------------
 
-This module provides functionality to train a custom object detection model built on the RetinaNet architecture.
 """
-import torch
 from torch.utils.data import DataLoader
 import torch.optim as optim
 from tqdm import tqdm
 
-def train_model(model, train_loader, val_loader, num_epochs, device="cpu"):
+
+def train_model(model, train_loader, num_epochs, device="cpu"):
     """
     Trains the RetinaNet detection model.
 
     Args:
-        model (nn.Module): The detection model.
+        model (nn.Module): The detection model (e.g., from build_detection_model).
         train_loader (DataLoader): DataLoader for training data.
         val_loader (DataLoader): DataLoader for validation data (optional).
         num_epochs (int): Number of epochs to train.
@@ -47,7 +46,5 @@ def train_model(model, train_loader, val_loader, num_epochs, device="cpu"):
 
         avg_loss = total_loss / len(train_loader)
         print(f"Epoch {epoch+1}/{num_epochs} - Loss: {avg_loss:.4f}")
-
-        # Optionally run validation
 
     return model

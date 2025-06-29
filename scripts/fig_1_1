@@ -1,0 +1,75 @@
+flowchart LR
+    %% ─── MULTI-MODAL INPUTS ───────────────────────
+    subgraph MODES["Multi-modal inputs"]
+        direction TB
+        REF["Drone / field data"]
+        SAT["WV-3 mosaic"]
+        LID["Airborne LiDAR"]
+    end
+    class MODES in
+
+    %% ─── Pre-process & CNN detection ──────────────
+    PRE["Height-guided ground suppression"]
+    DF["DeepForest boxes"]
+    class PRE,DF proc
+
+    %% ─── LiDAR products & seeds ───────────────────
+    CHM["Canopy height"]
+    FP["First-return points"]
+    CHMseed["CHM peak seeds"]
+    PCseed["Density-peak seeds"]
+    class CHM,FP data
+    class CHMseed,PCseed seed
+
+    %% ─── Core OBIA + DL pipeline ──────────────────
+    SEG["SLIC-3D segments (MS + CHM)"]
+    GRAPH["Adjacency graph"]
+    PROP["Label propagation"]
+    DISS["Merge segments → crowns"]
+    class SEG,GRAPH,PROP,DISS proc
+
+    FEAT["Per-crown features"]
+    CLS["MLP species classifier"]
+    SHAP["SHAP analysis"]
+    OUT["Panoptic crowns<br/>species + uncert."]
+    class FEAT,CLS proc
+    class SHAP,OUT out
+
+    %% ─── Edges ────────────────────────────────────
+    SAT --> PRE
+    CHM --> PRE
+    PRE --> DF
+
+    REF -. train/validate .-> CLS
+    REF -. fine-tune .-> DF
+
+    LID --> CHM
+    LID --> FP
+    CHM --> CHMseed
+    FP  --> PCseed
+
+    SAT --> SEG
+    CHM --> SEG
+
+    DF      --> GRAPH
+    CHMseed --> GRAPH
+    PCseed  --> GRAPH
+    SEG     --> GRAPH
+    GRAPH   --> PROP
+    PROP    --> DISS
+
+    DISS --> FEAT
+    SAT  --> FEAT
+    LID  --> FEAT
+    CHM  --> FEAT
+
+    FEAT --> CLS
+    CLS  --> SHAP
+    CLS  --> OUT
+
+    %% ─── Styles ──────────────────────────────────
+    classDef in   fill:#e0f1ff,stroke:#2b7bba,stroke-width:1;
+    classDef proc fill:#d8f5e3,stroke:#238b45,stroke-width:1;
+    classDef data fill:#eeeeee,stroke:#666,stroke-width:1;
+    classDef seed fill:#fff8c6,stroke:#b59f00,stroke-width:1;
+    classDef out  fill:#ffe5e5,stroke:#a62323,stroke-width:1.2;

@@ -1,3 +1,4 @@
+import math
 import os
 import json
 import rasterio
@@ -7,6 +8,7 @@ from rasterio.windows import from_bounds
 from rasterio.transform import rowcol
 import numpy as np
 import cv2
+from tqdm import tqdm
 
 from obia.utils.image import apply_clahe, rescale_to_8bit
 
@@ -30,7 +32,6 @@ def generate_tiles(bounds, step, tile_size):
             x += step
         y += step
 
-
 def tile_and_process(
     raster_path,
     mask_path=None,
@@ -51,6 +52,10 @@ def tile_and_process(
     and writes out per-tile images (JPEG). Also converts polygons to bounding-box
     annotations if 'boxes_gpkg_path' is provided.
 
+    Additionally, it saves a 'transforms.json' containing each tile's
+    transform (as [a,b,c,d,e,f]) and its CRS in string form, so you can
+    later reconstruct georeferencing for each tile.
+
     Parameters
     ----------
     raster_path : str
@@ -62,7 +67,7 @@ def tile_and_process(
         If provided, path to a GeoPackage with polygon annotations to be converted
         to bounding boxes per tile. If None, no annotations are generated.
     output_dir : str
-        Directory to save output JPEG tiles and annotations.json.
+        Directory to save output JPEG tiles, annotations.json, and transforms.json.
     tile_size : float
         Size of each tile in the raster's coordinate units (e.g., meters).
     overlap : float
@@ -81,13 +86,19 @@ def tile_and_process(
     apply_clahe_flag : bool
         If True, apply CLAHE to the rescaled 8-bit tile before blending.
         If False, skip CLAHE and use the raw 8-bit image.
+    rescale : bool
+        If True, apply a percentile-based stretch to 8-bit. If False, do a min-max
+        linear scaling (or no scaling if tile_min==tile_max).
 
     Returns
     -------
     None
-        Writes out JPEG tiles to 'output_dir' and a single 'annotations.json'
-        with bounding boxes if 'boxes_gpkg_path' is provided.
+        Writes:
+          - Per-tile JPEG images in 'output_dir'.
+          - 'annotations.json' (if polygons are provided).
+          - 'transforms.json' with each tile's geotransform & CRS.
     """
+
     os.makedirs(output_dir, exist_ok=True)
     step = tile_size - overlap
 
@@ -96,7 +107,7 @@ def tile_and_process(
         gdf = gpd.read_file(boxes_gpkg_path)
     else:
         gdf = None
-
+    print("reading raster...")
     with rasterio.open(raster_path) as src:
         # If we have a mask path, open it; else None
         mask_src = rasterio.open(mask_path) if mask_path else None
@@ -108,8 +119,20 @@ def tile_and_process(
         all_annotations = {}
         tile_index = 0
 
+        # Dictionary to store tile transforms for each tile_name
+        transforms_dict = {}
+        print("read raster")
         # Generate tiles
-        for tbox in generate_tiles(src.bounds, step, tile_size):
+
+        width = src.bounds.right - src.bounds.left
+        height = src.bounds.top - src.bounds.bottom
+
+        num_tiles_x = math.ceil((width - overlap) / (tile_size - overlap))
+        num_tiles_y = math.ceil((height - overlap) / (tile_size - overlap))
+        total_tiles = num_tiles_x * num_tiles_y
+
+        for tbox in tqdm(generate_tiles(src.bounds, step, tile_size), total=total_tiles):
+        # for tbox in generate_tiles(src.bounds, step, tile_size):
             tile_index += 1
             minx, miny, maxx, maxy = tbox
 
@@ -129,11 +152,9 @@ def tile_and_process(
             tile_img = np.moveaxis(data, 0, -1)  # shape => (H, W, num_bands)
 
             # (2) Rescale to 8-bit & optionally apply CLAHE
-            # tile_img_8bit = rescale_to_8bit(tile_img)
             if rescale:
-                tile_img_8bit = rescale_to_8bit(tile_img)  # your percentile-based approach
+                tile_img_8bit = rescale_to_8bit(tile_img)  # percentile-based approach
             else:
-                # Minimal linear scale from raw min..max to 0..255
                 tile_min, tile_max = tile_img.min(), tile_img.max()
                 if tile_min == tile_max:
                     tile_img_8bit = np.zeros_like(tile_img, dtype=np.uint8)
@@ -151,14 +172,25 @@ def tile_and_process(
             # (3) If we have a mask, read the tile & do blending
             if mask_src:
                 mask_data = mask_src.read(1, window=tile_window)
-                # ensure binary if needed: mask_data = (mask_data>0).astype(np.uint8)
+
+                # if mask_data.shape[0] == 0 or mask_data.shape[1] == 0:
+                #     continue
+                # if not np.any(mask_data):
+                #     continue
+                #
+                # if mask_data.shape != tile_img_final.shape[:2]:
+                #     # resample mask_data to match tile_img_final
+                #     mask_data = cv2.resize(
+                #         mask_data,
+                #         (tile_img_final.shape[1], tile_img_final.shape[0]),
+                #         interpolation=cv2.INTER_NEAREST
+                #     )
 
                 # (A) If blur_kernel == 0 => skip blur
                 if isinstance(blur_kernel, int):
                     if blur_kernel == 0:
                         blurred_img = tile_img_final
                     else:
-                        # must be a positive odd int
                         blur_kernel = (blur_kernel, blur_kernel)
                         blurred_img = cv2.GaussianBlur(tile_img_final, blur_kernel, 0)
                 elif isinstance(blur_kernel, tuple):
@@ -188,19 +220,20 @@ def tile_and_process(
 
                     out_img_f = alpha_3d * tile_f + (1.0 - alpha_3d) * darkened_bg_f
                     out_img = np.clip(out_img_f, 0, 255).astype(np.uint8)
-
                 else:
                     # Hard blend with binary mask
                     mask_3d = np.stack([mask_data]*3, axis=-1)  # (H, W, 3)
                     blended_f = tile_img_final * mask_3d + darkened_background * (1 - mask_3d)
                     out_img = blended_f.astype(np.uint8)
-
             else:
                 # No mask => just keep tile_img_final as is
                 out_img = tile_img_final
 
             # (4) Save tile
             out_height, out_width = out_img.shape[:2]
+            # Create a local transform for this tile
+            tile_transform = rasterio.windows.transform(tile_window, src.transform)
+
             profile = src.profile.copy()
             profile.update({
                 "driver": "JPEG",
@@ -208,7 +241,7 @@ def tile_and_process(
                 "width": out_width,
                 "count": out_img.shape[2],  # typically 3
                 "dtype": "uint8",
-                "transform": rasterio.windows.transform(tile_window, src.transform),
+                "transform": tile_transform,  # georeferencing for the tile
                 "crs": src.crs
             })
 
@@ -218,6 +251,18 @@ def tile_and_process(
 
             with rasterio.open(tile_path, "w", **profile) as dst:
                 dst.write(out_data)
+
+            # Store the transform & CRS in a dict
+            # tile_transform is an Affine object with attributes (a,b,c,d,e,f)
+            # We'll store them as a list [a,b,c,d,e,f] plus a CRS string
+            transform_list = [
+                tile_transform.a, tile_transform.b, tile_transform.c,
+                tile_transform.d, tile_transform.e, tile_transform.f
+            ]
+            transforms_dict[tile_name] = {
+                "transform": transform_list,
+                "crs": str(src.crs)  # or src.crs.to_string() / to_wkt() if you prefer
+            }
 
             # (5) Convert polygons -> bounding boxes
             if gdf is not None and len(tile_polygons) > 0:
@@ -273,7 +318,6 @@ def tile_and_process(
                     }
 
         # End of tile loop
-
         # Close mask if used
         if mask_src:
             mask_src.close()
@@ -284,5 +328,11 @@ def tile_and_process(
         with open(json_path, "w") as f:
             json.dump(all_annotations, f, indent=2)
         print(f"Annotations JSON written to: {json_path}")
+
+    # (7) Write out the transforms JSON
+    transforms_path = os.path.join(output_dir, "transforms.json")
+    with open(transforms_path, "w") as ft:
+        json.dump(transforms_dict, ft, indent=2)
+    print(f"Transforms JSON written to: {transforms_path}")
 
     print("Done! Tiles written to:", output_dir)
