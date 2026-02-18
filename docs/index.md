@@ -14,7 +14,7 @@ Object-based image analysis tools for geospatial raster workflows.
 
 ## Current scope
 
-This repository is in active cleanup. The docs now describe the modules that exist in this repo today and avoid inherited `pyforestscan` content.
+This documentation describes the modules that exist in this repository today.
 
 Use these pages first:
 

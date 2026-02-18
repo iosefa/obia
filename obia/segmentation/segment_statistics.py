@@ -3,8 +3,6 @@ import geopandas as gpd
 
 from skimage.feature import graycomatrix, graycoprops
 from tqdm import tqdm
-from pyforestscan.handlers import read_lidar
-from pyforestscan.calculate import assign_voxels, calculate_pad, calculate_fhd, calculate_chm, calculate_pai
 
 from obia.utils.utils import mask_image_with_polygon, crop_image_to_bbox
 
@@ -325,37 +323,10 @@ def calculate_structural_stats(
     :return: Dictionary containing the calculated statistics.
     :rtype: dict
     """
-    stats_dict = {}
-    try:
-        voxels, extent = assign_voxels(pointcloud, voxel_resolution)
-    except ValueError:
-        print('oh no')
-        if calc_pai:
-            stats_dict['pai'] = np.nan
-        if calc_fhd:
-            stats_dict['fhd'] = np.nan
-        if calc_ch:
-            stats_dict['ch'] = np.nan
-        return stats_dict
-    if np.sum(voxels) == 0:
-        if calc_pai:
-            stats_dict['pai'] = np.nan
-        if calc_fhd:
-            stats_dict['fhd'] = np.nan
-        if calc_ch:
-            stats_dict['ch'] = np.nan
-        return stats_dict
-    if calc_pai:
-        pad = calculate_pad(voxels, voxel_resolution[-1])
-        pai = calculate_pai(pad, min_height=0)
-        stats_dict['pai'] = np.mean(pai)
-    if calc_fhd:
-        fhd = calculate_fhd(voxels)
-        stats_dict['fhd'] = np.mean(fhd)
-    if calc_ch:
-        ch, extent = calculate_chm(pointcloud, voxel_resolution, interpolation=None)
-        stats_dict['ch'] = np.mean(ch)
-    return stats_dict
+    raise NotImplementedError(
+        "Structural statistics are temporarily disabled. "
+        "Point-cloud dependencies were removed and will be reintroduced later."
+    )
 
 
 def calculate_radiometric_stats(
@@ -461,6 +432,12 @@ def create_objects(
             "At least one of 'calculate_spectral', 'calculate_textural', 'calculate_structural', or 'calculate_radiometric' must be True."
         )
 
+    if ept is not None or calculate_structural or calculate_radiometric:
+        raise NotImplementedError(
+            "Point-cloud workflows are temporarily disabled. "
+            "Use spectral/textural statistics only for now."
+        )
+
     if spectral_bands is None:
         spectral_bands = list(range(image.img_data.shape[0]))
     if textural_bands is None:
@@ -527,44 +504,6 @@ def create_objects(
                 calc_correlation=calc_correlation
             )
             row.update(textural_statistics)
-
-        if ept is not None:
-            if ept_srs is None:
-                raise ValueError("Error: 'ept_srs' must be provided when 'ept' is not None.")
-            if voxel_resolution is None:
-                raise ValueError("Error: 'voxel_resolution' must be provided when 'ept' is not None.")
-            xmin, ymin, xmax, ymax = geom.bounds
-            bounds = ([xmin, xmax], [ymin, ymax])
-
-            pointclouds = read_lidar(ept, ept_srs, bounds, crop_poly=True, poly=geom.wkt)
-            if not pointclouds:
-                print("no point clouds found for segment", segment_id)
-                if calculate_structural:
-                    row['pai'] = np.nan
-                    row['fhd'] = np.nan
-                    row['ch'] = np.nan
-                if calculate_radiometric:
-                    row['mean_intensity'] = np.nan
-                    row['variance_intensity'] = np.nan
-            else:
-                pointcloud = pointclouds[0]
-                if calculate_structural:
-                    structural_statistics = calculate_structural_stats(
-                        pointcloud,
-                        voxel_resolution,
-                        calc_pai=calc_pai,
-                        calc_fhd=calc_fhd,
-                        calc_ch=calc_ch
-                    )
-                    row.update(structural_statistics)
-
-                if calculate_radiometric:
-                    radiometric_statistics = calculate_radiometric_stats(
-                        pointcloud,
-                        calc_mean_intensity=calc_mean_intensity,
-                        calc_variance_intensity=calc_variance_intensity
-                    )
-                    row.update(radiometric_statistics)
 
         results.append(row)
 
