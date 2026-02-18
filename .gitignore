@@ -175,7 +175,7 @@ notebooks/data
 *.xml
 *.npy
 scripts/SAM copy
-docs
+archive/
 
 # Local artifacts
 .DS_Store

@@ -1,6 +1,6 @@
-site_name: pyMobia
-site_url: https://pymobia.sefa.ai
-repo_url: https://github.com/iosefa/pymobia
+site_name: obia
+site_url: https://github.com/iosefa/obia
+repo_url: https://github.com/iosefa/obia
 
 theme:
     name: material
@@ -36,26 +36,22 @@ markdown_extensions:
 nav:
     - Home: index.md
     - Installation: installation.md
-    - Usage:
-        - usage/getting-started.md
-        - usage/segmentation.md
-        - usage/feature-building.md
-        - usage/classification.md
-        - usage/feature-importance.md
-        - usage/uncertainty-analysis.md
-        - usage/working-with-big-data.md
-    - Contributing: contributing.md
-    - Changelog: https://github.com/iosefa/pymobia/releases
-    - Report Issues: https://github.com/iosefa/pymobia/issues
+    - Quickstart: quickstart.md
+    - Project Structure: project-structure.md
+    - Workflows: workflows.md
     - Examples:
-        - examples/getting-started.ipynb
+        - Segmentation Quickstart: examples/segmentation-quickstart.ipynb
+    - Project Status: status.md
+    - Contributing: contributing.md
+    - Changelog: https://github.com/iosefa/obia/releases
+    - Report Issues: https://github.com/iosefa/obia/issues
     - API Reference:
-        - calculate module: api/calculate.md
-        - filters module: api/filters.md
-        - handlers module: api/handlers.md
-        - pipeline module: api/pipeline.md
-        - process module: api/process.md
-        - visualize module: api/visualize.md
+        - Overview: api/index.md
+        - Handlers: api/handlers.md
+        - Segmentation: api/segmentation.md
+        - Detection: api/detection.md
+        - Classification: api/classification.md
+        - Utils: api/utils.md
 
 extra_css:
     - overrides/custom.css

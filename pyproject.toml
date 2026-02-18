@@ -1,3 +1,53 @@
 [build-system]
-requires = ["setuptools>=42", "wheel"]
+requires = ["setuptools>=68", "wheel"]
 build-backend = "setuptools.build_meta"
+
+[project]
+name = "obia"
+version = "0.1.3"
+description = "A Python package for object-based image analysis with multimodal data sources"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [
+  { name = "Joseph Emile Honour Percival", email = "ipercival@gmail.com" }
+]
+dependencies = [
+  "numpy>=2.1.1",
+  "rasterio>=1.3.11",
+  "shapely>=2.0.3",
+  "pillow>=10.3.0",
+  "pandas>=2.2.2",
+  "geopandas>=1.0.1",
+  "scipy>=1.14.1",
+  "scikit-image>=0.23.2",
+  "tqdm>=4.66.2",
+  "scikit-learn>=1.4.2",
+  "affine>=2.4.0",
+  "pyproj>=3.6.1",
+  "shap>=0.46.0",
+  "pyforestscan>=0.1.7"
+]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent"
+]
+
+[project.optional-dependencies]
+docs = [
+  "mkdocs>=1.6",
+  "mkdocs-material>=9.5",
+  "mkdocstrings[python]>=0.26",
+  "mkdocs-jupyter>=0.24",
+  "mkdocs-git-revision-date-localized-plugin>=1.2"
+]
+
+[project.urls]
+Homepage = "https://github.com/iosefa/obia"
+Repository = "https://github.com/iosefa/obia"
+Issues = "https://github.com/iosefa/obia/issues"
+
+[tool.setuptools.packages.find]
+include = ["obia*"]
+exclude = ["notebooks*", "tests*", "archive*"]
