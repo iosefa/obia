@@ -17,9 +17,9 @@ from shapely.ops import unary_union
 from shapely.validation import make_valid              # Shapely ≥ 2.x
 
 # ──── PATHS ────────────────────────────────────────────────────────────────
-RASTER_REF       = Path("canopy_index.tif")
-CROWNS_RAW_GPKG  = Path("crowns_train.gpkg")
-MASK_OUT_TIF     = Path("crowns_mask.tif")
+RASTER_REF       = Path("canopy_index2.tif")
+CROWNS_RAW_GPKG  = Path("stardist_masks2_clipped.gpkg")
+MASK_OUT_TIF     = Path("crowns_mask2.tif")
 # --------------------------------------------------------------------------
 
 print("• reading crowns …")

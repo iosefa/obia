@@ -15,7 +15,7 @@ from rasterio.merge import merge
 TILE_DIR   = "composite_tiles_ns2"
 OUT_RASTER = "canopy_index2.tif"
 
-CHM_MAX = 35.0        # m mapping to chm_norm = 1
+CHM_MAX = 25.0        # m mapping to chm_norm = 1
 W_CHM   = 0.75         # CHM influence in base index
 W_COST  = 0.25         # cost influence in base index
 

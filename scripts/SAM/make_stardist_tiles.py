@@ -29,7 +29,7 @@ CHM_FILE        = BASE_DIR / "chm2.tif"
 
 OUT_TILE_DIR    = BASE_DIR / "composite_tiles_ns2"
 OUT_CENTRES_GPKG = BASE_DIR / "crown_centres2.gpkg"
-SMOOTH_SIGMA    = 10           # pixels – “huge” smoothing
+SMOOTH_SIGMA    = 12           # pixels – “huge” smoothing. was initially 8.
 PCTL_LOW_HIGH   = (5, 95)     # for CHM / cost normalisation
 # ---------------------------------------------------------------------------
 
