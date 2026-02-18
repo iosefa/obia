@@ -2,12 +2,32 @@
 
 `obia` is a Python library for object-based image analysis.
 
+> Note: `obia` is under active development.
+
 ## Installation
 
 ```bash
 conda env create -f environment.yml
 conda activate obia
 ```
+
+## Supported Algorithms
+
+Segmentation:
+
+- `slic`
+- `quickshift`
+
+Classification:
+
+- `rf` (Random Forest)
+- `mlp` (Multi-layer Perceptron)
+
+## Notable Features
+
+- Large-raster tiled segmentation for `slic` via `obia.utils.tiling.create_tiled_segments`
+- Seam-oriented tile handling for `slic` using overlap/buffer logic to reduce boundary artifacts
+- End-to-end segmentation + classification workflow using geospatial vector outputs (`GeoPackage`)
 
 ## Quickstart (Segmentation + Classification)
 
