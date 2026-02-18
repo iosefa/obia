@@ -69,7 +69,7 @@ instance/
 .scrapy
 
 # Sphinx documentation
-docs/_build/
+docs_old/_build/
 
 # PyBuilder
 .pybuilder/
@@ -160,3 +160,52 @@ cython_debug/
 #.idea/
 
 notebooks/data
+
+*.png
+*.gpkg
+*.gpkg-shm
+*.gpkg-wal
+*.yaml
+*.tif
+*.laz
+*.las
+*.json
+*.jpeg
+*.jpg
+*.xml
+*.npy
+scripts/SAM copy
+archive/
+
+# Local artifacts
+.DS_Store
+
+# Data directories and outputs
+data/
+notebooks/lightning_logs/
+notebooks/tiles/
+scripts/lightning_logs/
+scripts/SAM/backup/
+scripts/SAM/crowns/
+scripts/SAM/data/
+scripts/SAM/data_stardist/
+scripts/SAM/logits/
+scripts/SAM/models/
+scripts/SAM/probs/
+scripts/SAM/tmp_prob/
+scripts/SAM/tmp_prob2_old/
+scripts/SAM/train/
+scripts/SegmentationSAM/cost_tiles_old/
+scripts/SegmentationSAM/crown_tiles/
+scripts/SegmentationSAM/data/
+scripts/SegmentationSAM/training_crowns/
+scripts/SegmentationSAM/training_crowns_raw/
+
+# Model files and serialized artifacts
+*.pth
+*.pt
+*.ckpt
+*.parquet
+*.pkl
+scripts/segments_graph.pkl*
+scripts/segments_labeled.parquet*

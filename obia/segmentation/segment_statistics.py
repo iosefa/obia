@@ -3,8 +3,6 @@ import geopandas as gpd
 
 from skimage.feature import graycomatrix, graycoprops
 from tqdm import tqdm
-from pyforestscan.handlers import read_lidar
-from pyforestscan.calculate import assign_voxels, calculate_pad, calculate_fhd, calculate_chm, calculate_pai
 
 from obia.utils.utils import mask_image_with_polygon, crop_image_to_bbox
 
@@ -213,7 +211,7 @@ def calculate_textural_stats(
     stats_dict = {}
 
     for band_index in textural_bands:
-        band_data = image[band_index, :, :]
+        band_data = image[:, :, band_index]
         valid_mask = ~np.isnan(band_data)
 
         if not np.any(valid_mask):
@@ -261,12 +259,14 @@ def calculate_textural_stats(
                 glcm_input = ((band_clean - band_min) / (band_max - band_min) * 255).astype(np.uint8)
 
         try:
-            glcm = graycomatrix(glcm_input,
-                                distances=[2],
-                                angles=[0, np.pi / 4, np.pi / 2, 3 * np.pi / 4],
-                                levels=256,
-                                symmetric=True,
-                                normed=True)
+            glcm = graycomatrix(
+                glcm_input,
+                distances=[2],
+                angles=[0, np.pi / 4, np.pi / 2, 3 * np.pi / 4],
+                levels=256,
+                symmetric=True,
+                normed=True
+            )
         except ValueError:
             if calc_contrast:
                 stats_dict[f"{band_prefix}_contrast"] = np.nan
@@ -323,36 +323,10 @@ def calculate_structural_stats(
     :return: Dictionary containing the calculated statistics.
     :rtype: dict
     """
-    stats_dict = {}
-    try:
-        voxels, extent = assign_voxels(pointcloud, voxel_resolution)
-    except ValueError:
-        if calc_pai:
-            stats_dict['pai'] = np.nan
-        if calc_fhd:
-            stats_dict['fhd'] = np.nan
-        if calc_ch:
-            stats_dict['ch'] = np.nan
-        return stats_dict
-    if np.sum(voxels) == 0:
-        if calc_pai:
-            stats_dict['pai'] = np.nan
-        if calc_fhd:
-            stats_dict['fhd'] = np.nan
-        if calc_ch:
-            stats_dict['ch'] = np.nan
-        return stats_dict
-    if calc_pai:
-        pad = calculate_pad(voxels, voxel_resolution[-1])
-        pai = calculate_pai(pad, min_height=0)
-        stats_dict['pai'] = np.mean(pai)
-    if calc_fhd:
-        fhd = calculate_fhd(voxels)
-        stats_dict['fhd'] = np.mean(fhd)
-    if calc_ch:
-        ch, extent = calculate_chm(pointcloud, voxel_resolution)
-        stats_dict['ch'] = np.mean(ch)
-    return stats_dict
+    raise NotImplementedError(
+        "Structural statistics are temporarily disabled. "
+        "Point-cloud dependencies were removed and will be reintroduced later."
+    )
 
 
 def calculate_radiometric_stats(
@@ -455,12 +429,39 @@ def create_objects(
     """
     if not (calculate_spectral or calculate_textural or calculate_structural or calculate_radiometric):
         raise ValueError(
-            "At least one of 'calculate_spectral', 'calculate_textural', 'calculate_structural', or 'calculate_radiometric' must be True.")
+            "At least one of 'calculate_spectral', 'calculate_textural', 'calculate_structural', or 'calculate_radiometric' must be True."
+        )
+
+    if ept is not None or calculate_structural or calculate_radiometric:
+        raise NotImplementedError(
+            "Point-cloud workflows are temporarily disabled. "
+            "Use spectral/textural statistics only for now."
+        )
 
     if spectral_bands is None:
-        spectral_bands = list(range(image.img_data.shape[0]))  # (bands, height, width)
+        spectral_bands = list(range(image.img_data.shape[0]))
     if textural_bands is None:
-        textural_bands = list(range(image.img_data.shape[0]))  # (bands, height, width)
+        textural_bands = list(range(image.img_data.shape[0]))
+
+    #
+    # # ------------- KEY ADDITION -------------
+    # # Filter out any band indices that exceed the number of bands in the image.
+    # valid_spectral_bands = [b for b in spectral_bands if b < image.img_data.shape[0]]
+    # if len(valid_spectral_bands) < len(spectral_bands):
+    #     print(
+    #         "Warning: Some spectral band indices were invalid and have been removed. "
+    #         f"(Requested: {spectral_bands}, valid: {valid_spectral_bands})"
+    #     )
+    # spectral_bands = valid_spectral_bands
+    #
+    # valid_textural_bands = [b for b in textural_bands if b < image.img_data.shape[0]]
+    # if len(valid_textural_bands) < len(textural_bands):
+    #     print(
+    #         "Warning: Some textural band indices were invalid and have been removed. "
+    #         f"(Requested: {textural_bands}, valid: {valid_textural_bands})"
+    #     )
+    # textural_bands = valid_textural_bands
+    # # ------------- END KEY ADDITION ----------
 
     columns = _create_empty_stats_columns(
         spectral_bands, textural_bands,
@@ -490,45 +491,19 @@ def create_objects(
         )
         row.update(spectral_statistics)
 
-        textural_statistics = calculate_textural_stats(
-            masked_img_data, textural_bands,
-            calc_contrast=calc_contrast, calc_dissimilarity=calc_dissimilarity, calc_homogeneity=calc_homogeneity,
-            calc_ASM=calc_ASM, calc_energy=calc_energy, calc_correlation=calc_correlation
-        )
-        row.update(textural_statistics)
-
-        if ept is not None:
-            if ept_srs is None:
-                raise ValueError("Error: 'ept_srs' must be provided when 'ept' is not None.")
-            if voxel_resolution is None:
-                raise ValueError("Error: 'voxel_resolution' must be provided when 'ept' is not None.")
-            xmin, ymin, xmax, ymax = geom.bounds
-            bounds = ([xmin, xmax], [ymin, ymax])
-
-            pointclouds = read_lidar(ept, ept_srs, bounds, crop_poly=True, poly=geom.wkt)
-            if not pointclouds:
-                if calculate_structural:
-                    row['pai'] = np.nan
-                    row['fhd'] = np.nan
-                    row['ch'] = np.nan
-                if calculate_radiometric:
-                    row['mean_intensity'] = np.nan
-                    row['variance_intensity'] = np.nan
-            else:
-                pointcloud = pointclouds[0]
-                if calculate_structural:
-                    structural_statistics = calculate_structural_stats(
-                        pointcloud, voxel_resolution,
-                        calc_pai=calc_pai, calc_fhd=calc_fhd, calc_ch=calc_ch
-                    )
-                    row.update(structural_statistics)
-
-                if calculate_radiometric:
-                    radiometric_statistics = calculate_radiometric_stats(
-                        pointcloud,
-                        calc_mean_intensity=calc_mean_intensity, calc_variance_intensity=calc_variance_intensity
-                    )
-                    row.update(radiometric_statistics)
+        # --- 2) Textural stats
+        if calculate_textural and textural_bands:
+            textural_statistics = calculate_textural_stats(
+                masked_img_data,
+                textural_bands,
+                calc_contrast=calc_contrast,
+                calc_dissimilarity=calc_dissimilarity,
+                calc_homogeneity=calc_homogeneity,
+                calc_ASM=calc_ASM,
+                calc_energy=calc_energy,
+                calc_correlation=calc_correlation
+            )
+            row.update(textural_statistics)
 
         results.append(row)
 

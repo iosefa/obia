@@ -51,6 +51,8 @@ def _create_tile(dataset, i_offset, j_offset, w, h, binary_mask=False):
                 img_data[:, :, band - 1] = data
 
         crs = dataset.GetProjection()
+        if crs is None:
+            crs = "epsg:32702"
         affine_transformation = [tile_transform.a, tile_transform.b, tile_transform.d, tile_transform.e,
                                  tile_transform.c, tile_transform.f]
         image = Image(img_data, crs, affine_transformation, tile_transform, None)
@@ -73,7 +75,7 @@ def create_tiled_segments(input_raster, output_dir, input_mask=None,
     """
     if method != "slic":
         raise ValueError("Currently, only the 'slic' method is supported for segmentation.")
-    buffer = buffer * 2
+    # buffer = buffer * 2
     dataset = gdal.Open(input_raster)
     if not dataset:
         raise ValueError(f"Unable to open {input_raster} or {input_mask}")
@@ -107,8 +109,12 @@ def create_tiled_segments(input_raster, output_dir, input_mask=None,
 
             i_offset = i
             j_offset = j
+
             w = min(tile_size, width - i_offset)
             h = min(tile_size, height - j_offset)
+
+            if w == 0 or h == 0:
+                continue
 
             image = _create_tile(dataset, i_offset, j_offset, w, h)
 
@@ -152,17 +158,20 @@ def create_tiled_segments(input_raster, output_dir, input_mask=None,
             is_white_tile = (i // tile_size + j // tile_size) % 2 != 0
 
             if is_white_tile:
-                i_offset = max(0, i - buffer)
-                j_offset = max(0, j - buffer)
-                if i == 0 or i == max(range(0, width, tile_size)):
-                    w = min(tile_size + buffer, width - i_offset)
-                else:
-                    w = min(tile_size + buffer * 2, width - i_offset + buffer)
+                # ---- horizontal offsets & width ----
+                i_offset = max(0, i - buffer)  # shift left by buffer unless we hit 0
+                right_edge = min(width, i + tile_size + buffer)  # shift right by buffer unless we hit width
+                w = right_edge - i_offset  # final window width
 
-                if j == 0 or j == max(range(0, height, tile_size)):
-                    h = min(tile_size + buffer, height - j_offset)
-                else:
-                    h = min(tile_size + buffer * 2, height - j_offset + buffer)
+                # ---- vertical offsets & height ----
+                j_offset = max(0, j - buffer)
+                bottom_edge = min(height, j + tile_size + buffer)
+                h = bottom_edge - j_offset
+
+                w = max(0, min(w, width - i_offset))
+                h = max(0, min(h, height - j_offset))
+                if w == 0 or h == 0:
+                    continue
 
                 # create tile mask and image
                 image = _create_tile(dataset, i_offset, j_offset, w, h)
