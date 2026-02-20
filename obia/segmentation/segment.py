@@ -84,7 +84,7 @@ def segment(image, segmentation_bands=None, statistics_bands=None,
     :return: Segments object containing the segmented image and statistics.
     """
     segments_gdf = create_segments(image, segmentation_bands=segmentation_bands, method=method, **kwargs)
-    objects_gdf = create_objects(segments_gdf, image, statistics_bands=statistics_bands, calc_mean=calc_mean,
+    objects_gdf = create_objects(segments_gdf, image, spectral_bands=statistics_bands, calc_mean=calc_mean,
                                  calc_variance=calc_variance, calc_skewness=calc_skewness, calc_kurtosis=calc_kurtosis,
                                  calc_contrast=calc_contrast, calc_dissimilarity=calc_dissimilarity,
                                  calc_homogeneity=calc_homogeneity, calc_ASM=calc_ASM, calc_energy=calc_energy,
