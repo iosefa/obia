@@ -439,9 +439,9 @@ def create_objects(
         )
 
     if spectral_bands is None:
-        spectral_bands = list(range(image.img_data.shape[0]))
+        spectral_bands = list(range(image.img_data.shape[2]))
     if textural_bands is None:
-        textural_bands = list(range(image.img_data.shape[0]))
+        textural_bands = list(range(image.img_data.shape[2]))
 
     #
     # # ------------- KEY ADDITION -------------
