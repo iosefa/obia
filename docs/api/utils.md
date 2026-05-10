@@ -12,14 +12,6 @@
 
 ::: obia.utils.training
 
-## `obia.utils.seeds`
-
-::: obia.utils.seeds
-
-## `obia.utils.cost`
-
-::: obia.utils.cost
-
 ## `obia.utils.utils`
 
 ::: obia.utils.utils

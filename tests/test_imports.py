@@ -15,6 +15,7 @@ def test_core_modules_import_without_detection_extras():
         "obia.segmentation.segment_boundaries",
         "obia.segmentation.segment_statistics",
         "obia.utils.tiling",
+        "obia.pointcloud",
     ]
 
     for module in modules:

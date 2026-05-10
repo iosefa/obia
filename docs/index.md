@@ -1,24 +1,59 @@
-# obia
+# OBIA
 
-Object-based image analysis tools for geospatial raster workflows.
+**Object-based image analysis tools for geospatial rasters.**
 
-## What this project is
+OBIA segments a raster into image objects, summarizes each object with feature columns, and uses those object-level features for classification or review. The main output is a GeoDataFrame of segment polygons that can be saved, labelled, enriched, and classified.
 
-`obia` is a Python package for:
+The library supports:
 
-- loading georeferenced rasters (`obia.handlers`)
-- creating segment polygons and segment-level features (`obia.segmentation`)
-- training/inference for detection models (`obia.detection`)
-- segment classification with scikit-learn (`obia.classification`)
-- utility workflows for tiling, seed generation, and cost-surface construction (`obia.utils`)
+- GeoTIFF loading with Rasterio metadata
+- SLIC and quickshift segmentation
+- spectral and texture summaries for segment objects
+- optional point-cloud height, intensity, and density features
+- point-to-segment labelling for training data
+- random forest and MLP segment classification
+- tiled large-raster workflows for supported segmentation methods
 
-## Current scope
+## First Segmentation
 
-This documentation describes the modules that exist in this repository today.
+```python
+from obia.handlers.geotif import open_geotiff
+from obia.segmentation.segment import segment
 
-Use these pages first:
+image = open_geotiff("/path/to/image.tif")
 
-- Installation: `installation.md`
-- Quickstart: `quickstart.md`
-- Workflows: `workflows.md`
-- API reference: `api/index.md`
+objects = segment(
+    image,
+    segmentation_bands=[0, 1, 2],
+    statistics_bands=[0, 1, 2, 3],
+    method="slic",
+    n_segments=3000,
+    compactness=10,
+)
+
+objects.segments.to_file("segments.gpkg")
+```
+
+`objects.segments` is a GeoDataFrame. Each row is a segment polygon with a `segment_id` and calculated feature columns.
+
+Add point-cloud features to the same rows when LiDAR or SfM points are available:
+
+```python
+from obia.pointcloud import add_pointcloud_features
+
+segments = add_pointcloud_features(
+    objects.segments,
+    pointcloud="/path/to/points.laz",
+    metrics=["height", "intensity", "density"],
+)
+```
+
+## Next Steps
+
+- [Installation](installation.md): install OBIA with pip or set up a development environment.
+- [Concepts](concepts.md): understand segment objects, feature sources, labels, and classification.
+- [Segmentation](usage/segmentation.md): create object polygons and feature tables.
+- [Classification](usage/classification.md): label segments and train a classifier.
+- [Point Clouds](usage/pointcloud.md): add point-cloud metrics to segment objects.
+- [Large Rasters](usage/large-rasters.md): use tiled segmentation utilities.
+- [API Reference](api/index.md): inspect generated API documentation.

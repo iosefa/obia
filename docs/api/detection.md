@@ -1,4 +1,6 @@
-# Detection API
+# Experimental Detection API
+
+`obia.detection` is experimental. Its interfaces and workflow may change in future releases.
 
 ## `obia.detection.dataset`
 

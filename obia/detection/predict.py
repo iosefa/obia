@@ -11,7 +11,7 @@ import torch
 import rasterio
 import numpy as np
 
-def predict(model, image_path, device="cpu", score_threshold=0.5):
+def predict(model, image_path, device="cpu", score_threshold=0.5) -> dict:
     """
     Args:
         model (nn.Module): Trained RetinaNet model (with in_channels matching your data).

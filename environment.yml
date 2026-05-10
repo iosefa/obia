@@ -17,8 +17,9 @@ dependencies:
   - affine>=2.4.0
   - pyproj>=3.6.1
   - opencv
-  - click>=8.1
   - gdal
+  - pdal
+  - python-pdal
   - pytorch
   - torchvision
   - matplotlib>=3.8
@@ -27,6 +28,7 @@ dependencies:
   - pytest>=7.4
   - pip:
       - albumentations>=1.4
+      - pyforestscan
       - shap>=0.46.0
       - mkdocstrings[python]>=0.26
       - mkdocs-jupyter>=0.24

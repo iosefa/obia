@@ -25,8 +25,7 @@ dependencies = [
   "scikit-learn>=1.4.2",
   "affine>=2.4.0",
   "pyproj>=3.6.1",
-  "opencv-python>=4.10",
-  "click>=8.1"
+  "opencv-python>=4.10"
 ]
 classifiers = [
   "Programming Language :: Python :: 3",
@@ -47,6 +46,10 @@ detection = [
   "torchvision>=0.18",
   "albumentations>=1.4",
   "matplotlib>=3.8"
+]
+pointcloud = [
+  "pdal",
+  "pyforestscan"
 ]
 explain = [
   "shap>=0.46.0"

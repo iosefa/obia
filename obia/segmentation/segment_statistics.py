@@ -12,15 +12,10 @@ from scipy.stats import skew, kurtosis
 def _create_empty_stats_columns(spectral_bands, textural_bands, calc_mean, calc_variance, calc_min, calc_max,
                                 calc_skewness, calc_kurtosis,
                                 calc_contrast, calc_dissimilarity, calc_homogeneity, calc_ASM, calc_energy,
-                                calc_correlation,
-                                calc_pai, calc_fhd, calc_ch, calc_mean_intensity, calc_variance_intensity):
+                                calc_correlation):
     """
     Generate a list of columns for statistics based on the input parameters. This function is
-    used to create the necessary column headers for storing spectral, textural, and pointcloud
-    statistics, dynamically adjusted based on which statistics have been selected to calculate.
-    The resulting list of columns is structured to accommodate both spectral and textural band
-    data, as well as point cloud statistics, ensuring that only the required statistics are
-    included based on the calculation flags provided.
+    used to create column headers for spectral and textural segment statistics.
 
     :param spectral_bands: A list of indices representing the spectral bands to include in the
         statistics. Each index corresponds to a band for which statistics may be calculated.
@@ -49,19 +44,8 @@ def _create_empty_stats_columns(spectral_bands, textural_bands, calc_mean, calc_
         textural band.
     :param calc_correlation: A boolean indicating whether to include correlation statistics for
         each textural band.
-    :param calc_pai: A boolean indicating whether to include Plant Area Index (PAI) statistics
-        in the pointcloud stats.
-    :param calc_fhd: A boolean indicating whether to include Foliage Height Diversity (FHD)
-        statistics in the pointcloud stats.
-    :param calc_ch: A boolean indicating whether to include canopy height (CH) statistics in
-        the pointcloud stats.
-    :param calc_mean_intensity: A boolean indicating whether to include mean intensity
-        statistics in the pointcloud stats.
-    :param calc_variance_intensity: A boolean indicating whether to include intensity variance
-        statistics in the pointcloud stats.
     :return: A list of column names representing the structure of statistics to be collected.
-        The columns include various statistical measures for each selected band and additional
-        statistics for point clouds if specified.
+        The columns include statistical measures for each selected band.
     """
     columns = ['segment_id']
 
@@ -92,18 +76,6 @@ def _create_empty_stats_columns(spectral_bands, textural_bands, calc_mean, calc_
         for stat, is_calculated in textural_stats.items():
             if is_calculated:
                 columns.append(f"b{band_index}_{stat}")
-
-    pointcloud_stats = {
-        "pai": calc_pai,
-        "fhd": calc_fhd,
-        "ch": calc_ch,
-        "mean_intensity": calc_mean_intensity,
-        "variance_intensity": calc_variance_intensity
-    }
-
-    for stat, is_calculated in pointcloud_stats.items():
-        if is_calculated:
-            columns.append(stat)
 
     columns.append('geometry')
 
@@ -298,116 +270,19 @@ def calculate_textural_stats(
     return stats_dict
 
 
-def calculate_structural_stats(
-        pointcloud, voxel_resolution, calc_pai=True, calc_fhd=True, calc_ch=True
-):
-    """
-    Calculate structural statistics from a point cloud.
-
-    This function computes structural statistics of a 3D point cloud, such as
-    plant area index (PAI), foliage height diversity (FHD), and canopy height (CH),
-    based on the given voxel resolution. The computation of each statistic is
-    conditional and can be controlled via corresponding boolean flags. The results
-    are returned in a dictionary format.
-
-    :param pointcloud: A 3D point cloud to analyze.
-    :type pointcloud: array-like
-    :param voxel_resolution: Resolution for voxel grid used in computations.
-    :type voxel_resolution: tuple or list
-    :param calc_pai: Flag to determine if plant area index (PAI) should be calculated.
-    :type calc_pai: bool, optional
-    :param calc_fhd: Flag to determine if foliage height diversity (FHD) should be calculated.
-    :type calc_fhd: bool, optional
-    :param calc_ch: Flag to determine if canopy height (CH) should be calculated.
-    :type calc_ch: bool, optional
-    :return: Dictionary containing the calculated statistics.
-    :rtype: dict
-    """
-    raise NotImplementedError(
-        "Structural statistics are temporarily disabled. "
-        "Point-cloud dependencies were removed and will be reintroduced later."
-    )
-
-
-def calculate_radiometric_stats(
-        pointcloud, calc_mean_intensity=True, calc_variance_intensity=True
-):
-    """
-    Calculate radiometric statistics from a point cloud data structure.
-
-    This function evaluates the mean and variance of intensity values
-    present in a point cloud dataset. The point cloud can be represented
-    either as a structured NumPy array or a dictionary, with intensity
-    data stored under the 'Intensity' field or key. Users can specify
-    whether to calculate the mean or variance of the intensity values,
-    or both, by setting the corresponding flags. If intensity data is
-    not available, the function returns NaN for the requested statistics.
-
-    :param pointcloud: A point cloud data containing intensity values,
-       represented as a structured numpy array or a dictionary.
-    :type pointcloud: numpy.ndarray or dict
-    :param calc_mean_intensity: Flag to determine whether to calculate
-       the mean of intensity values. Defaults to True.
-    :type calc_mean_intensity: bool, optional
-    :param calc_variance_intensity: Flag to determine whether to
-       calculate the variance of intensity values. Defaults to True.
-    :type calc_variance_intensity: bool, optional
-    :return: A dictionary containing the calculated statistics:
-       keys 'mean_intensity' and/or 'variance_intensity' with their
-       corresponding values or NaN if the intensity data is missing.
-    :rtype: dict
-    """
-    stats_dict = {}
-    if isinstance(pointcloud, np.ndarray) and pointcloud.dtype.names:
-        if 'Intensity' in pointcloud.dtype.names:
-            intensities = pointcloud['Intensity']
-        else:
-            intensities = None
-    elif isinstance(pointcloud, dict):
-        intensities = pointcloud.get('Intensity', None)
-    else:
-        intensities = None
-
-    if intensities is None:
-        if calc_mean_intensity:
-            stats_dict['mean_intensity'] = np.nan
-        if calc_variance_intensity:
-            stats_dict['variance_intensity'] = np.nan
-        return stats_dict
-
-    if intensities.size == 0:
-        if calc_mean_intensity:
-            stats_dict['mean_intensity'] = np.nan
-        if calc_variance_intensity:
-            stats_dict['variance_intensity'] = np.nan
-        return stats_dict
-
-    if calc_mean_intensity:
-        stats_dict['mean_intensity'] = np.mean(intensities)
-    if calc_variance_intensity:
-        stats_dict['variance_intensity'] = np.var(intensities)
-    return stats_dict
-
-
 def create_objects(
-        segments, image, ept=None, ept_srs=None, spectral_bands=None, textural_bands=None, voxel_resolution=None,
-        calculate_spectral=True, calculate_textural=True, calculate_structural=False, calculate_radiometric=False,
+        segments, image, spectral_bands=None, textural_bands=None,
+        calculate_spectral=True, calculate_textural=True,
         calc_mean=True, calc_variance=True, calc_min=True, calc_max=True, calc_skewness=True, calc_kurtosis=True,
-        calc_contrast=True, calc_dissimilarity=True, calc_homogeneity=True, calc_ASM=True, calc_energy=True, calc_correlation=True,
-        calc_pai=True, calc_fhd=True, calc_ch=True, calc_mean_intensity=True, calc_variance_intensity=True
+        calc_contrast=True, calc_dissimilarity=True, calc_homogeneity=True, calc_ASM=True, calc_energy=True, calc_correlation=True
 ):
     """
     :param segments: GeoDataFrame containing the segmented regions to be analyzed.
     :param image: Object containing image data and metadata to be used for analysis. Should have 'img_data' attribute as 3D NumPy array and 'crs' attribute.
-    :param ept: Optional; Path to the EPT (Entwine Point Tiles) point cloud data. Defaults to None.
-    :param ept_srs: Optional; Spatial reference system for the EPT data. Required if ept is provided. Defaults to None.
     :param spectral_bands: Optional; List of spectral bands to be used in the analysis. Defaults to all available bands.
     :param textural_bands: Optional; List of textural bands to be used in the analysis. Defaults to all available bands.
-    :param voxel_resolution: Optional; Voxel resolution for 3D point cloud data analysis. Required if ept is provided. Defaults to None.
     :param calculate_spectral: Boolean; Whether to calculate spectral statistics. Defaults to True.
     :param calculate_textural: Boolean; Whether to calculate textural statistics. Defaults to True.
-    :param calculate_structural: Boolean; Whether to calculate structural statistics using point cloud data. Defaults to False.
-    :param calculate_radiometric: Boolean; Whether to calculate radiometric statistics using point cloud data. Defaults to False.
     :param calc_mean: Boolean; Whether to calculate the mean of the pixel values. Defaults to True.
     :param calc_variance: Boolean; Whether to calculate the variance of the pixel values. Defaults to True.
     :param calc_min: Boolean; Whether to calculate the minimum of the pixel values. Defaults to True.
@@ -420,22 +295,11 @@ def create_objects(
     :param calc_ASM: Boolean; Whether to calculate the Angular Second Moment (ASM) for textural analysis. Defaults to True.
     :param calc_energy: Boolean; Whether to calculate the energy for textural analysis. Defaults to True.
     :param calc_correlation: Boolean; Whether to calculate the correlation for textural analysis. Defaults to True.
-    :param calc_pai: Boolean; Whether to calculate the Plant Area Index (PAI) from point cloud data. Defaults to True.
-    :param calc_fhd: Boolean; Whether to calculate the Foliage Height Diversity (FHD) from point cloud data. Defaults to True.
-    :param calc_ch: Boolean; Whether to calculate the Canopy Height (CH) from point cloud data. Defaults to True.
-    :param calc_mean_intensity: Boolean; Whether to calculate the mean intensity from point cloud data. Defaults to True.
-    :param calc_variance_intensity: Boolean; Whether to calculate the variance of intensity from point cloud data. Defaults to True.
     :return: GeoDataFrame containing the calculated statistics for each segment.
     """
-    if not (calculate_spectral or calculate_textural or calculate_structural or calculate_radiometric):
+    if not (calculate_spectral or calculate_textural):
         raise ValueError(
-            "At least one of 'calculate_spectral', 'calculate_textural', 'calculate_structural', or 'calculate_radiometric' must be True."
-        )
-
-    if ept is not None or calculate_structural or calculate_radiometric:
-        raise NotImplementedError(
-            "Point-cloud workflows are temporarily disabled. "
-            "Use spectral/textural statistics only for now."
+            "At least one of 'calculate_spectral' or 'calculate_textural' must be True."
         )
 
     if spectral_bands is None:
@@ -466,8 +330,7 @@ def create_objects(
     columns = _create_empty_stats_columns(
         spectral_bands, textural_bands,
         calc_mean, calc_variance, calc_min, calc_max, calc_skewness, calc_kurtosis,
-        calc_contrast, calc_dissimilarity, calc_homogeneity, calc_ASM, calc_energy, calc_correlation,
-        calc_pai, calc_fhd, calc_ch, calc_mean_intensity, calc_variance_intensity
+        calc_contrast, calc_dissimilarity, calc_homogeneity, calc_ASM, calc_energy, calc_correlation
     )
 
     results = []

@@ -15,7 +15,6 @@ def train_model(model, train_loader, num_epochs, device="cpu"):
     Args:
         model (nn.Module): The detection model (e.g., from build_detection_model).
         train_loader (DataLoader): DataLoader for training data.
-        val_loader (DataLoader): DataLoader for validation data (optional).
         num_epochs (int): Number of epochs to train.
         device (str): Device to use ("cpu", "cuda", or "mps").
 
