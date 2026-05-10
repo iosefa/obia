@@ -25,7 +25,8 @@ dependencies = [
   "scikit-learn>=1.4.2",
   "affine>=2.4.0",
   "pyproj>=3.6.1",
-  "shap>=0.46.0"
+  "opencv-python>=4.10",
+  "click>=8.1"
 ]
 classifiers = [
   "Programming Language :: Python :: 3",
@@ -35,11 +36,23 @@ classifiers = [
 
 [project.optional-dependencies]
 docs = [
-  "mkdocs>=1.6",
+  "mkdocs>=1.6,<2",
   "mkdocs-material>=9.5",
   "mkdocstrings[python]>=0.26",
   "mkdocs-jupyter>=0.24",
   "mkdocs-git-revision-date-localized-plugin>=1.2"
+]
+detection = [
+  "torch>=2.3",
+  "torchvision>=0.18",
+  "albumentations>=1.4",
+  "matplotlib>=3.8"
+]
+explain = [
+  "shap>=0.46.0"
+]
+test = [
+  "pytest>=7.4"
 ]
 
 [project.urls]
@@ -50,3 +63,6 @@ Issues = "https://github.com/iosefa/obia/issues"
 [tool.setuptools.packages.find]
 include = ["obia*"]
 exclude = ["notebooks*", "tests*", "archive*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

@@ -1,4 +1,3 @@
-import shap
 import numpy as np
 import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
@@ -102,6 +101,14 @@ def classify(segments, training_classes, acceptable_classes_gdf=None,
 
     classifier.fit(x_train, y_train)
     if compute_shap:
+        try:
+            import shap
+        except ImportError as exc:
+            raise ImportError(
+                "SHAP support requires the optional 'explain' dependencies. "
+                "Install with `pip install obia[explain]`."
+            ) from exc
+
         explainer = None
         if isinstance(classifier, RandomForestClassifier):
             explainer = shap.TreeExplainer(classifier)

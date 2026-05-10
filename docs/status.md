@@ -12,5 +12,6 @@ What is still in progress:
 - expanded tests and end-to-end examples
 - fuller API docs and polished tutorials
 - standardization of legacy interfaces and naming
+- optional dependency boundaries for heavier detection workflows
 
 If you find inconsistencies, open an issue in the repo and include the module path and traceback.

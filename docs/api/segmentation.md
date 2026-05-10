@@ -11,11 +11,3 @@
 ## `obia.segmentation.segment_statistics`
 
 ::: obia.segmentation.segment_statistics
-
-## `obia.segmentation.object_detection`
-
-::: obia.segmentation.object_detection
-
-## `obia.segmentation.models`
-
-::: obia.segmentation.models

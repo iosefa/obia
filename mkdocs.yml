@@ -12,12 +12,18 @@ theme:
     features:
         - navigation.instant
         - search.highlight
-    custom_dir: overrides
 
 plugins:
     - search
-    - mkdocstrings
-    - git-revision-date
+    - mkdocstrings:
+        handlers:
+            python:
+                options:
+                    docstring_style: google
+                    show_source: true
+                    show_root_heading: true
+                    show_symbol_type_heading: true
+    - git-revision-date-localized
     - mkdocs-jupyter:
         include_source: true
         execute: false
@@ -52,9 +58,6 @@ nav:
         - Detection: api/detection.md
         - Classification: api/classification.md
         - Utils: api/utils.md
-
-extra_css:
-    - overrides/custom.css
 
 extra_javascript:
  - https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.0/es5/tex-mml-chtml.js

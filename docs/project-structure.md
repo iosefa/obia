@@ -11,10 +11,10 @@
 ## Repository areas
 
 - `docs/`: MkDocs source files
-- `notebooks/`: exploratory notebooks
+- `docs/examples/`: maintained notebooks used by the documentation
 - `tests/`: test files
-- `main.py`, `pyproject.toml`: entry-point and packaging metadata
+- `pyproject.toml`: packaging metadata
 
 ## Cleanup note
 
-Legacy experimental material was previously under `scripts/` and has been removed as part of the repo cleanup.
+Legacy experimental material was previously under `scripts/`, `notebooks/`, and the repo root. It has been removed from the maintained package surface.

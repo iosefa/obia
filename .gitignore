@@ -159,21 +159,19 @@ cython_debug/
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 .idea/
 
-notebooks/data
-
-*.png
-*.gpkg
+# Local geospatial data and generated outputs
+notebooks/
 *.gpkg-shm
 *.gpkg-wal
-*.yaml
-*.tif
 *.laz
 *.las
-*.json
-*.jpeg
-*.jpg
-*.xml
 *.npy
+*.pth
+*.pt
+*.ckpt
+*.parquet
+*.pkl
+
 scripts/SAM copy
 archive/
 
@@ -182,8 +180,8 @@ archive/
 
 # Data directories and outputs
 data/
-notebooks/lightning_logs/
-notebooks/tiles/
+output_tiles*/
+lightning_logs/
 scripts/lightning_logs/
 scripts/SAM/backup/
 scripts/SAM/crowns/
@@ -201,11 +199,6 @@ scripts/SegmentationSAM/data/
 scripts/SegmentationSAM/training_crowns/
 scripts/SegmentationSAM/training_crowns_raw/
 
-# Model files and serialized artifacts
-*.pth
-*.pt
-*.ckpt
-*.parquet
-*.pkl
+# Serialized graph artifacts
 scripts/segments_graph.pkl*
 scripts/segments_labeled.parquet*

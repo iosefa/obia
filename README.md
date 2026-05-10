@@ -69,6 +69,8 @@ result.classified.to_file("classified_segments.gpkg")
 - docs source: `docs/`
 - example notebook: `docs/examples/segmentation-quickstart.ipynb`
 
+Exploratory notebooks and generated geospatial outputs are intentionally kept out of the maintained package surface.
+
 ## License
 
 MIT (`LICENSE`)
