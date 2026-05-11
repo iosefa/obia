@@ -6,7 +6,6 @@ import pandas as pd
 import rasterio
 import geopandas as gpd
 
-from osgeo import gdal
 from rasterio.features import rasterize
 from shapely import Polygon
 from shapely.geometry import box
@@ -14,6 +13,17 @@ from affine import Affine
 
 from obia.handlers.geotif import Image
 from obia.segmentation.segment_boundaries import create_segments
+
+
+def _require_gdal():
+    try:
+        from osgeo import gdal
+    except ImportError as exc:
+        raise ImportError(
+            "Tiled segmentation requires GDAL Python bindings. "
+            "Install GDAL through conda-forge or an environment with `osgeo.gdal`."
+        ) from exc
+    return gdal
 
 
 def get_raster_bbox(dataset):
@@ -76,6 +86,7 @@ def create_tiled_segments(input_raster, output_dir, input_mask=None,
     if method != "slic":
         raise ValueError("Currently, only the 'slic' method is supported for segmentation.")
     # buffer = buffer * 2
+    gdal = _require_gdal()
     dataset = gdal.Open(input_raster)
     if not dataset:
         raise ValueError(f"Unable to open {input_raster} or {input_mask}")

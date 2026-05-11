@@ -1,5 +1,5 @@
-site_name: obia
-site_url: https://github.com/iosefa/obia
+site_name: OBIA
+site_url: https://obia.sefa.ai
 repo_url: https://github.com/iosefa/obia
 
 theme:
@@ -11,19 +11,28 @@ theme:
         repo: fontawesome/brands/github
     features:
         - navigation.instant
+        - navigation.sections
         - search.highlight
-    custom_dir: overrides
+        - search.suggest
 
 plugins:
     - search
-    - mkdocstrings
-    - git-revision-date
+    - mkdocstrings:
+        handlers:
+            python:
+                options:
+                    docstring_style: google
+                    show_source: true
+                    show_root_heading: true
+                    show_symbol_type_heading: true
+    - git-revision-date-localized
     - mkdocs-jupyter:
         include_source: true
         execute: false
         ignore_h1_titles: true
 
 markdown_extensions:
+    - md_in_html
     - attr_list
     - pymdownx.superfences
     - pymdownx.arithmatex:
@@ -36,25 +45,26 @@ markdown_extensions:
 nav:
     - Home: index.md
     - Installation: installation.md
-    - Quickstart: quickstart.md
-    - Project Structure: project-structure.md
-    - Workflows: workflows.md
-    - Examples:
-        - Segmentation Quickstart: examples/segmentation-quickstart.ipynb
-    - Project Status: status.md
-    - Contributing: contributing.md
+    - Concepts: concepts.md
+    - Usage:
+        - Segmentation: usage/segmentation.md
+        - Classification: usage/classification.md
+        - Point Clouds: usage/pointcloud.md
+        - Large Rasters: usage/large-rasters.md
+        - Experimental Detection: usage/detection.md
+    - Development:
+        - Contributing: contributing.md
+        - Code of Conduct: code_of_conduct.md
     - Changelog: https://github.com/iosefa/obia/releases
     - Report Issues: https://github.com/iosefa/obia/issues
     - API Reference:
         - Overview: api/index.md
         - Handlers: api/handlers.md
         - Segmentation: api/segmentation.md
-        - Detection: api/detection.md
+        - Point Clouds: api/pointcloud.md
+        - Experimental Detection: api/detection.md
         - Classification: api/classification.md
         - Utils: api/utils.md
-
-extra_css:
-    - overrides/custom.css
 
 extra_javascript:
  - https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.0/es5/tex-mml-chtml.js

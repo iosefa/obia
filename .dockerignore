@@ -1,0 +1,15 @@
+.git
+.github
+.cache
+.pytest_cache
+*.egg-info
+__pycache__/
+*.py[cod]
+site/
+build/
+dist/
+docs/
+tests/
+notebooks/
+archive/
+data/

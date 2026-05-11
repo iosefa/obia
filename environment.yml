@@ -16,12 +16,20 @@ dependencies:
   - scikit-learn>=1.4.2
   - affine>=2.4.0
   - pyproj>=3.6.1
-  - shap>=0.46.0
+  - opencv
+  - gdal
+  - pdal
+  - python-pdal
   - pytorch
   - torchvision
+  - matplotlib>=3.8
   - mkdocs>=1.6
   - mkdocs-material>=9.5
+  - pytest>=7.4
   - pip:
+      - albumentations>=1.4
+      - pyforestscan
+      - shap>=0.46.0
       - mkdocstrings[python]>=0.26
       - mkdocs-jupyter>=0.24
       - mkdocs-git-revision-date-localized-plugin>=1.2

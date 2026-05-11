@@ -1,73 +1,150 @@
-# obia
+# OBIA
 
-`obia` is a Python library for object-based image analysis.
+[![PyPI](https://img.shields.io/pypi/v/obia.svg)](https://pypi.org/project/obia/)
+[![PyPI Downloads](https://static.pepy.tech/badge/obia)](https://pepy.tech/projects/obia)
+[![Docker Pulls](https://img.shields.io/docker/pulls/iosefa/obia?logo=docker&label=pulls)](https://hub.docker.com/r/iosefa/obia)
+[![Tests](https://img.shields.io/github/actions/workflow/status/iosefa/obia/tests.yml?branch=main&label=tests)](https://github.com/iosefa/obia/actions/workflows/tests.yml)
+[![Docs](https://img.shields.io/github/actions/workflow/status/iosefa/obia/docs.yml?branch=main&label=docs)](https://github.com/iosefa/obia/actions/workflows/docs.yml)
+[![Contributors](https://img.shields.io/github/contributors/iosefa/obia.svg?label=contributors)](https://github.com/iosefa/obia/graphs/contributors)
+[![License](https://img.shields.io/github/license/iosefa/obia)](https://github.com/iosefa/obia/blob/main/LICENSE)
 
-> Note: `obia` is under active development.
+Object-based image analysis tools for geospatial rasters.
 
-## Installation
+OBIA groups raster pixels into spatial objects, calculates object-level features, and supports downstream segment classification. The main output is a GeoDataFrame or GeoPackage of segment polygons with feature columns, optional point-cloud metrics, and predicted classes.
+
+Current scope:
+
+- GeoTIFF loading with Rasterio metadata preserved
+- SLIC and quickshift segmentation
+- segment-level spectral and texture features
+- optional point-cloud features joined to the same segment objects
+- point-to-segment labelling utilities
+- random forest and MLP segment classification
+- tiled SLIC utilities for large rasters
+- experimental RetinaNet-based detection modules
+
+## Install
+
+### From PyPI
 
 ```bash
+pip install obia
+```
+
+### Point-cloud support
+
+Point-cloud workflows need PDAL. Install PDAL with conda-forge first, then install OBIA with `pip` inside that environment:
+
+```bash
+conda create -n obia-pointcloud -c conda-forge python=3.11 pdal python-pdal
+conda activate obia-pointcloud
+pip install obia
+```
+
+### Docker
+
+Build the image from the repository root:
+
+```bash
+docker build -t obia .
+```
+
+Release images are published to Docker Hub as `iosefa/obia`:
+
+```bash
+docker pull iosefa/obia:latest
+```
+
+The image includes OBIA, PDAL, the PDAL Python bindings, and `pyforestscan`.
+
+### Developer install
+
+```bash
+git clone https://github.com/iosefa/obia.git
+cd obia
 conda env create -f environment.yml
 conda activate obia
 ```
 
-## Supported Algorithms
+The development environment installs the package in editable mode with documentation and optional workflow dependencies.
 
-Segmentation:
-
-- `slic`
-- `quickshift`
-
-Classification:
-
-- `rf` (Random Forest)
-- `mlp` (Multi-layer Perceptron)
-
-## Notable Features
-
-- Large-raster tiled segmentation for `slic` via `obia.utils.tiling.create_tiled_segments`
-- Seam-oriented tile handling for `slic` using overlap/buffer logic to reduce boundary artifacts
-- End-to-end segmentation + classification workflow using geospatial vector outputs (`GeoPackage`)
-
-## Quickstart (Segmentation + Classification)
+## Basic Segmentation
 
 ```python
 from obia.handlers.geotif import open_geotiff
 from obia.segmentation.segment import segment
-from obia.classification.classify import classify
-from obia.utils.utils import label_segments
-import geopandas as gpd
 
-img = open_geotiff("/path/to/image.tif")
-segments = segment(
-    img,
+image = open_geotiff("/path/to/image.tif")
+
+objects = segment(
+    image,
     segmentation_bands=[0, 1, 2],
+    statistics_bands=[0, 1, 2, 3],
     method="slic",
     n_segments=3000,
     compactness=10,
 )
 
-# Build training labels from points (must have a `class` column + geometry)
-labelled_points = gpd.read_file("/path/to/labelled_points.gpkg")
-training_classes, mixed_segments = label_segments(segments.segments, labelled_points)
-# training_classes now contains segment features + `feature_class`
+segments = objects.segments
+segments.to_file("segments.gpkg", driver="GPKG")
+```
 
-result = classify(
-    segments.segments,
-    training_classes,
-    method="rf",
-    n_estimators=300,
+## Point-Cloud Features
+
+```python
+from obia.pointcloud import add_pointcloud_features
+
+segments = add_pointcloud_features(
+    segments,
+    pointcloud="/path/to/points.laz",
+    metrics=["height", "intensity", "density"],
+)
+```
+
+Point-cloud features are appended as `pc_*` columns, so the enriched segment table can be labelled and classified with the raster-derived features.
+
+## Segment Classification
+
+```python
+import geopandas as gpd
+
+from obia.classification.classify import classify
+from obia.utils.utils import label_segments
+
+labelled_points = gpd.read_file("/path/to/labelled_points.gpkg")
+training_segments, mixed_segments = label_segments(
+    segments,
+    labelled_points,
 )
 
-segments.segments.to_file("segments.gpkg")
-training_classes.to_file("training_classes.gpkg")
-result.classified.to_file("classified_segments.gpkg")
+result = classify(
+    segments,
+    training_segments,
+    method="rf",
+    n_estimators=300,
+    random_state=42,
+)
+
+result.classified.to_file("classified_segments.gpkg", driver="GPKG")
 ```
 
 ## Documentation
 
-- docs source: `docs/`
-- example notebook: `docs/examples/segmentation-quickstart.ipynb`
+Published documentation is available at `https://obia.sefa.ai`.
+
+Preview the docs locally:
+
+```bash
+mkdocs serve
+```
+
+Open `http://127.0.0.1:8000`. If the port is already in use:
+
+```bash
+mkdocs serve -a 127.0.0.1:8001
+```
+
+Documentation source lives in `docs/`.
 
 ## License
 
