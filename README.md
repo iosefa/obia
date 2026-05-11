@@ -1,8 +1,16 @@
 # OBIA
 
+[![PyPI](https://img.shields.io/pypi/v/obia.svg)](https://pypi.org/project/obia/)
+[![PyPI Downloads](https://static.pepy.tech/badge/obia)](https://pepy.tech/projects/obia)
+[![Docker Pulls](https://img.shields.io/docker/pulls/iosefa/obia?logo=docker&label=pulls)](https://hub.docker.com/r/iosefa/obia)
+[![Tests](https://img.shields.io/github/actions/workflow/status/iosefa/obia/tests.yml?branch=main&label=tests)](https://github.com/iosefa/obia/actions/workflows/tests.yml)
+[![Docs](https://img.shields.io/github/actions/workflow/status/iosefa/obia/docs.yml?branch=main&label=docs)](https://github.com/iosefa/obia/actions/workflows/docs.yml)
+[![Contributors](https://img.shields.io/github/contributors/iosefa/obia.svg?label=contributors)](https://github.com/iosefa/obia/graphs/contributors)
+[![License](https://img.shields.io/github/license/iosefa/obia)](https://github.com/iosefa/obia/blob/main/LICENSE)
+
 Object-based image analysis tools for geospatial rasters.
 
-OBIA groups raster pixels into spatial objects, calculates object-level features, and supports downstream segment classification. The main output is a GeoDataFrame or GeoPackage of segment polygons with feature columns and predicted classes.
+OBIA groups raster pixels into spatial objects, calculates object-level features, and supports downstream segment classification. The main output is a GeoDataFrame or GeoPackage of segment polygons with feature columns, optional point-cloud metrics, and predicted classes.
 
 Current scope:
 
@@ -25,24 +33,13 @@ pip install obia
 
 ### Point-cloud support
 
-Point-cloud workflows need PDAL. Install PDAL with conda-forge first, then install OBIA with `pip`:
+Point-cloud workflows need PDAL. Install PDAL with conda-forge first, then install OBIA with `pip` inside that environment:
 
 ```bash
 conda create -n obia-pointcloud -c conda-forge python=3.11 pdal python-pdal
 conda activate obia-pointcloud
 pip install obia
 ```
-
-### Developer install
-
-```bash
-git clone https://github.com/iosefa/obia.git
-cd obia
-conda env create -f environment.yml
-conda activate obia
-```
-
-The development environment installs the package in editable mode with documentation and optional workflow dependencies.
 
 ### Docker
 
@@ -59,6 +56,17 @@ docker pull iosefa/obia:latest
 ```
 
 The image includes OBIA, PDAL, the PDAL Python bindings, and `pyforestscan`.
+
+### Developer install
+
+```bash
+git clone https://github.com/iosefa/obia.git
+cd obia
+conda env create -f environment.yml
+conda activate obia
+```
+
+The development environment installs the package in editable mode with documentation and optional workflow dependencies.
 
 ## Basic Segmentation
 
@@ -121,6 +129,8 @@ result.classified.to_file("classified_segments.gpkg", driver="GPKG")
 ```
 
 ## Documentation
+
+Published documentation is available at `https://obia.sefa.ai`.
 
 Preview the docs locally:
 
