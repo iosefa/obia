@@ -1,5 +1,5 @@
-site_name: obia
-site_url: https://github.com/iosefa/obia
+site_name: OBIA
+site_url: https://obia.sefa.ai
 repo_url: https://github.com/iosefa/obia
 
 theme:
@@ -11,7 +11,9 @@ theme:
         repo: fontawesome/brands/github
     features:
         - navigation.instant
+        - navigation.sections
         - search.highlight
+        - search.suggest
 
 plugins:
     - search

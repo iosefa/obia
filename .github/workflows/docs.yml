@@ -1,26 +1,22 @@
-name: Docs
+name: Build and Deploy Docs
 
 on:
-  pull_request:
-    paths:
-      - "docs/**"
-      - "obia/**"
-      - "mkdocs.yml"
-      - "pyproject.toml"
-      - ".github/workflows/docs.yml"
   push:
     branches:
       - main
     paths:
-      - "docs/**"
       - "obia/**"
+      - "docs/**"
       - "mkdocs.yml"
       - "pyproject.toml"
       - ".github/workflows/docs.yml"
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
-  mkdocs:
+  docs:
     runs-on: ubuntu-latest
 
     steps:
@@ -30,13 +26,19 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
-          cache: pip
+          python-version: "3.x"
 
-      - name: Install docs dependencies
+      - name: Install package and docs dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -e ".[docs,detection]"
 
-      - name: Build docs
+      - name: Build MkDocs site
         run: mkdocs build --strict
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./site
+          cname: obia.sefa.ai

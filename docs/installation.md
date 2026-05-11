@@ -66,6 +66,36 @@ Install experimental object-detection dependencies with:
 pip install "obia[detection]"
 ```
 
+## Docker
+
+Build the image from the repository root:
+
+```bash
+docker build -t obia .
+```
+
+Release images are published to Docker Hub as `iosefa/obia`:
+
+```bash
+docker pull iosefa/obia:latest
+```
+
+The Docker image includes OBIA, PDAL, the PDAL Python bindings, and `pyforestscan`.
+
+Start a Python session inside the image:
+
+```bash
+docker run --rm -it obia
+```
+
+Mount a local data directory when working with rasters, vectors, or point clouds:
+
+```bash
+docker run --rm -it \
+  -v "$PWD:/data" \
+  obia
+```
+
 ## Developer Install
 
 For local development, clone the repository and create the conda environment:

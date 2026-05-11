@@ -44,6 +44,22 @@ conda activate obia
 
 The development environment installs the package in editable mode with documentation and optional workflow dependencies.
 
+### Docker
+
+Build the image from the repository root:
+
+```bash
+docker build -t obia .
+```
+
+Release images are published to Docker Hub as `iosefa/obia`:
+
+```bash
+docker pull iosefa/obia:latest
+```
+
+The image includes OBIA, PDAL, the PDAL Python bindings, and `pyforestscan`.
+
 ## Basic Segmentation
 
 ```python
