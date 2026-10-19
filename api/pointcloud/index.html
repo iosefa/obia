@@ -21,7 +21,7 @@
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
     
     
       
@@ -29,7 +29,7 @@
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.ec1eaa64.min.css">
       
         
         <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
@@ -1650,7 +1650,7 @@
 
 
 <h3 id="obia.pointcloud.add_pointcloud_features" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <code class="highlight language-python"><span class="n">add_pointcloud_features</span><span class="p">(</span><span class="n">segments</span><span class="p">,</span> <span class="n">pointcloud</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">metrics</span><span class="o">=</span><span class="n">DEFAULT_METRICS</span><span class="p">,</span> <span class="n">crs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">reader</span><span class="o">=</span><span class="s1">&#39;auto&#39;</span><span class="p">,</span> <span class="n">predicate</span><span class="o">=</span><span class="s1">&#39;within&#39;</span><span class="p">)</span></code>
+<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <code class="highlight language-python"><span class="n">add_pointcloud_features</span><span class="p">(</span><span class="n">segments</span><span class="p">,</span> <span class="n">pointcloud</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">metrics</span><span class="o">=</span><span class="n">DEFAULT_METRICS</span><span class="p">,</span> <span class="n">crs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">reader</span><span class="o">=</span><span class="s1">'auto'</span><span class="p">,</span> <span class="n">predicate</span><span class="o">=</span><span class="s1">'within'</span><span class="p">)</span></code>
 
 <a href="#obia.pointcloud.add_pointcloud_features" class="headerlink" title="Permanent link">&para;</a></h3>
 
@@ -1764,10 +1764,10 @@ predicate:
     <span class="o">*</span><span class="p">,</span>
     <span class="n">metrics</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">DEFAULT_METRICS</span><span class="p">,</span>
     <span class="n">crs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-    <span class="n">reader</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;auto&quot;</span><span class="p">,</span>
-    <span class="n">predicate</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;within&quot;</span><span class="p">,</span>
+    <span class="n">reader</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"auto"</span><span class="p">,</span>
+    <span class="n">predicate</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"within"</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Add point-cloud features to segment objects.</span>
+<span class="w">    </span><span class="sd">"""Add point-cloud features to segment objects.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -1778,19 +1778,19 @@ predicate:
 <span class="sd">        LAS/LAZ path or in-memory point cloud. Path inputs require optional</span>
 <span class="sd">        pointcloud dependencies.</span>
 <span class="sd">    metrics:</span>
-<span class="sd">        Feature groups to calculate: ``&quot;height&quot;``, ``&quot;intensity&quot;``, and</span>
-<span class="sd">        ``&quot;density&quot;``.</span>
+<span class="sd">        Feature groups to calculate: ``"height"``, ``"intensity"``, and</span>
+<span class="sd">        ``"density"``.</span>
 <span class="sd">    crs:</span>
 <span class="sd">        CRS assigned to point clouds that do not already have one.</span>
 <span class="sd">    reader:</span>
-<span class="sd">        Backend for path inputs: ``&quot;auto&quot;``, ``&quot;pdal&quot;``, or ``&quot;pyforestscan&quot;``.</span>
+<span class="sd">        Backend for path inputs: ``"auto"``, ``"pdal"``, or ``"pyforestscan"``.</span>
 <span class="sd">    predicate:</span>
 <span class="sd">        Spatial join predicate used to attach points to polygons.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="n">segments</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">segments</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
     <span class="k">if</span> <span class="n">segments</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;segments must have an active geometry column&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"segments must have an active geometry column"</span><span class="p">)</span>
 
     <span class="n">points</span> <span class="o">=</span> <span class="n">read_pointcloud</span><span class="p">(</span><span class="n">pointcloud</span><span class="p">,</span> <span class="n">crs</span><span class="o">=</span><span class="n">crs</span> <span class="ow">or</span> <span class="n">segments</span><span class="o">.</span><span class="n">crs</span><span class="p">,</span> <span class="n">reader</span><span class="o">=</span><span class="n">reader</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">points</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
@@ -1802,8 +1802,8 @@ predicate:
         <span class="k">elif</span> <span class="n">points</span><span class="o">.</span><span class="n">crs</span> <span class="o">!=</span> <span class="n">segments</span><span class="o">.</span><span class="n">crs</span><span class="p">:</span>
             <span class="n">points</span> <span class="o">=</span> <span class="n">points</span><span class="o">.</span><span class="n">to_crs</span><span class="p">(</span><span class="n">segments</span><span class="o">.</span><span class="n">crs</span><span class="p">)</span>
 
-    <span class="n">segment_index_name</span> <span class="o">=</span> <span class="s2">&quot;__obia_segment_index&quot;</span>
-    <span class="n">point_index_name</span> <span class="o">=</span> <span class="s2">&quot;__obia_point_index&quot;</span>
+    <span class="n">segment_index_name</span> <span class="o">=</span> <span class="s2">"__obia_segment_index"</span>
+    <span class="n">point_index_name</span> <span class="o">=</span> <span class="s2">"__obia_point_index"</span>
 
     <span class="n">segment_table</span> <span class="o">=</span> <span class="n">segments</span><span class="p">[[</span><span class="n">segments</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">name</span><span class="p">]]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
     <span class="n">segment_table</span><span class="p">[</span><span class="n">segment_index_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">segments</span><span class="o">.</span><span class="n">index</span>
@@ -1814,7 +1814,7 @@ predicate:
     <span class="n">joined</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">sjoin</span><span class="p">(</span>
         <span class="n">point_table</span><span class="p">,</span>
         <span class="n">segment_table</span><span class="p">,</span>
-        <span class="n">how</span><span class="o">=</span><span class="s2">&quot;inner&quot;</span><span class="p">,</span>
+        <span class="n">how</span><span class="o">=</span><span class="s2">"inner"</span><span class="p">,</span>
         <span class="n">predicate</span><span class="o">=</span><span class="n">predicate</span><span class="p">,</span>
     <span class="p">)</span>
 
@@ -1837,7 +1837,7 @@ predicate:
         <span class="k">for</span> <span class="n">column</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">features</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="n">output</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">segment_index</span><span class="p">,</span> <span class="n">column</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
 
-    <span class="n">output</span><span class="p">[</span><span class="s2">&quot;pc_point_count&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">output</span><span class="p">[</span><span class="s2">&quot;pc_point_count&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+    <span class="n">output</span><span class="p">[</span><span class="s2">"pc_point_count"</span><span class="p">]</span> <span class="o">=</span> <span class="n">output</span><span class="p">[</span><span class="s2">"pc_point_count"</span><span class="p">]</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">output</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -1849,7 +1849,7 @@ predicate:
 
 
 <h3 id="obia.pointcloud.calculate_pointcloud_features" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <code class="highlight language-python"><span class="n">calculate_pointcloud_features</span><span class="p">(</span><span class="n">points</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">metrics</span><span class="o">=</span><span class="n">DEFAULT_METRICS</span><span class="p">,</span> <span class="n">area</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">height_column</span><span class="o">=</span><span class="s1">&#39;z&#39;</span><span class="p">,</span> <span class="n">intensity_column</span><span class="o">=</span><span class="s1">&#39;intensity&#39;</span><span class="p">)</span></code>
+<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <code class="highlight language-python"><span class="n">calculate_pointcloud_features</span><span class="p">(</span><span class="n">points</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">metrics</span><span class="o">=</span><span class="n">DEFAULT_METRICS</span><span class="p">,</span> <span class="n">area</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">height_column</span><span class="o">=</span><span class="s1">'z'</span><span class="p">,</span> <span class="n">intensity_column</span><span class="o">=</span><span class="s1">'intensity'</span><span class="p">)</span></code>
 
 <a href="#obia.pointcloud.calculate_pointcloud_features" class="headerlink" title="Permanent link">&para;</a></h3>
 
@@ -1925,10 +1925,10 @@ intensity_column:
     <span class="o">*</span><span class="p">,</span>
     <span class="n">metrics</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">DEFAULT_METRICS</span><span class="p">,</span>
     <span class="n">area</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">height_column</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;z&quot;</span><span class="p">,</span>
-    <span class="n">intensity_column</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;intensity&quot;</span><span class="p">,</span>
+    <span class="n">height_column</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"z"</span><span class="p">,</span>
+    <span class="n">intensity_column</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"intensity"</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate point-cloud features for one segment.</span>
+<span class="w">    </span><span class="sd">"""Calculate point-cloud features for one segment.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -1936,34 +1936,34 @@ intensity_column:
 <span class="sd">        Points inside one segment. The table may contain ``z`` and</span>
 <span class="sd">        ``intensity`` columns.</span>
 <span class="sd">    metrics:</span>
-<span class="sd">        Feature groups to calculate. Supported values are ``&quot;height&quot;``,</span>
-<span class="sd">        ``&quot;intensity&quot;``, and ``&quot;density&quot;``.</span>
+<span class="sd">        Feature groups to calculate. Supported values are ``"height"``,</span>
+<span class="sd">        ``"intensity"``, and ``"density"``.</span>
 <span class="sd">    area:</span>
 <span class="sd">        Segment area in CRS units squared. Required for density.</span>
 <span class="sd">    height_column:</span>
 <span class="sd">        Column used for height metrics.</span>
 <span class="sd">    intensity_column:</span>
 <span class="sd">        Column used for intensity metrics.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">metric_set</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">metrics</span><span class="p">)</span>
     <span class="n">unknown</span> <span class="o">=</span> <span class="n">metric_set</span><span class="o">.</span><span class="n">difference</span><span class="p">(</span><span class="n">DEFAULT_METRICS</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">unknown</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown point-cloud metrics: </span><span class="si">{</span><span class="nb">sorted</span><span class="p">(</span><span class="n">unknown</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Unknown point-cloud metrics: </span><span class="si">{</span><span class="nb">sorted</span><span class="p">(</span><span class="n">unknown</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
-    <span class="n">features</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;pc_point_count&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">points</span><span class="p">))}</span>
+    <span class="n">features</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"pc_point_count"</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">points</span><span class="p">))}</span>
 
-    <span class="k">if</span> <span class="s2">&quot;density&quot;</span> <span class="ow">in</span> <span class="n">metric_set</span><span class="p">:</span>
+    <span class="k">if</span> <span class="s2">"density"</span> <span class="ow">in</span> <span class="n">metric_set</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">area</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">area</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">features</span><span class="p">[</span><span class="s2">&quot;pc_density&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+            <span class="n">features</span><span class="p">[</span><span class="s2">"pc_density"</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">features</span><span class="p">[</span><span class="s2">&quot;pc_density&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">points</span><span class="p">)</span> <span class="o">/</span> <span class="n">area</span><span class="p">)</span>
+            <span class="n">features</span><span class="p">[</span><span class="s2">"pc_density"</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">points</span><span class="p">)</span> <span class="o">/</span> <span class="n">area</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="s2">&quot;height&quot;</span> <span class="ow">in</span> <span class="n">metric_set</span><span class="p">:</span>
-        <span class="n">features</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">_numeric_series_features</span><span class="p">(</span><span class="n">points</span><span class="p">,</span> <span class="n">height_column</span><span class="p">,</span> <span class="s2">&quot;pc_z&quot;</span><span class="p">,</span> <span class="n">HEIGHT_PERCENTILES</span><span class="p">))</span>
+    <span class="k">if</span> <span class="s2">"height"</span> <span class="ow">in</span> <span class="n">metric_set</span><span class="p">:</span>
+        <span class="n">features</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">_numeric_series_features</span><span class="p">(</span><span class="n">points</span><span class="p">,</span> <span class="n">height_column</span><span class="p">,</span> <span class="s2">"pc_z"</span><span class="p">,</span> <span class="n">HEIGHT_PERCENTILES</span><span class="p">))</span>
 
-    <span class="k">if</span> <span class="s2">&quot;intensity&quot;</span> <span class="ow">in</span> <span class="n">metric_set</span><span class="p">:</span>
+    <span class="k">if</span> <span class="s2">"intensity"</span> <span class="ow">in</span> <span class="n">metric_set</span><span class="p">:</span>
         <span class="n">features</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
-            <span class="n">_numeric_series_features</span><span class="p">(</span><span class="n">points</span><span class="p">,</span> <span class="n">intensity_column</span><span class="p">,</span> <span class="s2">&quot;pc_intensity&quot;</span><span class="p">,</span> <span class="n">INTENSITY_PERCENTILES</span><span class="p">)</span>
+            <span class="n">_numeric_series_features</span><span class="p">(</span><span class="n">points</span><span class="p">,</span> <span class="n">intensity_column</span><span class="p">,</span> <span class="s2">"pc_intensity"</span><span class="p">,</span> <span class="n">INTENSITY_PERCENTILES</span><span class="p">)</span>
         <span class="p">)</span>
 
     <span class="k">return</span> <span class="n">features</span>
@@ -1977,7 +1977,7 @@ intensity_column:
 
 
 <h3 id="obia.pointcloud.read_pointcloud" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <code class="highlight language-python"><span class="n">read_pointcloud</span><span class="p">(</span><span class="n">pointcloud</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">crs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">reader</span><span class="o">=</span><span class="s1">&#39;auto&#39;</span><span class="p">)</span></code>
+<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <code class="highlight language-python"><span class="n">read_pointcloud</span><span class="p">(</span><span class="n">pointcloud</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">crs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">reader</span><span class="o">=</span><span class="s1">'auto'</span><span class="p">)</span></code>
 
 <a href="#obia.pointcloud.read_pointcloud" class="headerlink" title="Permanent link">&para;</a></h3>
 
@@ -2042,9 +2042,9 @@ reader:
     <span class="n">pointcloud</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Path</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span> <span class="o">|</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">crs</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">reader</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;auto&quot;</span><span class="p">,</span>
+    <span class="n">reader</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"auto"</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return point-cloud data as a point GeoDataFrame.</span>
+<span class="w">    </span><span class="sd">"""Return point-cloud data as a point GeoDataFrame.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -2056,9 +2056,9 @@ reader:
 <span class="sd">        CRS alignment with segment polygons is checked later by</span>
 <span class="sd">        ``add_pointcloud_features``.</span>
 <span class="sd">    reader:</span>
-<span class="sd">        Reader used for path inputs. ``&quot;auto&quot;`` tries PDAL first and then</span>
-<span class="sd">        pyforestscan. ``&quot;pdal&quot;`` and ``&quot;pyforestscan&quot;`` force one backend.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">        Reader used for path inputs. ``"auto"`` tries PDAL first and then</span>
+<span class="sd">        pyforestscan. ``"pdal"`` and ``"pyforestscan"`` force one backend.</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">pointcloud</span><span class="p">,</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">):</span>
         <span class="n">gdf</span> <span class="o">=</span> <span class="n">pointcloud</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">gdf</span><span class="o">.</span><span class="n">crs</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">crs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -2075,7 +2075,7 @@ reader:
         <span class="k">return</span> <span class="n">_read_pointcloud_path</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">pointcloud</span><span class="p">),</span> <span class="n">crs</span><span class="o">=</span><span class="n">crs</span><span class="p">,</span> <span class="n">reader</span><span class="o">=</span><span class="n">reader</span><span class="p">)</span>
 
     <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-        <span class="s2">&quot;pointcloud must be a path, NumPy array, pandas DataFrame, or GeoDataFrame&quot;</span>
+        <span class="s2">"pointcloud must be a path, NumPy array, pandas DataFrame, or GeoDataFrame"</span>
     <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -2134,7 +2134,7 @@ environments.</p>
 
 
 <h3 id="obia.pointcloud.io.read_pointcloud" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <code class="highlight language-python"><span class="n">read_pointcloud</span><span class="p">(</span><span class="n">pointcloud</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">crs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">reader</span><span class="o">=</span><span class="s1">&#39;auto&#39;</span><span class="p">)</span></code>
+<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <code class="highlight language-python"><span class="n">read_pointcloud</span><span class="p">(</span><span class="n">pointcloud</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">crs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">reader</span><span class="o">=</span><span class="s1">'auto'</span><span class="p">)</span></code>
 
 <a href="#obia.pointcloud.io.read_pointcloud" class="headerlink" title="Permanent link">&para;</a></h3>
 
@@ -2199,9 +2199,9 @@ reader:
     <span class="n">pointcloud</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Path</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span> <span class="o">|</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">crs</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">reader</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;auto&quot;</span><span class="p">,</span>
+    <span class="n">reader</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"auto"</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return point-cloud data as a point GeoDataFrame.</span>
+<span class="w">    </span><span class="sd">"""Return point-cloud data as a point GeoDataFrame.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -2213,9 +2213,9 @@ reader:
 <span class="sd">        CRS alignment with segment polygons is checked later by</span>
 <span class="sd">        ``add_pointcloud_features``.</span>
 <span class="sd">    reader:</span>
-<span class="sd">        Reader used for path inputs. ``&quot;auto&quot;`` tries PDAL first and then</span>
-<span class="sd">        pyforestscan. ``&quot;pdal&quot;`` and ``&quot;pyforestscan&quot;`` force one backend.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">        Reader used for path inputs. ``"auto"`` tries PDAL first and then</span>
+<span class="sd">        pyforestscan. ``"pdal"`` and ``"pyforestscan"`` force one backend.</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">pointcloud</span><span class="p">,</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">):</span>
         <span class="n">gdf</span> <span class="o">=</span> <span class="n">pointcloud</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">gdf</span><span class="o">.</span><span class="n">crs</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">crs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -2232,7 +2232,7 @@ reader:
         <span class="k">return</span> <span class="n">_read_pointcloud_path</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">pointcloud</span><span class="p">),</span> <span class="n">crs</span><span class="o">=</span><span class="n">crs</span><span class="p">,</span> <span class="n">reader</span><span class="o">=</span><span class="n">reader</span><span class="p">)</span>
 
     <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-        <span class="s2">&quot;pointcloud must be a path, NumPy array, pandas DataFrame, or GeoDataFrame&quot;</span>
+        <span class="s2">"pointcloud must be a path, NumPy array, pandas DataFrame, or GeoDataFrame"</span>
     <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -2287,7 +2287,7 @@ reader:
 
 
 <h3 id="obia.pointcloud.features.calculate_pointcloud_features" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <code class="highlight language-python"><span class="n">calculate_pointcloud_features</span><span class="p">(</span><span class="n">points</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">metrics</span><span class="o">=</span><span class="n">DEFAULT_METRICS</span><span class="p">,</span> <span class="n">area</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">height_column</span><span class="o">=</span><span class="s1">&#39;z&#39;</span><span class="p">,</span> <span class="n">intensity_column</span><span class="o">=</span><span class="s1">&#39;intensity&#39;</span><span class="p">)</span></code>
+<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <code class="highlight language-python"><span class="n">calculate_pointcloud_features</span><span class="p">(</span><span class="n">points</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">metrics</span><span class="o">=</span><span class="n">DEFAULT_METRICS</span><span class="p">,</span> <span class="n">area</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">height_column</span><span class="o">=</span><span class="s1">'z'</span><span class="p">,</span> <span class="n">intensity_column</span><span class="o">=</span><span class="s1">'intensity'</span><span class="p">)</span></code>
 
 <a href="#obia.pointcloud.features.calculate_pointcloud_features" class="headerlink" title="Permanent link">&para;</a></h3>
 
@@ -2363,10 +2363,10 @@ intensity_column:
     <span class="o">*</span><span class="p">,</span>
     <span class="n">metrics</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">DEFAULT_METRICS</span><span class="p">,</span>
     <span class="n">area</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">height_column</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;z&quot;</span><span class="p">,</span>
-    <span class="n">intensity_column</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;intensity&quot;</span><span class="p">,</span>
+    <span class="n">height_column</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"z"</span><span class="p">,</span>
+    <span class="n">intensity_column</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"intensity"</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate point-cloud features for one segment.</span>
+<span class="w">    </span><span class="sd">"""Calculate point-cloud features for one segment.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -2374,34 +2374,34 @@ intensity_column:
 <span class="sd">        Points inside one segment. The table may contain ``z`` and</span>
 <span class="sd">        ``intensity`` columns.</span>
 <span class="sd">    metrics:</span>
-<span class="sd">        Feature groups to calculate. Supported values are ``&quot;height&quot;``,</span>
-<span class="sd">        ``&quot;intensity&quot;``, and ``&quot;density&quot;``.</span>
+<span class="sd">        Feature groups to calculate. Supported values are ``"height"``,</span>
+<span class="sd">        ``"intensity"``, and ``"density"``.</span>
 <span class="sd">    area:</span>
 <span class="sd">        Segment area in CRS units squared. Required for density.</span>
 <span class="sd">    height_column:</span>
 <span class="sd">        Column used for height metrics.</span>
 <span class="sd">    intensity_column:</span>
 <span class="sd">        Column used for intensity metrics.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">metric_set</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">metrics</span><span class="p">)</span>
     <span class="n">unknown</span> <span class="o">=</span> <span class="n">metric_set</span><span class="o">.</span><span class="n">difference</span><span class="p">(</span><span class="n">DEFAULT_METRICS</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">unknown</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown point-cloud metrics: </span><span class="si">{</span><span class="nb">sorted</span><span class="p">(</span><span class="n">unknown</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Unknown point-cloud metrics: </span><span class="si">{</span><span class="nb">sorted</span><span class="p">(</span><span class="n">unknown</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
-    <span class="n">features</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;pc_point_count&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">points</span><span class="p">))}</span>
+    <span class="n">features</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"pc_point_count"</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">points</span><span class="p">))}</span>
 
-    <span class="k">if</span> <span class="s2">&quot;density&quot;</span> <span class="ow">in</span> <span class="n">metric_set</span><span class="p">:</span>
+    <span class="k">if</span> <span class="s2">"density"</span> <span class="ow">in</span> <span class="n">metric_set</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">area</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">area</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">features</span><span class="p">[</span><span class="s2">&quot;pc_density&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+            <span class="n">features</span><span class="p">[</span><span class="s2">"pc_density"</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">features</span><span class="p">[</span><span class="s2">&quot;pc_density&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">points</span><span class="p">)</span> <span class="o">/</span> <span class="n">area</span><span class="p">)</span>
+            <span class="n">features</span><span class="p">[</span><span class="s2">"pc_density"</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">points</span><span class="p">)</span> <span class="o">/</span> <span class="n">area</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="s2">&quot;height&quot;</span> <span class="ow">in</span> <span class="n">metric_set</span><span class="p">:</span>
-        <span class="n">features</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">_numeric_series_features</span><span class="p">(</span><span class="n">points</span><span class="p">,</span> <span class="n">height_column</span><span class="p">,</span> <span class="s2">&quot;pc_z&quot;</span><span class="p">,</span> <span class="n">HEIGHT_PERCENTILES</span><span class="p">))</span>
+    <span class="k">if</span> <span class="s2">"height"</span> <span class="ow">in</span> <span class="n">metric_set</span><span class="p">:</span>
+        <span class="n">features</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">_numeric_series_features</span><span class="p">(</span><span class="n">points</span><span class="p">,</span> <span class="n">height_column</span><span class="p">,</span> <span class="s2">"pc_z"</span><span class="p">,</span> <span class="n">HEIGHT_PERCENTILES</span><span class="p">))</span>
 
-    <span class="k">if</span> <span class="s2">&quot;intensity&quot;</span> <span class="ow">in</span> <span class="n">metric_set</span><span class="p">:</span>
+    <span class="k">if</span> <span class="s2">"intensity"</span> <span class="ow">in</span> <span class="n">metric_set</span><span class="p">:</span>
         <span class="n">features</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
-            <span class="n">_numeric_series_features</span><span class="p">(</span><span class="n">points</span><span class="p">,</span> <span class="n">intensity_column</span><span class="p">,</span> <span class="s2">&quot;pc_intensity&quot;</span><span class="p">,</span> <span class="n">INTENSITY_PERCENTILES</span><span class="p">)</span>
+            <span class="n">_numeric_series_features</span><span class="p">(</span><span class="n">points</span><span class="p">,</span> <span class="n">intensity_column</span><span class="p">,</span> <span class="s2">"pc_intensity"</span><span class="p">,</span> <span class="n">INTENSITY_PERCENTILES</span><span class="p">)</span>
         <span class="p">)</span>
 
     <span class="k">return</span> <span class="n">features</span>
@@ -2436,7 +2436,7 @@ intensity_column:
     <span class="o">*</span><span class="p">,</span>
     <span class="n">metrics</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">DEFAULT_METRICS</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return a feature dictionary filled with empty values.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Return a feature dictionary filled with empty values."""</span>
     <span class="k">return</span> <span class="n">calculate_pointcloud_features</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(),</span> <span class="n">metrics</span><span class="o">=</span><span class="n">metrics</span><span class="p">,</span> <span class="n">area</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -2491,7 +2491,7 @@ intensity_column:
 
 
 <h3 id="obia.pointcloud.segment_features.add_pointcloud_features" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <code class="highlight language-python"><span class="n">add_pointcloud_features</span><span class="p">(</span><span class="n">segments</span><span class="p">,</span> <span class="n">pointcloud</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">metrics</span><span class="o">=</span><span class="n">DEFAULT_METRICS</span><span class="p">,</span> <span class="n">crs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">reader</span><span class="o">=</span><span class="s1">&#39;auto&#39;</span><span class="p">,</span> <span class="n">predicate</span><span class="o">=</span><span class="s1">&#39;within&#39;</span><span class="p">)</span></code>
+<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <code class="highlight language-python"><span class="n">add_pointcloud_features</span><span class="p">(</span><span class="n">segments</span><span class="p">,</span> <span class="n">pointcloud</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">metrics</span><span class="o">=</span><span class="n">DEFAULT_METRICS</span><span class="p">,</span> <span class="n">crs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">reader</span><span class="o">=</span><span class="s1">'auto'</span><span class="p">,</span> <span class="n">predicate</span><span class="o">=</span><span class="s1">'within'</span><span class="p">)</span></code>
 
 <a href="#obia.pointcloud.segment_features.add_pointcloud_features" class="headerlink" title="Permanent link">&para;</a></h3>
 
@@ -2605,10 +2605,10 @@ predicate:
     <span class="o">*</span><span class="p">,</span>
     <span class="n">metrics</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">DEFAULT_METRICS</span><span class="p">,</span>
     <span class="n">crs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-    <span class="n">reader</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;auto&quot;</span><span class="p">,</span>
-    <span class="n">predicate</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;within&quot;</span><span class="p">,</span>
+    <span class="n">reader</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"auto"</span><span class="p">,</span>
+    <span class="n">predicate</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"within"</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Add point-cloud features to segment objects.</span>
+<span class="w">    </span><span class="sd">"""Add point-cloud features to segment objects.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -2619,19 +2619,19 @@ predicate:
 <span class="sd">        LAS/LAZ path or in-memory point cloud. Path inputs require optional</span>
 <span class="sd">        pointcloud dependencies.</span>
 <span class="sd">    metrics:</span>
-<span class="sd">        Feature groups to calculate: ``&quot;height&quot;``, ``&quot;intensity&quot;``, and</span>
-<span class="sd">        ``&quot;density&quot;``.</span>
+<span class="sd">        Feature groups to calculate: ``"height"``, ``"intensity"``, and</span>
+<span class="sd">        ``"density"``.</span>
 <span class="sd">    crs:</span>
 <span class="sd">        CRS assigned to point clouds that do not already have one.</span>
 <span class="sd">    reader:</span>
-<span class="sd">        Backend for path inputs: ``&quot;auto&quot;``, ``&quot;pdal&quot;``, or ``&quot;pyforestscan&quot;``.</span>
+<span class="sd">        Backend for path inputs: ``"auto"``, ``"pdal"``, or ``"pyforestscan"``.</span>
 <span class="sd">    predicate:</span>
 <span class="sd">        Spatial join predicate used to attach points to polygons.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="n">segments</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">segments</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
     <span class="k">if</span> <span class="n">segments</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;segments must have an active geometry column&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"segments must have an active geometry column"</span><span class="p">)</span>
 
     <span class="n">points</span> <span class="o">=</span> <span class="n">read_pointcloud</span><span class="p">(</span><span class="n">pointcloud</span><span class="p">,</span> <span class="n">crs</span><span class="o">=</span><span class="n">crs</span> <span class="ow">or</span> <span class="n">segments</span><span class="o">.</span><span class="n">crs</span><span class="p">,</span> <span class="n">reader</span><span class="o">=</span><span class="n">reader</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">points</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
@@ -2643,8 +2643,8 @@ predicate:
         <span class="k">elif</span> <span class="n">points</span><span class="o">.</span><span class="n">crs</span> <span class="o">!=</span> <span class="n">segments</span><span class="o">.</span><span class="n">crs</span><span class="p">:</span>
             <span class="n">points</span> <span class="o">=</span> <span class="n">points</span><span class="o">.</span><span class="n">to_crs</span><span class="p">(</span><span class="n">segments</span><span class="o">.</span><span class="n">crs</span><span class="p">)</span>
 
-    <span class="n">segment_index_name</span> <span class="o">=</span> <span class="s2">&quot;__obia_segment_index&quot;</span>
-    <span class="n">point_index_name</span> <span class="o">=</span> <span class="s2">&quot;__obia_point_index&quot;</span>
+    <span class="n">segment_index_name</span> <span class="o">=</span> <span class="s2">"__obia_segment_index"</span>
+    <span class="n">point_index_name</span> <span class="o">=</span> <span class="s2">"__obia_point_index"</span>
 
     <span class="n">segment_table</span> <span class="o">=</span> <span class="n">segments</span><span class="p">[[</span><span class="n">segments</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">name</span><span class="p">]]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
     <span class="n">segment_table</span><span class="p">[</span><span class="n">segment_index_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">segments</span><span class="o">.</span><span class="n">index</span>
@@ -2655,7 +2655,7 @@ predicate:
     <span class="n">joined</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">sjoin</span><span class="p">(</span>
         <span class="n">point_table</span><span class="p">,</span>
         <span class="n">segment_table</span><span class="p">,</span>
-        <span class="n">how</span><span class="o">=</span><span class="s2">&quot;inner&quot;</span><span class="p">,</span>
+        <span class="n">how</span><span class="o">=</span><span class="s2">"inner"</span><span class="p">,</span>
         <span class="n">predicate</span><span class="o">=</span><span class="n">predicate</span><span class="p">,</span>
     <span class="p">)</span>
 
@@ -2678,7 +2678,7 @@ predicate:
         <span class="k">for</span> <span class="n">column</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">features</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="n">output</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">segment_index</span><span class="p">,</span> <span class="n">column</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
 
-    <span class="n">output</span><span class="p">[</span><span class="s2">&quot;pc_point_count&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">output</span><span class="p">[</span><span class="s2">&quot;pc_point_count&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+    <span class="n">output</span><span class="p">[</span><span class="s2">"pc_point_count"</span><span class="p">]</span> <span class="o">=</span> <span class="n">output</span><span class="p">[</span><span class="s2">"pc_point_count"</span><span class="p">]</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">output</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -2713,7 +2713,7 @@ predicate:
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="May 11, 2026 00:31:24 UTC">May 11, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="May 10, 2026 23:45:42 UTC">May 10, 2026</span>
   </span>
 
     
@@ -2766,7 +2766,7 @@ predicate:
       <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.sections", "search.highlight", "search.suggest"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
-      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>
       
         <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.0/es5/tex-mml-chtml.js"></script>
       

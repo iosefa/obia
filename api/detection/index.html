@@ -21,7 +21,7 @@
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
     
     
       
@@ -29,7 +29,7 @@
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.ec1eaa64.min.css">
       
         
         <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
@@ -1718,7 +1718,7 @@ and optional scaling of pixel values.</p>
 <span class="normal">75</span>
 <span class="normal">76</span>
 <span class="normal">77</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">TreeDetectionDataset</span><span class="p">(</span><span class="n">Dataset</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Represents a dataset for tree detection tasks.</span>
 
 <span class="sd">    This class handles loading, preprocessing, and transforming tree detection</span>
@@ -1737,13 +1737,13 @@ and optional scaling of pixel values.</p>
 <span class="sd">    :type transforms: callable, optional</span>
 <span class="sd">    :ivar do_scale: Whether to scale image pixel values to the range 0-255.</span>
 <span class="sd">    :type do_scale: bool</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">images_dir</span><span class="p">,</span> <span class="n">annotations_path</span><span class="p">,</span> <span class="n">transforms</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">do_scale</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">images_dir</span> <span class="o">=</span> <span class="n">images_dir</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">transforms</span> <span class="o">=</span> <span class="n">transforms</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">do_scale</span> <span class="o">=</span> <span class="n">do_scale</span>
 
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">annotations_path</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">annotations_path</span><span class="p">,</span> <span class="s2">"r"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">annotations</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">image_ids</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">annotations</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
 
@@ -1753,7 +1753,7 @@ and optional scaling of pixel values.</p>
     <span class="k">def</span><span class="w"> </span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idx</span><span class="p">):</span>
         <span class="n">image_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">image_ids</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
         <span class="n">ann</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">annotations</span><span class="p">[</span><span class="n">image_id</span><span class="p">]</span>
-        <span class="n">image_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">images_dir</span><span class="p">,</span> <span class="n">ann</span><span class="p">[</span><span class="s2">&quot;file_name&quot;</span><span class="p">])</span>
+        <span class="n">image_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">images_dir</span><span class="p">,</span> <span class="n">ann</span><span class="p">[</span><span class="s2">"file_name"</span><span class="p">])</span>
 
         <span class="k">with</span> <span class="n">rasterio</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">image_path</span><span class="p">)</span> <span class="k">as</span> <span class="n">src</span><span class="p">:</span>
             <span class="n">image_array</span> <span class="o">=</span> <span class="n">src</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
@@ -1767,8 +1767,8 @@ and optional scaling of pixel values.</p>
                 <span class="n">image_array</span> <span class="o">=</span> <span class="mf">255.0</span> <span class="o">*</span> <span class="p">(</span><span class="n">image_array</span> <span class="o">-</span> <span class="n">data_min</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">data_max</span> <span class="o">-</span> <span class="n">data_min</span> <span class="o">+</span> <span class="mf">1e-8</span><span class="p">)</span>
             <span class="n">image_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">image_array</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>
 
-        <span class="n">boxes</span> <span class="o">=</span> <span class="n">ann</span><span class="p">[</span><span class="s2">&quot;boxes&quot;</span><span class="p">]</span>
-        <span class="n">labels</span> <span class="o">=</span> <span class="n">ann</span><span class="p">[</span><span class="s2">&quot;labels&quot;</span><span class="p">]</span>
+        <span class="n">boxes</span> <span class="o">=</span> <span class="n">ann</span><span class="p">[</span><span class="s2">"boxes"</span><span class="p">]</span>
+        <span class="n">labels</span> <span class="o">=</span> <span class="n">ann</span><span class="p">[</span><span class="s2">"labels"</span><span class="p">]</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">transforms</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">augmented</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">transforms</span><span class="p">(</span>
@@ -1776,15 +1776,15 @@ and optional scaling of pixel values.</p>
                 <span class="n">bboxes</span><span class="o">=</span><span class="n">boxes</span><span class="p">,</span>
                 <span class="n">labels</span><span class="o">=</span><span class="n">labels</span>
             <span class="p">)</span>
-            <span class="n">image_array</span> <span class="o">=</span> <span class="n">augmented</span><span class="p">[</span><span class="s2">&quot;image&quot;</span><span class="p">]</span>
-            <span class="n">boxes</span> <span class="o">=</span> <span class="n">augmented</span><span class="p">[</span><span class="s2">&quot;bboxes&quot;</span><span class="p">]</span>
-            <span class="n">labels</span> <span class="o">=</span> <span class="n">augmented</span><span class="p">[</span><span class="s2">&quot;labels&quot;</span><span class="p">]</span>
+            <span class="n">image_array</span> <span class="o">=</span> <span class="n">augmented</span><span class="p">[</span><span class="s2">"image"</span><span class="p">]</span>
+            <span class="n">boxes</span> <span class="o">=</span> <span class="n">augmented</span><span class="p">[</span><span class="s2">"bboxes"</span><span class="p">]</span>
+            <span class="n">labels</span> <span class="o">=</span> <span class="n">augmented</span><span class="p">[</span><span class="s2">"labels"</span><span class="p">]</span>
 
         <span class="n">image_tensor</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">image_array</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span><span class="o">.</span><span class="n">permute</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
         <span class="n">boxes_tensor</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">boxes</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
         <span class="n">labels_tensor</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">labels</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
 
-        <span class="n">target</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;boxes&quot;</span><span class="p">:</span> <span class="n">boxes_tensor</span><span class="p">,</span> <span class="s2">&quot;labels&quot;</span><span class="p">:</span> <span class="n">labels_tensor</span><span class="p">}</span>
+        <span class="n">target</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"boxes"</span><span class="p">:</span> <span class="n">boxes_tensor</span><span class="p">,</span> <span class="s2">"labels"</span><span class="p">:</span> <span class="n">labels_tensor</span><span class="p">}</span>
         <span class="k">return</span> <span class="n">image_tensor</span><span class="p">,</span> <span class="n">target</span>
 </code></pre></div></td></tr></table></div>
               </details>
@@ -1988,7 +1988,7 @@ first 3 channels if in_channels &gt;= 3.</p>
 <span class="normal">60</span>
 <span class="normal">61</span>
 <span class="normal">62</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">build_detection_model</span><span class="p">(</span><span class="n">num_classes</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">in_channels</span><span class="o">=</span><span class="mi">3</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Builds a RetinaNet model with optional adjustment for N-band input.</span>
 
 <span class="sd">    Args:</span>
@@ -1997,7 +1997,7 @@ first 3 channels if in_channels &gt;= 3.</p>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        model (nn.Module): The modified RetinaNet model.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">model</span> <span class="o">=</span> <span class="n">retinanet_resnet50_fpn</span><span class="p">(</span><span class="n">weights</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
     <span class="n">model</span><span class="o">.</span><span class="n">transform</span><span class="o">.</span><span class="n">image_mean</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">]</span> <span class="o">*</span> <span class="mi">10</span>
     <span class="n">model</span><span class="o">.</span><span class="n">transform</span><span class="o">.</span><span class="n">image_std</span> <span class="o">=</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">]</span> <span class="o">*</span> <span class="mi">10</span>
@@ -2084,7 +2084,7 @@ first 3 channels if in_channels &gt;= 3.</p>
 
 
 <h3 id="obia.detection.train.train_model" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <code class="highlight language-python"><span class="n">train_model</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">train_loader</span><span class="p">,</span> <span class="n">num_epochs</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s1">&#39;cpu&#39;</span><span class="p">)</span></code>
+<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <code class="highlight language-python"><span class="n">train_model</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">train_loader</span><span class="p">,</span> <span class="n">num_epochs</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s1">'cpu'</span><span class="p">)</span></code>
 
 <a href="#obia.detection.train.train_model" class="headerlink" title="Permanent link">&para;</a></h3>
 
@@ -2236,19 +2236,19 @@ first 3 channels if in_channels &gt;= 3.</p>
 <span class="normal">46</span>
 <span class="normal">47</span>
 <span class="normal">48</span>
-<span class="normal">49</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">train_model</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">train_loader</span><span class="p">,</span> <span class="n">num_epochs</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s2">&quot;cpu&quot;</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="normal">49</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">train_model</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">train_loader</span><span class="p">,</span> <span class="n">num_epochs</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s2">"cpu"</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Trains the RetinaNet detection model.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        model (nn.Module): The detection model (e.g., from build_detection_model).</span>
 <span class="sd">        train_loader (DataLoader): DataLoader for training data.</span>
 <span class="sd">        num_epochs (int): Number of epochs to train.</span>
-<span class="sd">        device (str): Device to use (&quot;cpu&quot;, &quot;cuda&quot;, or &quot;mps&quot;).</span>
+<span class="sd">        device (str): Device to use ("cpu", "cuda", or "mps").</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        model (nn.Module): Trained model.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">model</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
 
     <span class="n">params</span> <span class="o">=</span> <span class="p">[</span><span class="n">p</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">()</span> <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">requires_grad</span><span class="p">]</span>
@@ -2258,7 +2258,7 @@ first 3 channels if in_channels &gt;= 3.</p>
         <span class="n">model</span><span class="o">.</span><span class="n">train</span><span class="p">()</span>
         <span class="n">total_loss</span> <span class="o">=</span> <span class="mf">0.0</span>
 
-        <span class="k">for</span> <span class="n">images</span><span class="p">,</span> <span class="n">targets</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">train_loader</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Epoch </span><span class="si">{</span><span class="n">epoch</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">num_epochs</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">images</span><span class="p">,</span> <span class="n">targets</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">train_loader</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="sa">f</span><span class="s2">"Epoch </span><span class="si">{</span><span class="n">epoch</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">num_epochs</span><span class="si">}</span><span class="s2">"</span><span class="p">):</span>
             <span class="n">images</span> <span class="o">=</span> <span class="p">[</span><span class="n">img</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span> <span class="k">for</span> <span class="n">img</span> <span class="ow">in</span> <span class="n">images</span><span class="p">]</span>
             <span class="n">targets</span> <span class="o">=</span> <span class="p">[{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">t</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">targets</span><span class="p">]</span>
 
@@ -2272,7 +2272,7 @@ first 3 channels if in_channels &gt;= 3.</p>
             <span class="n">total_loss</span> <span class="o">+=</span> <span class="n">losses</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
 
         <span class="n">avg_loss</span> <span class="o">=</span> <span class="n">total_loss</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">train_loader</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Epoch </span><span class="si">{</span><span class="n">epoch</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">num_epochs</span><span class="si">}</span><span class="s2"> - Loss: </span><span class="si">{</span><span class="n">avg_loss</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Epoch </span><span class="si">{</span><span class="n">epoch</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">num_epochs</span><span class="si">}</span><span class="s2"> - Loss: </span><span class="si">{</span><span class="n">avg_loss</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">model</span>
 </code></pre></div></td></tr></table></div>
@@ -2331,7 +2331,7 @@ the data, scales each band to [0..255], then feeds to the model.</p>
 
 
 <h3 id="obia.detection.predict.predict" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <code class="highlight language-python"><span class="n">predict</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">image_path</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s1">&#39;cpu&#39;</span><span class="p">,</span> <span class="n">score_threshold</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span></code>
+<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <code class="highlight language-python"><span class="n">predict</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">image_path</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s1">'cpu'</span><span class="p">,</span> <span class="n">score_threshold</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span></code>
 
 <a href="#obia.detection.predict.predict" class="headerlink" title="Permanent link">&para;</a></h3>
 
@@ -2487,17 +2487,17 @@ the data, scales each band to [0..255], then feeds to the model.</p>
 <span class="normal">54</span>
 <span class="normal">55</span>
 <span class="normal">56</span>
-<span class="normal">57</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">predict</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">image_path</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s2">&quot;cpu&quot;</span><span class="p">,</span> <span class="n">score_threshold</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="normal">57</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">predict</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">image_path</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s2">"cpu"</span><span class="p">,</span> <span class="n">score_threshold</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Args:</span>
 <span class="sd">        model (nn.Module): Trained RetinaNet model (with in_channels matching your data).</span>
 <span class="sd">        image_path (str): Path to the multi-band raster (GeoTIFF, etc.).</span>
-<span class="sd">        device (str): &quot;cpu&quot;, &quot;cuda&quot;, or &quot;mps&quot;.</span>
+<span class="sd">        device (str): "cpu", "cuda", or "mps".</span>
 <span class="sd">        score_threshold (float): Minimum confidence for detection.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        dict with { &quot;boxes&quot;: nd.array, &quot;scores&quot;: nd.array, &quot;labels&quot;: nd.array }</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">        dict with { "boxes": nd.array, "scores": nd.array, "labels": nd.array }</span>
+<span class="sd">    """</span>
     <span class="k">with</span> <span class="n">rasterio</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">image_path</span><span class="p">)</span> <span class="k">as</span> <span class="n">src</span><span class="p">:</span>
         <span class="n">image_array</span> <span class="o">=</span> <span class="n">src</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
 
@@ -2517,9 +2517,9 @@ the data, scales each band to [0..255], then feeds to the model.</p>
     <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
         <span class="n">outputs</span> <span class="o">=</span> <span class="n">model</span><span class="p">([</span><span class="n">image_tensor</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)])</span>
 
-    <span class="n">boxes</span> <span class="o">=</span> <span class="n">outputs</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;boxes&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
-    <span class="n">scores</span> <span class="o">=</span> <span class="n">outputs</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;scores&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
-    <span class="n">labels</span> <span class="o">=</span> <span class="n">outputs</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;labels&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+    <span class="n">boxes</span> <span class="o">=</span> <span class="n">outputs</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s2">"boxes"</span><span class="p">]</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+    <span class="n">scores</span> <span class="o">=</span> <span class="n">outputs</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s2">"scores"</span><span class="p">]</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+    <span class="n">labels</span> <span class="o">=</span> <span class="n">outputs</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s2">"labels"</span><span class="p">]</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
 
     <span class="n">keep</span> <span class="o">=</span> <span class="n">scores</span> <span class="o">&gt;=</span> <span class="n">score_threshold</span>
     <span class="n">boxes</span> <span class="o">=</span> <span class="n">boxes</span><span class="p">[</span><span class="n">keep</span><span class="p">]</span>
@@ -2527,9 +2527,9 @@ the data, scales each band to [0..255], then feeds to the model.</p>
     <span class="n">labels</span> <span class="o">=</span> <span class="n">labels</span><span class="p">[</span><span class="n">keep</span><span class="p">]</span>
 
     <span class="k">return</span> <span class="p">{</span>
-        <span class="s2">&quot;boxes&quot;</span><span class="p">:</span> <span class="n">boxes</span><span class="p">,</span>
-        <span class="s2">&quot;scores&quot;</span><span class="p">:</span> <span class="n">scores</span><span class="p">,</span>
-        <span class="s2">&quot;labels&quot;</span><span class="p">:</span> <span class="n">labels</span>
+        <span class="s2">"boxes"</span><span class="p">:</span> <span class="n">boxes</span><span class="p">,</span>
+        <span class="s2">"scores"</span><span class="p">:</span> <span class="n">scores</span><span class="p">,</span>
+        <span class="s2">"labels"</span><span class="p">:</span> <span class="n">labels</span>
     <span class="p">}</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -2621,10 +2621,10 @@ Boxes assumed in format [x_min, y_min, x_max, y_max].</p>
 <span class="normal">79</span>
 <span class="normal">80</span>
 <span class="normal">81</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">calculate_iou</span><span class="p">(</span><span class="n">box1</span><span class="p">,</span> <span class="n">box2</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Compute Intersection over Union (IoU) for two bounding boxes.</span>
 <span class="sd">    Boxes assumed in format [x_min, y_min, x_max, y_max].</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">x1</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">box1</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">box2</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
     <span class="n">y1</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">box1</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">box2</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
     <span class="n">x2</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">box1</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">box2</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
@@ -2673,10 +2673,10 @@ Returns lists of images and targets.</p>
 <span class="normal">58</span>
 <span class="normal">59</span>
 <span class="normal">60</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">collate_fn</span><span class="p">(</span><span class="n">batch</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Custom collate function for object detection in PyTorch.</span>
 <span class="sd">    Returns lists of images and targets.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">images</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">targets</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">img</span><span class="p">,</span> <span class="n">tgt</span> <span class="ow">in</span> <span class="n">batch</span><span class="p">:</span>
@@ -2738,11 +2738,11 @@ If you have more than 3 channels, consider removing any
 <span class="normal">45</span>
 <span class="normal">46</span>
 <span class="normal">47</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_transforms</span><span class="p">(</span><span class="n">train</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Returns Albumentations transforms for bounding-box tasks.</span>
 <span class="sd">    If you have more than 3 channels, consider removing any</span>
 <span class="sd">    3-channel-specific Normalization or adjusting mean/std.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="n">train</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">A</span><span class="o">.</span><span class="n">Compose</span><span class="p">(</span>
             <span class="p">[</span>
@@ -2750,8 +2750,8 @@ If you have more than 3 channels, consider removing any
                 <span class="n">A</span><span class="o">.</span><span class="n">Flip</span><span class="p">(</span><span class="n">p</span><span class="o">=</span><span class="mf">0.5</span><span class="p">),</span>
             <span class="p">],</span>
             <span class="n">bbox_params</span><span class="o">=</span><span class="n">A</span><span class="o">.</span><span class="n">BboxParams</span><span class="p">(</span>
-                <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;pascal_voc&#39;</span><span class="p">,</span>
-                <span class="n">label_fields</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;labels&#39;</span><span class="p">],</span>
+                <span class="nb">format</span><span class="o">=</span><span class="s1">'pascal_voc'</span><span class="p">,</span>
+                <span class="n">label_fields</span><span class="o">=</span><span class="p">[</span><span class="s1">'labels'</span><span class="p">],</span>
                 <span class="n">min_area</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
                 <span class="n">min_visibility</span><span class="o">=</span><span class="mf">0.0</span>
             <span class="p">)</span>
@@ -2762,8 +2762,8 @@ If you have more than 3 channels, consider removing any
                 <span class="c1"># A.Normalize(mean=(...), std=(...)),</span>
             <span class="p">],</span>
             <span class="n">bbox_params</span><span class="o">=</span><span class="n">A</span><span class="o">.</span><span class="n">BboxParams</span><span class="p">(</span>
-                <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;pascal_voc&#39;</span><span class="p">,</span>
-                <span class="n">label_fields</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;labels&#39;</span><span class="p">],</span>
+                <span class="nb">format</span><span class="o">=</span><span class="s1">'pascal_voc'</span><span class="p">,</span>
+                <span class="n">label_fields</span><span class="o">=</span><span class="p">[</span><span class="s1">'labels'</span><span class="p">],</span>
                 <span class="n">min_area</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
                 <span class="n">min_visibility</span><span class="o">=</span><span class="mf">0.0</span>
             <span class="p">)</span>
@@ -2895,22 +2895,22 @@ If you have more than 3 channels, consider removing any
 <span class="normal">123</span>
 <span class="normal">124</span>
 <span class="normal">125</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">visualize_predictions</span><span class="p">(</span><span class="n">image_path</span><span class="p">,</span> <span class="n">detection_output</span><span class="p">,</span> <span class="n">score_threshold</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Draws bounding boxes (and scores) on an image and displays it using matplotlib.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        image_path (str): Path to the image file.</span>
-<span class="sd">        detection_output (dict): Must contain &quot;boxes&quot;, &quot;scores&quot;, &quot;labels&quot;.</span>
+<span class="sd">        detection_output (dict): Must contain "boxes", "scores", "labels".</span>
 <span class="sd">        score_threshold (float): Only visualize boxes with score &gt;= threshold.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">image</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="n">image_path</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">image</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Could not read image from </span><span class="si">{</span><span class="n">image_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Could not read image from </span><span class="si">{</span><span class="n">image_path</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
     <span class="n">image_rgb</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">cvtColor</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">cv2</span><span class="o">.</span><span class="n">COLOR_BGR2RGB</span><span class="p">)</span>
 
-    <span class="n">boxes</span> <span class="o">=</span> <span class="n">detection_output</span><span class="p">[</span><span class="s2">&quot;boxes&quot;</span><span class="p">]</span>
-    <span class="n">scores</span> <span class="o">=</span> <span class="n">detection_output</span><span class="p">[</span><span class="s2">&quot;scores&quot;</span><span class="p">]</span>
-    <span class="n">labels</span> <span class="o">=</span> <span class="n">detection_output</span><span class="p">[</span><span class="s2">&quot;labels&quot;</span><span class="p">]</span>
+    <span class="n">boxes</span> <span class="o">=</span> <span class="n">detection_output</span><span class="p">[</span><span class="s2">"boxes"</span><span class="p">]</span>
+    <span class="n">scores</span> <span class="o">=</span> <span class="n">detection_output</span><span class="p">[</span><span class="s2">"scores"</span><span class="p">]</span>
+    <span class="n">labels</span> <span class="o">=</span> <span class="n">detection_output</span><span class="p">[</span><span class="s2">"labels"</span><span class="p">]</span>
 
     <span class="k">for</span> <span class="n">box</span><span class="p">,</span> <span class="n">score</span><span class="p">,</span> <span class="n">label</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">boxes</span><span class="p">,</span> <span class="n">scores</span><span class="p">,</span> <span class="n">labels</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">score</span> <span class="o">&gt;=</span> <span class="n">score_threshold</span><span class="p">:</span>
@@ -2921,7 +2921,7 @@ If you have more than 3 channels, consider removing any
                 <span class="p">(</span><span class="n">x2</span><span class="p">,</span> <span class="n">y2</span><span class="p">),</span>
                 <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="mi">2</span>
             <span class="p">)</span>
-            <span class="n">text</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Class </span><span class="si">{</span><span class="n">label</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">score</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="n">text</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"Class </span><span class="si">{</span><span class="n">label</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">score</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">"</span>
             <span class="n">cv2</span><span class="o">.</span><span class="n">putText</span><span class="p">(</span>
                 <span class="n">image_rgb</span><span class="p">,</span>
                 <span class="n">text</span><span class="p">,</span>
@@ -2934,7 +2934,7 @@ If you have more than 3 channels, consider removing any
 
     <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">image_rgb</span><span class="p">)</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s2">&quot;off&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s2">"off"</span><span class="p">)</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -2969,7 +2969,7 @@ If you have more than 3 channels, consider removing any
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="May 11, 2026 00:31:24 UTC">May 11, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="May 10, 2026 23:45:42 UTC">May 10, 2026</span>
   </span>
 
     
@@ -3022,7 +3022,7 @@ If you have more than 3 channels, consider removing any
       <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.sections", "search.highlight", "search.suggest"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
-      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>
       
         <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.0/es5/tex-mml-chtml.js"></script>
       

@@ -21,7 +21,7 @@
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
     
     
       
@@ -29,7 +29,7 @@
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.ec1eaa64.min.css">
       
         
         <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
@@ -1607,7 +1607,7 @@
 <span class="normal">58</span>
 <span class="normal">59</span>
 <span class="normal">60</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">Segments</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Segments class for handling and processing image segments.</span>
 
 <span class="sd">    Attributes:</span>
@@ -1625,7 +1625,7 @@
 
 <span class="sd">        write_segments(file_path):</span>
 <span class="sd">            Writes the segments data to a file.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">_segments</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">segments</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">method</span> <span class="o">=</span> <span class="kc">None</span>
@@ -1638,12 +1638,12 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">to_segmented_image</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">image</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        :param image: An input image expected to be of type PIL Image.</span>
 <span class="sd">        :return: A new image with the boundaries marked on the segments.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">PILImage</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Input must be a PIL Image&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">'Input must be a PIL Image'</span><span class="p">)</span>
         <span class="n">img</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
         <span class="n">boundaries</span> <span class="o">=</span> <span class="n">mark_boundaries</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_segments</span><span class="p">)</span>
         <span class="n">boundaries_int</span> <span class="o">=</span> <span class="n">boundaries</span> <span class="o">*</span> <span class="mi">255</span>
@@ -1652,10 +1652,10 @@
         <span class="k">return</span> <span class="n">fromarray</span><span class="p">(</span><span class="n">masked_img</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">))</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">write_segments</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_path</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        :param file_path: The path to the file where segments will be written.</span>
 <span class="sd">        :return: None</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">segments</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
               </details>
@@ -1703,12 +1703,12 @@
 <span class="normal">51</span>
 <span class="normal">52</span>
 <span class="normal">53</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">to_segmented_image</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">image</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    :param image: An input image expected to be of type PIL Image.</span>
 <span class="sd">    :return: A new image with the boundaries marked on the segments.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">PILImage</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Input must be a PIL Image&#39;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">'Input must be a PIL Image'</span><span class="p">)</span>
     <span class="n">img</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
     <span class="n">boundaries</span> <span class="o">=</span> <span class="n">mark_boundaries</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_segments</span><span class="p">)</span>
     <span class="n">boundaries_int</span> <span class="o">=</span> <span class="n">boundaries</span> <span class="o">*</span> <span class="mi">255</span>
@@ -1744,10 +1744,10 @@
 <span class="normal">58</span>
 <span class="normal">59</span>
 <span class="normal">60</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">write_segments</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_path</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    :param file_path: The path to the file where segments will be written.</span>
 <span class="sd">    :return: None</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">segments</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -1768,7 +1768,7 @@
 
 
 <h3 id="obia.segmentation.segment.segment" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <code class="highlight language-python"><span class="n">segment</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">segmentation_bands</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">statistics_bands</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;slic&#39;</span><span class="p">,</span> <span class="n">calc_mean</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">calc_variance</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">calc_skewness</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">calc_kurtosis</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">calc_contrast</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">calc_dissimilarity</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">calc_homogeneity</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">calc_ASM</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">calc_energy</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">calc_correlation</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
+<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <code class="highlight language-python"><span class="n">segment</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">segmentation_bands</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">statistics_bands</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">'slic'</span><span class="p">,</span> <span class="n">calc_mean</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">calc_variance</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">calc_skewness</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">calc_kurtosis</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">calc_contrast</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">calc_dissimilarity</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">calc_homogeneity</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">calc_ASM</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">calc_energy</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">calc_correlation</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
 
 <a href="#obia.segmentation.segment.segment" class="headerlink" title="Permanent link">&para;</a></h3>
 
@@ -1826,15 +1826,15 @@
 <span class="normal">91</span>
 <span class="normal">92</span>
 <span class="normal">93</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">segment</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">segmentation_bands</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">statistics_bands</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-            <span class="n">method</span><span class="o">=</span><span class="s2">&quot;slic&quot;</span><span class="p">,</span> <span class="n">calc_mean</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">calc_variance</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">method</span><span class="o">=</span><span class="s2">"slic"</span><span class="p">,</span> <span class="n">calc_mean</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">calc_variance</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
             <span class="n">calc_skewness</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">calc_kurtosis</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">calc_contrast</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
             <span class="n">calc_dissimilarity</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">calc_homogeneity</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">calc_ASM</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
             <span class="n">calc_energy</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">calc_correlation</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    :param image: Input image for segmentation and feature extraction.</span>
 <span class="sd">    :param segmentation_bands: Bands to be used for segmentation. Default is None.</span>
 <span class="sd">    :param statistics_bands: Bands to be used for statistical calculations. Default is None.</span>
-<span class="sd">    :param method: Segmentation method to be used. Default is &quot;slic&quot;.</span>
+<span class="sd">    :param method: Segmentation method to be used. Default is "slic".</span>
 <span class="sd">    :param calc_mean: Flag to calculate mean of segments. Default is True.</span>
 <span class="sd">    :param calc_variance: Flag to calculate variance of segments. Default is True.</span>
 <span class="sd">    :param calc_skewness: Flag to calculate skewness of segments. Default is True.</span>
@@ -1847,7 +1847,7 @@
 <span class="sd">    :param calc_correlation: Flag to calculate correlation of segments. Default is True.</span>
 <span class="sd">    :param kwargs: Additional parameters for segmentation and feature extraction.</span>
 <span class="sd">    :return: Segments object containing the segmented image and statistics.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">segments_gdf</span> <span class="o">=</span> <span class="n">create_segments</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">segmentation_bands</span><span class="o">=</span><span class="n">segmentation_bands</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="n">method</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
     <span class="n">objects_gdf</span> <span class="o">=</span> <span class="n">create_objects</span><span class="p">(</span><span class="n">segments_gdf</span><span class="p">,</span> <span class="n">image</span><span class="p">,</span> <span class="n">spectral_bands</span><span class="o">=</span><span class="n">statistics_bands</span><span class="p">,</span> <span class="n">calc_mean</span><span class="o">=</span><span class="n">calc_mean</span><span class="p">,</span>
                                  <span class="n">calc_variance</span><span class="o">=</span><span class="n">calc_variance</span><span class="p">,</span> <span class="n">calc_skewness</span><span class="o">=</span><span class="n">calc_skewness</span><span class="p">,</span> <span class="n">calc_kurtosis</span><span class="o">=</span><span class="n">calc_kurtosis</span><span class="p">,</span>
@@ -1907,7 +1907,7 @@
 
 
 <h3 id="obia.segmentation.segment_boundaries.create_segments" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <code class="highlight language-python"><span class="n">create_segments</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">segmentation_bands</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;slic&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
+<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <code class="highlight language-python"><span class="n">create_segments</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">segmentation_bands</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">'slic'</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
 
 <a href="#obia.segmentation.segment_boundaries.create_segments" class="headerlink" title="Permanent link">&para;</a></h3>
 
@@ -1988,19 +1988,19 @@
 <span class="normal">75</span>
 <span class="normal">76</span>
 <span class="normal">77</span>
-<span class="normal">78</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">create_segments</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">segmentation_bands</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;slic&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="normal">78</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">create_segments</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">segmentation_bands</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">"slic"</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    :param image: The image to segment, composed of multiple bands.</span>
 <span class="sd">    :type image: Image object</span>
 <span class="sd">    :param segmentation_bands: List of band indices to use for segmentation. If None, all bands are used.</span>
 <span class="sd">    :type segmentation_bands: list[int] or None</span>
-<span class="sd">    :param method: Segmentation method to use: &#39;slic&#39; or &#39;quickshift&#39;.</span>
+<span class="sd">    :param method: Segmentation method to use: 'slic' or 'quickshift'.</span>
 <span class="sd">    :type method: str</span>
 <span class="sd">    :param kwargs: Additional keyword arguments passed to the segmentation algorithm.</span>
 <span class="sd">    :type kwargs: dict</span>
 <span class="sd">    :return: GeoDataFrame containing segmented geometries, with a column for segment IDs.</span>
 <span class="sd">    :rtype: GeoDataFrame</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">num_bands</span> <span class="o">=</span> <span class="n">image</span><span class="o">.</span><span class="n">img_data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">image</span><span class="o">.</span><span class="n">img_data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]):</span>
         <span class="n">image</span><span class="o">.</span><span class="n">img_data</span><span class="p">[:,</span> <span class="p">:,</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">normalize_band</span><span class="p">(</span><span class="n">image</span><span class="o">.</span><span class="n">img_data</span><span class="p">[:,</span> <span class="p">:,</span> <span class="n">i</span><span class="p">])</span>
@@ -2010,22 +2010,22 @@
 
     <span class="k">for</span> <span class="n">band</span> <span class="ow">in</span> <span class="n">segmentation_bands</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">band</span> <span class="o">&gt;=</span> <span class="n">num_bands</span> <span class="ow">or</span> <span class="n">band</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">IndexError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Band index </span><span class="si">{</span><span class="n">band</span><span class="si">}</span><span class="s2"> out of range. Available bands indices: 0 to </span><span class="si">{</span><span class="n">num_bands</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">IndexError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Band index </span><span class="si">{</span><span class="n">band</span><span class="si">}</span><span class="s2"> out of range. Available bands indices: 0 to </span><span class="si">{</span><span class="n">num_bands</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s2">."</span><span class="p">)</span>
 
     <span class="c1"># Prepare the image data for segmentation</span>
     <span class="n">img_to_segment</span> <span class="o">=</span> <span class="n">img_as_float</span><span class="p">(</span><span class="n">image</span><span class="o">.</span><span class="n">img_data</span><span class="p">[:,</span> <span class="p">:,</span> <span class="n">segmentation_bands</span><span class="p">])</span>
 
     <span class="c1"># Check shape of img_to_segment before passing to slic</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Shape of img_to_segment:&quot;</span><span class="p">,</span> <span class="n">img_to_segment</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"Shape of img_to_segment:"</span><span class="p">,</span> <span class="n">img_to_segment</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;quickshift&#39;</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">method</span> <span class="o">==</span> <span class="s1">'quickshift'</span><span class="p">:</span>
         <span class="n">segments</span> <span class="o">=</span> <span class="n">quickshift</span><span class="p">(</span><span class="n">img_to_segment</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-    <span class="k">elif</span> <span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;slic&#39;</span><span class="p">:</span>
+    <span class="k">elif</span> <span class="n">method</span> <span class="o">==</span> <span class="s1">'slic'</span><span class="p">:</span>
         <span class="n">segments</span> <span class="o">=</span> <span class="n">slic</span><span class="p">(</span><span class="n">img_to_segment</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>  <span class="c1"># Ensure no channel_axis or conflicting arguments</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;An unknown segmentation method was requested.&#39;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">'An unknown segmentation method was requested.'</span><span class="p">)</span>
 
-    <span class="n">mask</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;mask&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="n">mask</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'mask'</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">mask</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">segments</span><span class="p">[</span><span class="n">mask</span> <span class="o">==</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
 
@@ -2036,7 +2036,7 @@
         <span class="k">if</span> <span class="n">segment_id</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
             <span class="k">continue</span>
         <span class="n">segment_mask</span> <span class="o">=</span> <span class="n">segments</span> <span class="o">==</span> <span class="n">segment_id</span>
-        <span class="k">for</span> <span class="n">s</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">shapes</span><span class="p">(</span><span class="n">segment_mask</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;int32&#39;</span><span class="p">)):</span>
+        <span class="k">for</span> <span class="n">s</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">shapes</span><span class="p">(</span><span class="n">segment_mask</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">'int32'</span><span class="p">)):</span>
             <span class="k">if</span> <span class="n">v</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
                 <span class="n">geometry</span> <span class="o">=</span> <span class="n">shape</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
                 <span class="n">transformed_geom</span> <span class="o">=</span> <span class="n">affine_transform</span><span class="p">(</span><span class="n">geometry</span><span class="p">,</span> <span class="n">image</span><span class="o">.</span><span class="n">affine_transformation</span><span class="p">)</span>
@@ -2046,8 +2046,8 @@
 
     <span class="n">srs</span> <span class="o">=</span> <span class="n">pyproj</span><span class="o">.</span><span class="n">CRS</span><span class="p">(</span><span class="n">image</span><span class="o">.</span><span class="n">crs</span><span class="p">)</span>
     <span class="n">srs_epsg</span> <span class="o">=</span> <span class="n">srs</span><span class="o">.</span><span class="n">to_epsg</span><span class="p">()</span>
-    <span class="n">gdf</span><span class="o">.</span><span class="n">crs</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;EPSG:</span><span class="si">{</span><span class="n">srs_epsg</span><span class="si">}</span><span class="s2">&quot;</span>
-    <span class="n">gdf</span><span class="p">[</span><span class="s1">&#39;segment_id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">gdf</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">gdf</span><span class="o">.</span><span class="n">crs</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"EPSG:</span><span class="si">{</span><span class="n">srs_epsg</span><span class="si">}</span><span class="s2">"</span>
+    <span class="n">gdf</span><span class="p">[</span><span class="s1">'segment_id'</span><span class="p">]</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">gdf</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">gdf</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -2078,10 +2078,10 @@
 <span class="normal">14</span>
 <span class="normal">15</span>
 <span class="normal">16</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">normalize_band</span><span class="p">(</span><span class="n">band</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    :param band: The input band array that needs to be normalized. This should be a numpy array of numeric values.</span>
 <span class="sd">    :return: A numpy array with the normalized values, where the minimum value is mapped to 0 and the maximum value is mapped to 1.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="p">(</span><span class="n">band</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">band</span><span class="p">))</span> <span class="o">/</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">band</span><span class="p">)</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">band</span><span class="p">))</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -2234,7 +2234,7 @@ values are ignored when computing statistics. If all values are NaN for a band, 
         <span class="n">image</span><span class="p">,</span> <span class="n">statistics_bands</span><span class="p">,</span>
         <span class="n">calc_mean</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">calc_variance</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">calc_min</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">calc_max</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">calc_skewness</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">calc_kurtosis</span><span class="o">=</span><span class="kc">True</span>
 <span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Calculates a range of statistical measures for specific bands of a spectral image. The statistics calculated are</span>
 <span class="sd">    mean, variance, minimum, maximum, skewness, and kurtosis, based on the boolean flags provided. Missing or NaN</span>
 <span class="sd">    values are ignored when computing statistics. If all values are NaN for a band, NaN is returned for each statistic.</span>
@@ -2256,43 +2256,43 @@ values are ignored when computing statistics. If all values are NaN for a band, 
 <span class="sd">    :param calc_kurtosis: Indicates whether to calculate the kurtosis for the specified bands.</span>
 <span class="sd">    :type calc_kurtosis: bool</span>
 <span class="sd">    :return: A dictionary containing the calculated statistics for each specified band, with keys formatted as</span>
-<span class="sd">             &#39;b{band_index}_statistic&#39;.</span>
+<span class="sd">             'b{band_index}_statistic'.</span>
 <span class="sd">    :rtype: dict</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">stats_dict</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="k">for</span> <span class="n">band_index</span> <span class="ow">in</span> <span class="n">statistics_bands</span><span class="p">:</span>
         <span class="n">band_data</span> <span class="o">=</span> <span class="n">image</span><span class="p">[</span><span class="n">band_index</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span>
         <span class="n">valid_mask</span> <span class="o">=</span> <span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">band_data</span><span class="p">)</span>
         <span class="n">band_flat</span> <span class="o">=</span> <span class="n">band_data</span><span class="p">[</span><span class="n">valid_mask</span><span class="p">]</span>
 
-        <span class="n">band_prefix</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;b</span><span class="si">{</span><span class="n">band_index</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="n">band_prefix</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"b</span><span class="si">{</span><span class="n">band_index</span><span class="si">}</span><span class="s2">"</span>
 
         <span class="k">if</span> <span class="n">band_flat</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">calc_mean</span><span class="p">:</span>
-                <span class="n">stats_dict</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">band_prefix</span><span class="si">}</span><span class="s2">_mean&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+                <span class="n">stats_dict</span><span class="p">[</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">band_prefix</span><span class="si">}</span><span class="s2">_mean"</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
             <span class="k">if</span> <span class="n">calc_variance</span><span class="p">:</span>
-                <span class="n">stats_dict</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">band_prefix</span><span class="si">}</span><span class="s2">_variance&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+                <span class="n">stats_dict</span><span class="p">[</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">band_prefix</span><span class="si">}</span><span class="s2">_variance"</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
             <span class="k">if</span> <span class="n">calc_min</span><span class="p">:</span>
-                <span class="n">stats_dict</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">band_prefix</span><span class="si">}</span><span class="s2">_min&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+                <span class="n">stats_dict</span><span class="p">[</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">band_prefix</span><span class="si">}</span><span class="s2">_min"</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
             <span class="k">if</span> <span class="n">calc_max</span><span class="p">:</span>
-                <span class="n">stats_dict</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">band_prefix</span><span class="si">}</span><span class="s2">_max&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+                <span class="n">stats_dict</span><span class="p">[</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">band_prefix</span><span class="si">}</span><span class="s2">_max"</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
             <span class="k">if</span> <span class="n">calc_skewness</span><span class="p">:</span>
-                <span class="n">stats_dict</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">band_prefix</span><span class="si">}</span><span class="s2">_skewness&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+                <span class="n">stats_dict</span><span class="p">[</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">band_prefix</span><span class="si">}</span><span class="s2">_skewness"</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
             <span class="k">if</span> <span class="n">calc_kurtosis</span><span class="p">:</span>
-                <span class="n">stats_dict</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">band_prefix</span><span class="si">}</span><span class="s2">_kurtosis&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+                <span class="n">stats_dict</span><span class="p">[</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">band_prefix</span><span class="si">}</span><span class="s2">_kurtosis"</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">calc_mean</span><span class="p">:</span>
-                <span class="n">stats_dict</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">band_prefix</span><span class="si">}</span><span class="s2">_mean&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">band_flat</span><span class="p">)</span>
+                <span class="n">stats_dict</span><span class="p">[</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">band_prefix</span><span class="si">}</span><span class="s2">_mean"</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">band_flat</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">calc_variance</span><span class="p">:</span>
-                <span class="n">stats_dict</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">band_prefix</span><span class="si">}</span><span class="s2">_variance&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">var</span><span class="p">(</span><span class="n">band_flat</span><span class="p">)</span>
+                <span class="n">stats_dict</span><span class="p">[</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">band_prefix</span><span class="si">}</span><span class="s2">_variance"</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">var</span><span class="p">(</span><span class="n">band_flat</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">calc_min</span><span class="p">:</span>
-                <span class="n">stats_dict</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">band_prefix</span><span class="si">}</span><span class="s2">_min&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">band_flat</span><span class="p">)</span>
+                <span class="n">stats_dict</span><span class="p">[</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">band_prefix</span><span class="si">}</span><span class="s2">_min"</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">band_flat</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">calc_max</span><span class="p">:</span>
-                <span class="n">stats_dict</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">band_prefix</span><span class="si">}</span><span class="s2">_max&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">band_flat</span><span class="p">)</span>
+                <span class="n">stats_dict</span><span class="p">[</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">band_prefix</span><span class="si">}</span><span class="s2">_max"</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">band_flat</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">calc_skewness</span><span class="p">:</span>
-                <span class="n">stats_dict</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">band_prefix</span><span class="si">}</span><span class="s2">_skewness&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">skew</span><span class="p">(</span><span class="n">band_flat</span><span class="p">)</span>
+                <span class="n">stats_dict</span><span class="p">[</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">band_prefix</span><span class="si">}</span><span class="s2">_skewness"</span><span class="p">]</span> <span class="o">=</span> <span class="n">skew</span><span class="p">(</span><span class="n">band_flat</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">calc_kurtosis</span><span class="p">:</span>
-                <span class="n">stats_dict</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">band_prefix</span><span class="si">}</span><span class="s2">_kurtosis&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">kurtosis</span><span class="p">(</span><span class="n">band_flat</span><span class="p">)</span>
+                <span class="n">stats_dict</span><span class="p">[</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">band_prefix</span><span class="si">}</span><span class="s2">_kurtosis"</span><span class="p">]</span> <span class="o">=</span> <span class="n">kurtosis</span><span class="p">(</span><span class="n">band_flat</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">stats_dict</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -2463,7 +2463,7 @@ stored in a dictionary with the band index as the prefix to the keys.</p>
         <span class="n">calc_contrast</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">calc_dissimilarity</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">calc_homogeneity</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
         <span class="n">calc_ASM</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">calc_energy</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">calc_correlation</span><span class="o">=</span><span class="kc">True</span>
 <span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Calculate textural statistics from a multi-band image based on specified bands.</span>
 <span class="sd">    This function computes various textural properties such as contrast,</span>
 <span class="sd">    dissimilarity, homogeneity, ASM, energy, and correlation. The calculations</span>
@@ -2489,7 +2489,7 @@ stored in a dictionary with the band index as the prefix to the keys.</p>
 <span class="sd">    :type calc_correlation: bool, optional</span>
 <span class="sd">    :return: A dictionary containing the computed textural statistics for each band.</span>
 <span class="sd">    :rtype: dict</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">stats_dict</span> <span class="o">=</span> <span class="p">{}</span>
 
     <span class="k">for</span> <span class="n">band_index</span> <span class="ow">in</span> <span class="n">textural_bands</span><span class="p">:</span>
@@ -2498,38 +2498,38 @@ stored in a dictionary with the band index as the prefix to the keys.</p>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">valid_mask</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">calc_contrast</span><span class="p">:</span>
-                <span class="n">stats_dict</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;b</span><span class="si">{</span><span class="n">band_index</span><span class="si">}</span><span class="s2">_contrast&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+                <span class="n">stats_dict</span><span class="p">[</span><span class="sa">f</span><span class="s2">"b</span><span class="si">{</span><span class="n">band_index</span><span class="si">}</span><span class="s2">_contrast"</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
             <span class="k">if</span> <span class="n">calc_dissimilarity</span><span class="p">:</span>
-                <span class="n">stats_dict</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;b</span><span class="si">{</span><span class="n">band_index</span><span class="si">}</span><span class="s2">_dissimilarity&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+                <span class="n">stats_dict</span><span class="p">[</span><span class="sa">f</span><span class="s2">"b</span><span class="si">{</span><span class="n">band_index</span><span class="si">}</span><span class="s2">_dissimilarity"</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
             <span class="k">if</span> <span class="n">calc_homogeneity</span><span class="p">:</span>
-                <span class="n">stats_dict</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;b</span><span class="si">{</span><span class="n">band_index</span><span class="si">}</span><span class="s2">_homogeneity&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+                <span class="n">stats_dict</span><span class="p">[</span><span class="sa">f</span><span class="s2">"b</span><span class="si">{</span><span class="n">band_index</span><span class="si">}</span><span class="s2">_homogeneity"</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
             <span class="k">if</span> <span class="n">calc_ASM</span><span class="p">:</span>
-                <span class="n">stats_dict</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;b</span><span class="si">{</span><span class="n">band_index</span><span class="si">}</span><span class="s2">_ASM&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+                <span class="n">stats_dict</span><span class="p">[</span><span class="sa">f</span><span class="s2">"b</span><span class="si">{</span><span class="n">band_index</span><span class="si">}</span><span class="s2">_ASM"</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
             <span class="k">if</span> <span class="n">calc_energy</span><span class="p">:</span>
-                <span class="n">stats_dict</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;b</span><span class="si">{</span><span class="n">band_index</span><span class="si">}</span><span class="s2">_energy&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+                <span class="n">stats_dict</span><span class="p">[</span><span class="sa">f</span><span class="s2">"b</span><span class="si">{</span><span class="n">band_index</span><span class="si">}</span><span class="s2">_energy"</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
             <span class="k">if</span> <span class="n">calc_correlation</span><span class="p">:</span>
-                <span class="n">stats_dict</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;b</span><span class="si">{</span><span class="n">band_index</span><span class="si">}</span><span class="s2">_correlation&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+                <span class="n">stats_dict</span><span class="p">[</span><span class="sa">f</span><span class="s2">"b</span><span class="si">{</span><span class="n">band_index</span><span class="si">}</span><span class="s2">_correlation"</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
             <span class="k">continue</span>
 
         <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">band_data</span><span class="p">[</span><span class="n">valid_mask</span><span class="p">])</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
             <span class="k">if</span> <span class="n">calc_contrast</span><span class="p">:</span>
-                <span class="n">stats_dict</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;b</span><span class="si">{</span><span class="n">band_index</span><span class="si">}</span><span class="s2">_contrast&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+                <span class="n">stats_dict</span><span class="p">[</span><span class="sa">f</span><span class="s2">"b</span><span class="si">{</span><span class="n">band_index</span><span class="si">}</span><span class="s2">_contrast"</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
             <span class="k">if</span> <span class="n">calc_dissimilarity</span><span class="p">:</span>
-                <span class="n">stats_dict</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;b</span><span class="si">{</span><span class="n">band_index</span><span class="si">}</span><span class="s2">_dissimilarity&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+                <span class="n">stats_dict</span><span class="p">[</span><span class="sa">f</span><span class="s2">"b</span><span class="si">{</span><span class="n">band_index</span><span class="si">}</span><span class="s2">_dissimilarity"</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
             <span class="k">if</span> <span class="n">calc_homogeneity</span><span class="p">:</span>
-                <span class="n">stats_dict</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;b</span><span class="si">{</span><span class="n">band_index</span><span class="si">}</span><span class="s2">_homogeneity&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+                <span class="n">stats_dict</span><span class="p">[</span><span class="sa">f</span><span class="s2">"b</span><span class="si">{</span><span class="n">band_index</span><span class="si">}</span><span class="s2">_homogeneity"</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
             <span class="k">if</span> <span class="n">calc_ASM</span><span class="p">:</span>
-                <span class="n">stats_dict</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;b</span><span class="si">{</span><span class="n">band_index</span><span class="si">}</span><span class="s2">_ASM&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+                <span class="n">stats_dict</span><span class="p">[</span><span class="sa">f</span><span class="s2">"b</span><span class="si">{</span><span class="n">band_index</span><span class="si">}</span><span class="s2">_ASM"</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
             <span class="k">if</span> <span class="n">calc_energy</span><span class="p">:</span>
-                <span class="n">stats_dict</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;b</span><span class="si">{</span><span class="n">band_index</span><span class="si">}</span><span class="s2">_energy&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+                <span class="n">stats_dict</span><span class="p">[</span><span class="sa">f</span><span class="s2">"b</span><span class="si">{</span><span class="n">band_index</span><span class="si">}</span><span class="s2">_energy"</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
             <span class="k">if</span> <span class="n">calc_correlation</span><span class="p">:</span>
-                <span class="n">stats_dict</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;b</span><span class="si">{</span><span class="n">band_index</span><span class="si">}</span><span class="s2">_correlation&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+                <span class="n">stats_dict</span><span class="p">[</span><span class="sa">f</span><span class="s2">"b</span><span class="si">{</span><span class="n">band_index</span><span class="si">}</span><span class="s2">_correlation"</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
             <span class="k">continue</span>
 
         <span class="n">band_clean</span> <span class="o">=</span> <span class="n">band_data</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="n">band_clean</span><span class="p">[</span><span class="o">~</span><span class="n">valid_mask</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
 
-        <span class="n">band_prefix</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;b</span><span class="si">{</span><span class="n">band_index</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="n">band_prefix</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"b</span><span class="si">{</span><span class="n">band_index</span><span class="si">}</span><span class="s2">"</span>
 
         <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">issubdtype</span><span class="p">(</span><span class="n">band_clean</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">integer</span><span class="p">):</span>
             <span class="n">glcm_input</span> <span class="o">=</span> <span class="n">band_clean</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>
@@ -2551,31 +2551,31 @@ stored in a dictionary with the band index as the prefix to the keys.</p>
             <span class="p">)</span>
         <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">calc_contrast</span><span class="p">:</span>
-                <span class="n">stats_dict</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">band_prefix</span><span class="si">}</span><span class="s2">_contrast&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+                <span class="n">stats_dict</span><span class="p">[</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">band_prefix</span><span class="si">}</span><span class="s2">_contrast"</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
             <span class="k">if</span> <span class="n">calc_dissimilarity</span><span class="p">:</span>
-                <span class="n">stats_dict</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">band_prefix</span><span class="si">}</span><span class="s2">_dissimilarity&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+                <span class="n">stats_dict</span><span class="p">[</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">band_prefix</span><span class="si">}</span><span class="s2">_dissimilarity"</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
             <span class="k">if</span> <span class="n">calc_homogeneity</span><span class="p">:</span>
-                <span class="n">stats_dict</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">band_prefix</span><span class="si">}</span><span class="s2">_homogeneity&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+                <span class="n">stats_dict</span><span class="p">[</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">band_prefix</span><span class="si">}</span><span class="s2">_homogeneity"</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
             <span class="k">if</span> <span class="n">calc_ASM</span><span class="p">:</span>
-                <span class="n">stats_dict</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">band_prefix</span><span class="si">}</span><span class="s2">_ASM&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+                <span class="n">stats_dict</span><span class="p">[</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">band_prefix</span><span class="si">}</span><span class="s2">_ASM"</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
             <span class="k">if</span> <span class="n">calc_energy</span><span class="p">:</span>
-                <span class="n">stats_dict</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">band_prefix</span><span class="si">}</span><span class="s2">_energy&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+                <span class="n">stats_dict</span><span class="p">[</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">band_prefix</span><span class="si">}</span><span class="s2">_energy"</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
             <span class="k">if</span> <span class="n">calc_correlation</span><span class="p">:</span>
-                <span class="n">stats_dict</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">band_prefix</span><span class="si">}</span><span class="s2">_correlation&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+                <span class="n">stats_dict</span><span class="p">[</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">band_prefix</span><span class="si">}</span><span class="s2">_correlation"</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
             <span class="k">continue</span>
 
         <span class="k">if</span> <span class="n">calc_contrast</span><span class="p">:</span>
-            <span class="n">stats_dict</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">band_prefix</span><span class="si">}</span><span class="s2">_contrast&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">graycoprops</span><span class="p">(</span><span class="n">glcm</span><span class="p">,</span> <span class="s1">&#39;contrast&#39;</span><span class="p">))</span>
+            <span class="n">stats_dict</span><span class="p">[</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">band_prefix</span><span class="si">}</span><span class="s2">_contrast"</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">graycoprops</span><span class="p">(</span><span class="n">glcm</span><span class="p">,</span> <span class="s1">'contrast'</span><span class="p">))</span>
         <span class="k">if</span> <span class="n">calc_dissimilarity</span><span class="p">:</span>
-            <span class="n">stats_dict</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">band_prefix</span><span class="si">}</span><span class="s2">_dissimilarity&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">graycoprops</span><span class="p">(</span><span class="n">glcm</span><span class="p">,</span> <span class="s1">&#39;dissimilarity&#39;</span><span class="p">))</span>
+            <span class="n">stats_dict</span><span class="p">[</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">band_prefix</span><span class="si">}</span><span class="s2">_dissimilarity"</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">graycoprops</span><span class="p">(</span><span class="n">glcm</span><span class="p">,</span> <span class="s1">'dissimilarity'</span><span class="p">))</span>
         <span class="k">if</span> <span class="n">calc_homogeneity</span><span class="p">:</span>
-            <span class="n">stats_dict</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">band_prefix</span><span class="si">}</span><span class="s2">_homogeneity&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">graycoprops</span><span class="p">(</span><span class="n">glcm</span><span class="p">,</span> <span class="s1">&#39;homogeneity&#39;</span><span class="p">))</span>
+            <span class="n">stats_dict</span><span class="p">[</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">band_prefix</span><span class="si">}</span><span class="s2">_homogeneity"</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">graycoprops</span><span class="p">(</span><span class="n">glcm</span><span class="p">,</span> <span class="s1">'homogeneity'</span><span class="p">))</span>
         <span class="k">if</span> <span class="n">calc_ASM</span><span class="p">:</span>
-            <span class="n">stats_dict</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">band_prefix</span><span class="si">}</span><span class="s2">_ASM&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">graycoprops</span><span class="p">(</span><span class="n">glcm</span><span class="p">,</span> <span class="s1">&#39;ASM&#39;</span><span class="p">))</span>
+            <span class="n">stats_dict</span><span class="p">[</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">band_prefix</span><span class="si">}</span><span class="s2">_ASM"</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">graycoprops</span><span class="p">(</span><span class="n">glcm</span><span class="p">,</span> <span class="s1">'ASM'</span><span class="p">))</span>
         <span class="k">if</span> <span class="n">calc_energy</span><span class="p">:</span>
-            <span class="n">stats_dict</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">band_prefix</span><span class="si">}</span><span class="s2">_energy&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">graycoprops</span><span class="p">(</span><span class="n">glcm</span><span class="p">,</span> <span class="s1">&#39;energy&#39;</span><span class="p">))</span>
+            <span class="n">stats_dict</span><span class="p">[</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">band_prefix</span><span class="si">}</span><span class="s2">_energy"</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">graycoprops</span><span class="p">(</span><span class="n">glcm</span><span class="p">,</span> <span class="s1">'energy'</span><span class="p">))</span>
         <span class="k">if</span> <span class="n">calc_correlation</span><span class="p">:</span>
-            <span class="n">stats_dict</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">band_prefix</span><span class="si">}</span><span class="s2">_correlation&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">graycoprops</span><span class="p">(</span><span class="n">glcm</span><span class="p">,</span> <span class="s1">&#39;correlation&#39;</span><span class="p">))</span>
+            <span class="n">stats_dict</span><span class="p">[</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">band_prefix</span><span class="si">}</span><span class="s2">_correlation"</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">graycoprops</span><span class="p">(</span><span class="n">glcm</span><span class="p">,</span> <span class="s1">'correlation'</span><span class="p">))</span>
 
     <span class="k">return</span> <span class="n">stats_dict</span>
 </code></pre></div></td></tr></table></div>
@@ -2725,9 +2725,9 @@ stored in a dictionary with the band index as the prefix to the keys.</p>
         <span class="n">calc_mean</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">calc_variance</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">calc_min</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">calc_max</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">calc_skewness</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">calc_kurtosis</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
         <span class="n">calc_contrast</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">calc_dissimilarity</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">calc_homogeneity</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">calc_ASM</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">calc_energy</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">calc_correlation</span><span class="o">=</span><span class="kc">True</span>
 <span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    :param segments: GeoDataFrame containing the segmented regions to be analyzed.</span>
-<span class="sd">    :param image: Object containing image data and metadata to be used for analysis. Should have &#39;img_data&#39; attribute as 3D NumPy array and &#39;crs&#39; attribute.</span>
+<span class="sd">    :param image: Object containing image data and metadata to be used for analysis. Should have 'img_data' attribute as 3D NumPy array and 'crs' attribute.</span>
 <span class="sd">    :param spectral_bands: Optional; List of spectral bands to be used in the analysis. Defaults to all available bands.</span>
 <span class="sd">    :param textural_bands: Optional; List of textural bands to be used in the analysis. Defaults to all available bands.</span>
 <span class="sd">    :param calculate_spectral: Boolean; Whether to calculate spectral statistics. Defaults to True.</span>
@@ -2745,10 +2745,10 @@ stored in a dictionary with the band index as the prefix to the keys.</p>
 <span class="sd">    :param calc_energy: Boolean; Whether to calculate the energy for textural analysis. Defaults to True.</span>
 <span class="sd">    :param calc_correlation: Boolean; Whether to calculate the correlation for textural analysis. Defaults to True.</span>
 <span class="sd">    :return: GeoDataFrame containing the calculated statistics for each segment.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">calculate_spectral</span> <span class="ow">or</span> <span class="n">calculate_textural</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">&quot;At least one of &#39;calculate_spectral&#39; or &#39;calculate_textural&#39; must be True.&quot;</span>
+            <span class="s2">"At least one of 'calculate_spectral' or 'calculate_textural' must be True."</span>
         <span class="p">)</span>
 
     <span class="k">if</span> <span class="n">spectral_bands</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -2762,16 +2762,16 @@ stored in a dictionary with the band index as the prefix to the keys.</p>
     <span class="c1"># valid_spectral_bands = [b for b in spectral_bands if b &lt; image.img_data.shape[0]]</span>
     <span class="c1"># if len(valid_spectral_bands) &lt; len(spectral_bands):</span>
     <span class="c1">#     print(</span>
-    <span class="c1">#         &quot;Warning: Some spectral band indices were invalid and have been removed. &quot;</span>
-    <span class="c1">#         f&quot;(Requested: {spectral_bands}, valid: {valid_spectral_bands})&quot;</span>
+    <span class="c1">#         "Warning: Some spectral band indices were invalid and have been removed. "</span>
+    <span class="c1">#         f"(Requested: {spectral_bands}, valid: {valid_spectral_bands})"</span>
     <span class="c1">#     )</span>
     <span class="c1"># spectral_bands = valid_spectral_bands</span>
     <span class="c1">#</span>
     <span class="c1"># valid_textural_bands = [b for b in textural_bands if b &lt; image.img_data.shape[0]]</span>
     <span class="c1"># if len(valid_textural_bands) &lt; len(textural_bands):</span>
     <span class="c1">#     print(</span>
-    <span class="c1">#         &quot;Warning: Some textural band indices were invalid and have been removed. &quot;</span>
-    <span class="c1">#         f&quot;(Requested: {textural_bands}, valid: {valid_textural_bands})&quot;</span>
+    <span class="c1">#         "Warning: Some textural band indices were invalid and have been removed. "</span>
+    <span class="c1">#         f"(Requested: {textural_bands}, valid: {valid_textural_bands})"</span>
     <span class="c1">#     )</span>
     <span class="c1"># textural_bands = valid_textural_bands</span>
     <span class="c1"># # ------------- END KEY ADDITION ----------</span>
@@ -2784,16 +2784,16 @@ stored in a dictionary with the band index as the prefix to the keys.</p>
 
     <span class="n">results</span> <span class="o">=</span> <span class="p">[]</span>
 
-    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">idx</span><span class="p">,</span> <span class="n">segment</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">tqdm</span><span class="p">(</span><span class="n">segments</span><span class="o">.</span><span class="n">iterrows</span><span class="p">(),</span> <span class="n">total</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">segments</span><span class="p">),</span> <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;Processing Segments&quot;</span><span class="p">)):</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">idx</span><span class="p">,</span> <span class="n">segment</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">tqdm</span><span class="p">(</span><span class="n">segments</span><span class="o">.</span><span class="n">iterrows</span><span class="p">(),</span> <span class="n">total</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">segments</span><span class="p">),</span> <span class="n">desc</span><span class="o">=</span><span class="s2">"Processing Segments"</span><span class="p">)):</span>
         <span class="n">geom</span> <span class="o">=</span> <span class="n">segment</span><span class="o">.</span><span class="n">geometry</span>
-        <span class="n">segment_id</span> <span class="o">=</span> <span class="n">segment</span><span class="p">[</span><span class="s1">&#39;segment_id&#39;</span><span class="p">]</span>
+        <span class="n">segment_id</span> <span class="o">=</span> <span class="n">segment</span><span class="p">[</span><span class="s1">'segment_id'</span><span class="p">]</span>
 
         <span class="n">cropped_img_data</span><span class="p">,</span> <span class="n">cropped_transform</span> <span class="o">=</span> <span class="n">crop_image_to_bbox</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">geom</span><span class="p">)</span>
         <span class="n">masked_img_data</span> <span class="o">=</span> <span class="n">mask_image_with_polygon</span><span class="p">(</span><span class="n">cropped_img_data</span><span class="p">,</span> <span class="n">geom</span><span class="p">,</span> <span class="n">cropped_transform</span><span class="p">)</span>
 
         <span class="n">row</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s1">&#39;segment_id&#39;</span><span class="p">:</span> <span class="n">segment_id</span><span class="p">,</span>
-            <span class="s1">&#39;geometry&#39;</span><span class="p">:</span> <span class="n">geom</span>
+            <span class="s1">'segment_id'</span><span class="p">:</span> <span class="n">segment_id</span><span class="p">,</span>
+            <span class="s1">'geometry'</span><span class="p">:</span> <span class="n">geom</span>
         <span class="p">}</span>
 
         <span class="n">spectral_statistics</span> <span class="o">=</span> <span class="n">calculate_spectral_stats</span><span class="p">(</span>
@@ -2854,7 +2854,7 @@ stored in a dictionary with the band index as the prefix to the keys.</p>
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="May 11, 2026 00:31:24 UTC">May 11, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="May 10, 2026 22:33:13 UTC">May 10, 2026</span>
   </span>
 
     
@@ -2907,7 +2907,7 @@ stored in a dictionary with the band index as the prefix to the keys.</p>
       <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.sections", "search.highlight", "search.suggest"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
-      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>
       
         <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.0/es5/tex-mml-chtml.js"></script>
       
