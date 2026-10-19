@@ -17,7 +17,7 @@ Current scope:
 - GeoTIFF loading with Rasterio metadata preserved
 - ten scikit-image region-segmentation methods, including SLIC, quickshift,
   Felzenszwalb, watershed, random walker, active contours, and flood region growing
-- segment-level spectral and texture features
+- segment-level spectral distributions and indices, shape features, and configurable texture
 - optional point-cloud features joined to the same segment objects
 - point-to-segment labelling utilities
 - random forest and MLP segment classification
@@ -96,6 +96,29 @@ Segmentation also accepts `method="felzenszwalb"`, `"watershed"`,
 Scalar methods require one selected band; seeded methods require markers or an
 initial contour. See the [segmentation guide](https://obia.sefa.ai/usage/segmentation/)
 for inputs, parameters, and examples for each method.
+
+## Raster Object Features
+
+Calculate additional features on existing polygons without repeating segmentation.
+All bands use zero-based numeric positions in the loaded image:
+
+```python
+from obia.features import TextureConfig, extract_features
+
+segments = extract_features(
+    segments, image, bands=[0, 1, 2, 3],
+    spectral=("mean", "std", "median", "iqr", "mad", "valid_count", "valid_fraction"),
+    percentiles=(10, 90),
+    indices={"ndvi": (3, 0)},
+    shape=True,
+    texture=TextureConfig(bands=(0,), distances=(1, 2), entropy_radii=(1, 3)),
+)
+```
+
+Choose index inputs to match your raster's band order. Shape uses projected map
+units, or `shape_units="pixel"` for pixel measurements. See the
+[raster feature guide](https://obia.sefa.ai/usage/raster-features/) for definitions,
+masks, and texture settings.
 
 ## Point-Cloud Features
 

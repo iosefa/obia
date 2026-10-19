@@ -64,7 +64,7 @@ def segment(image, segmentation_bands=None, statistics_bands=None,
             method="slic", calc_mean=True, calc_variance=True,
             calc_skewness=True, calc_kurtosis=True, calc_contrast=True,
             calc_dissimilarity=True, calc_homogeneity=True, calc_ASM=True,
-            calc_energy=True, calc_correlation=True, **kwargs):
+            calc_energy=True, calc_correlation=True, feature_options=None, **kwargs):
     """
     :param image: Input image for segmentation and feature extraction.
     :param segmentation_bands: Bands to be used for segmentation. Default is None.
@@ -80,15 +80,20 @@ def segment(image, segmentation_bands=None, statistics_bands=None,
     :param calc_ASM: Flag to calculate angular second moment of segments. Default is True.
     :param calc_energy: Flag to calculate energy of segments. Default is True.
     :param calc_correlation: Flag to calculate correlation of segments. Default is True.
+    :param feature_options: Optional dictionary of create_objects options, including spectral_features,
+        percentiles, indices, shape_features, and texture_config. These override legacy feature flags.
     :param kwargs: Segmentation parameters; see ``create_labels`` for supported methods and inputs.
     :return: Segments object containing the segmented image and statistics.
     """
     labels = create_labels(image, segmentation_bands=segmentation_bands, method=method, **kwargs)
     segments_gdf = labels_to_segments(labels, image)
-    objects_gdf = create_objects(segments_gdf, image, spectral_bands=statistics_bands, calc_mean=calc_mean,
-                                 calc_variance=calc_variance, calc_skewness=calc_skewness, calc_kurtosis=calc_kurtosis,
-                                 calc_contrast=calc_contrast, calc_dissimilarity=calc_dissimilarity,
-                                 calc_homogeneity=calc_homogeneity, calc_ASM=calc_ASM, calc_energy=calc_energy,
-                                 calc_correlation=calc_correlation)
+    options = dict(spectral_bands=statistics_bands, calc_mean=calc_mean,
+                   calc_variance=calc_variance, calc_skewness=calc_skewness, calc_kurtosis=calc_kurtosis,
+                   calc_contrast=calc_contrast, calc_dissimilarity=calc_dissimilarity,
+                   calc_homogeneity=calc_homogeneity, calc_ASM=calc_ASM, calc_energy=calc_energy,
+                   calc_correlation=calc_correlation, mask=kwargs.get("mask"))
+    if feature_options is not None:
+        options.update(feature_options)
+    objects_gdf = create_objects(segments_gdf, image, **options)
 
     return Segments(labels, objects_gdf, method, **kwargs)

@@ -44,12 +44,18 @@ The classification workflow expects a segment table with numeric feature columns
 
 Common feature groups include:
 
-- spectral statistics from selected raster bands
-- texture statistics from gray-level co-occurrence calculations
+- spectral distributions from selected raster bands
+- spectral indices calculated from explicit numeric band positions
+- polygon size and shape measurements
+- texture statistics from masked gray-level co-occurrence matrices and local entropy
 - point-cloud height, intensity, and density metrics
 - segment identifiers and geometry for output
 
-Raster features are created during segmentation. Point-cloud features are added later as an enrichment step, using the same segment polygons.
+Raster features can be created during segmentation or recalculated independently
+with `obia.features.extract_features()`, using the same polygons. See
+[raster object features](usage/raster-features.md) for selectable measurements,
+formulas, and units. Point-cloud features are added later as an enrichment step,
+using the same segment polygons.
 
 Feature calculation can be expensive on large rasters or dense point clouds. Start with a small representative area before scaling up to a full scene.
 

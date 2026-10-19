@@ -17,7 +17,7 @@ The library supports:
 - GeoTIFF loading with Rasterio metadata
 - ten scikit-image segmentation methods, including superpixels, watershed,
   seeded regions, active contours, and flood region growing
-- spectral and texture summaries for segment objects
+- spectral distributions and indices, shape measurements, and configurable texture for segment objects
 - optional point-cloud height, intensity, and density features
 - point-to-segment labelling for training data
 - random forest and MLP segment classification

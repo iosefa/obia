@@ -179,6 +179,12 @@ OBIA does not silently average RGB or multispectral bands.
 summarized afterward, and can include bands that were not used for segmentation.
 Feature statistics use the original raster values.
 
+Use `feature_options` to request spectral distributions, indices specified with
+numeric band positions, shape measurements, and configurable texture. Alternatively,
+run `obia.features.extract_features()` on existing polygons to change measurements
+without rerunning segmentation. See [raster object features](raster-features.md)
+for configuration, formulas, and examples.
+
 An optional boolean `mask` with shape `(height, width)` restricts output to True
 pixels. SLIC, watershed, and random walker use the mask during segmentation.
 Other algorithms operate on the full prepared image, then their output is clipped;

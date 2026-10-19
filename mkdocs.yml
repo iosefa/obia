@@ -48,6 +48,7 @@ nav:
     - Concepts: concepts.md
     - Usage:
         - Segmentation: usage/segmentation.md
+        - Raster Features: usage/raster-features.md
         - Classification: usage/classification.md
         - Point Clouds: usage/pointcloud.md
         - Large Rasters: usage/large-rasters.md
@@ -61,6 +62,7 @@ nav:
         - Overview: api/index.md
         - Handlers: api/handlers.md
         - Segmentation: api/segmentation.md
+        - Raster Features: api/features.md
         - Point Clouds: api/pointcloud.md
         - Experimental Detection: api/detection.md
         - Classification: api/classification.md
