@@ -1,6 +1,6 @@
 # OBIA
 
-[![PyPI](https://img.shields.io/pypi/v/obia.svg?release=0.1.4)](https://pypi.org/project/obia/)
+[![PyPI](https://img.shields.io/pypi/v/obia.svg?release=0.2.0)](https://pypi.org/project/obia/)
 [![PyPI Downloads](https://static.pepy.tech/badge/obia)](https://pepy.tech/projects/obia)
 [![Docker Pulls](https://img.shields.io/docker/pulls/iosefa/obia?logo=docker&label=pulls)](https://hub.docker.com/r/iosefa/obia)
 [![Tests](https://img.shields.io/github/actions/workflow/status/iosefa/obia/tests.yml?branch=main&label=tests)](https://github.com/iosefa/obia/actions/workflows/tests.yml)

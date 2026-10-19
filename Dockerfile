@@ -34,6 +34,7 @@ RUN conda install -y -c conda-forge \
         gdal \
         pdal \
         python-pdal \
+    && pip install --no-cache-dir "xgboost>=2.1.4" \
     && pip install --no-cache-dir --no-deps pyforestscan . \
     && conda clean -afy
 
