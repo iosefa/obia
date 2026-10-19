@@ -1,4 +1,4 @@
-# Utils API
+# Utilities API
 
 ## `obia.utils.image`
 

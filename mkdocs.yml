@@ -69,7 +69,7 @@ nav:
     - Report Issues: https://github.com/iosefa/obia/issues
     - API Reference:
         - Overview: api/index.md
-        - Handlers: api/handlers.md
+        - Raster Loading: api/handlers.md
         - Segmentation: api/segmentation.md
         - Raster Features: api/features.md
         - Point Clouds: api/pointcloud.md

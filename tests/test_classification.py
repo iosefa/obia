@@ -268,7 +268,7 @@ def test_named_aliases(alias, canonical):
     assert type(create_classifier(alias)) is type(create_classifier(canonical))
 
 
-def test_optional_xgboost_import_is_lazy_and_error_is_actionable(monkeypatch, objects):
+def test_xgboost_import_is_lazy_and_preserves_import_errors(monkeypatch, objects):
     original = builtins.__import__
 
     def no_xgboost(name, *args, **kwargs):
@@ -278,14 +278,13 @@ def test_optional_xgboost_import_is_lazy_and_error_is_actionable(monkeypatch, ob
 
     monkeypatch.setattr(builtins, "__import__", no_xgboost)
     classify(*objects, method="decision_tree")
-    with pytest.raises(ImportError, match=r"obia\[xgboost\]"):
+    with pytest.raises(ImportError, match="not installed"):
         create_classifier("xgboost")
 
 
 @pytest.mark.parametrize("method", ["xgboost", "xgboost_rf", "xgb", "XGBClassifier"])
 @pytest.mark.parametrize("numeric", [False, True])
 def test_real_xgboost_multiclass_labels_and_probabilities(objects, method, numeric):
-    pytest.importorskip("xgboost")
     segments, training = objects
     if numeric:
         training.feature_class = training.feature_class.map({"forest": 10, "water": 30, "soil": 80})
@@ -301,7 +300,7 @@ def test_real_xgboost_multiclass_labels_and_probabilities(objects, method, numer
 
 
 def test_xgboost_binary_custom_pipeline_and_missing_values(objects):
-    xgb = pytest.importorskip("xgboost")
+    import xgboost as xgb
     segments, training = objects
     training = training[training.feature_class != "soil"].copy()
     training.iloc[0, training.columns.get_loc("b0_mean")] = np.nan
@@ -316,8 +315,6 @@ def test_xgboost_binary_custom_pipeline_and_missing_values(objects):
 @pytest.mark.parametrize("method", ["rf", "logistic_regression", "mlp", "xgboost"])
 def test_real_shap_explanations(objects, method):
     pytest.importorskip("shap")
-    if method == "xgboost":
-        pytest.importorskip("xgboost")
     segments, training = objects
     training = training.groupby("feature_class").head(3)
     options = _method_options(method)
@@ -364,7 +361,7 @@ def test_all_blocked_labels_keep_nullable_dtype_and_save_to_geopackage(objects, 
 
 @pytest.mark.parametrize("method", ["calibrated", "bagging", "voting", "adaboost"])
 def test_xgboost_inside_composite_models(objects, method):
-    xgb = pytest.importorskip("xgboost")
+    import xgboost as xgb
     segments, training = objects
     estimator = xgb.XGBClassifier(n_estimators=3, max_depth=2, n_jobs=1)
     if method == "voting":
@@ -428,7 +425,7 @@ def test_complex_features_are_rejected_without_losing_imaginary_part(objects):
 
 
 def test_xgboost_subclass_preserves_string_labels(objects):
-    xgb = pytest.importorskip("xgboost")
+    import xgboost as xgb
 
     class CustomXGBClassifier(xgb.XGBClassifier):
         pass
@@ -443,7 +440,7 @@ def test_xgboost_subclass_preserves_string_labels(objects):
 
 @pytest.mark.parametrize("nested", [False, True])
 def test_xgboost_search_keeps_user_parameter_paths(objects, nested):
-    xgb = pytest.importorskip("xgboost")
+    import xgboost as xgb
     segments, training = objects
     estimator = xgb.XGBClassifier(n_estimators=4, max_depth=2, n_jobs=1)
     if nested:
@@ -460,7 +457,7 @@ def test_xgboost_search_keeps_user_parameter_paths(objects, nested):
 
 @pytest.mark.parametrize("selector", ["select_from_model", "rfe"])
 def test_xgboost_importance_based_feature_selection(objects, selector):
-    xgb = pytest.importorskip("xgboost")
+    import xgboost as xgb
     segments, training = objects
     estimator = xgb.XGBClassifier(n_estimators=4, max_depth=2, n_jobs=1)
     selection = (SelectFromModel(estimator, threshold=-np.inf) if selector == "select_from_model"
@@ -474,7 +471,7 @@ def test_xgboost_importance_based_feature_selection(objects, selector):
 
 
 def test_xgboost_regressor_used_for_feature_selection_stays_a_regressor(objects):
-    xgb = pytest.importorskip("xgboost")
+    import xgboost as xgb
     segments, training = objects
     training.feature_class = training.feature_class.map({"forest": 10, "water": 30, "soil": 80})
     pipeline = Pipeline([
@@ -488,7 +485,7 @@ def test_xgboost_regressor_used_for_feature_selection_stays_a_regressor(objects)
 
 
 def test_xgboost_nan_support_survives_bagging_wrapper(objects):
-    xgb = pytest.importorskip("xgboost")
+    import xgboost as xgb
     segments, training = objects
     for table in (segments, training):
         table.iloc[0, table.columns.get_loc("b0_mean")] = np.nan
@@ -530,7 +527,7 @@ def test_pipeline_can_build_its_own_pairwise_matrices(objects):
 
 
 def test_search_can_choose_xgboost_as_an_estimator(objects):
-    xgb = pytest.importorskip("xgboost")
+    import xgboost as xgb
     segments, training = objects
     choices = [LogisticRegression(), xgb.XGBClassifier(n_estimators=4, max_depth=2, n_jobs=1)]
     pipeline = Pipeline([("model", LogisticRegression())])
@@ -543,7 +540,7 @@ def test_search_can_choose_xgboost_as_an_estimator(objects):
 
 
 def test_xgboost_feature_selector_inside_column_transformer(objects):
-    xgb = pytest.importorskip("xgboost")
+    import xgboost as xgb
     segments, training = objects
     columns = ColumnTransformer([
         ("selected", SelectFromModel(xgb.XGBClassifier(n_estimators=4, n_jobs=1), threshold=-np.inf),
@@ -601,8 +598,6 @@ def test_additional_sklearn_classifiers_with_fully_labelled_data(objects, name):
 def test_fitted_model_can_be_saved_reloaded_and_retrained(objects, method, tmp_path):
     import joblib
     from sklearn.base import clone
-    if method == "xgboost":
-        pytest.importorskip("xgboost")
     segments, training = objects
     options = {"n_estimators": 4, "n_jobs": 1} if method in {"rf", "xgboost"} else {}
     result = classify(segments, training, method=method, **options)
@@ -636,7 +631,7 @@ def test_frozen_classifier_and_parameter_overrides_preserve_original(objects):
 @pytest.mark.parametrize("calibrated", [False, True])
 def test_frozen_xgboost_can_be_used_directly_or_calibrated(objects, calibrated):
     frozen = pytest.importorskip("sklearn.frozen")
-    xgb = pytest.importorskip("xgboost")
+    import xgboost as xgb
     from sklearn.calibration import CalibratedClassifierCV
     segments, training = objects
     training.feature_class = training.feature_class.map({"forest": 0, "water": 1, "soil": 2})
@@ -663,8 +658,6 @@ def test_frozen_xgboost_can_be_used_directly_or_calibrated(objects, calibrated):
 ])
 def test_shap_across_other_probabilistic_families(objects, method, extra):
     pytest.importorskip("shap")
-    if method.startswith("xgboost"):
-        pytest.importorskip("xgboost")
     segments, training = objects
     training = training.groupby("feature_class").head(3)
     options = {**_method_options(method), **extra}

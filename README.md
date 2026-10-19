@@ -10,98 +10,67 @@
 
 Object-based image analysis tools for geospatial rasters.
 
-OBIA groups raster pixels into spatial objects, calculates object-level features, and supports downstream segment classification. The main output is a GeoDataFrame or GeoPackage of segment polygons with feature columns, optional point-cloud metrics, and predicted classes.
+OBIA groups raster pixels into objects, measures their properties, and classifies
+them using labelled examples. Results are stored in a GeoDataFrame: a table of
+polygons and their attributes that you can inspect, save, and use in GIS.
 
-Current scope:
+With OBIA, you can:
 
-- GeoTIFF loading with Rasterio metadata preserved
-- ten scikit-image region-segmentation methods, including SLIC, quickshift,
-  Felzenszwalb, watershed, random walker, active contours, and flood region growing
-- segment-level spectral distributions and indices, shape features, and configurable texture
-- optional point-cloud features joined to the same segment objects
-- point-to-segment labelling utilities
-- scikit-learn object classifiers and pipelines, plus optional XGBoost
-- grouped and spatial validation splits, geometry buffers, and reusable folds
-- tiled SLIC utilities for large rasters
-- experimental RetinaNet-based detection modules
+- Load GeoTIFFs with their coordinate reference system and spatial transform.
+- Segment imagery into object polygons.
+- Measure each object's band statistics, spectral indices, shape, and texture.
+- Transfer point labels to objects and train a classifier.
+- Evaluate models with grouped or spatial splits, buffers, and cross-validation.
+- Add point-cloud measurements or process large rasters in tiles when needed.
 
 ## Install
 
-### From PyPI
+Use Python 3.11 or newer. Install the published release with:
 
 ```bash
-pip install obia
+python -m pip install obia
 ```
 
-### Point-cloud support
+The documentation follows `main`. For a matching source installation, optional
+dependencies, or Docker setup, see the
+[installation guide](https://obia.sefa.ai/installation/).
 
-Point-cloud workflows need PDAL. Install PDAL with conda-forge first, then install OBIA with `pip` inside that environment:
+## Segment a raster
 
-```bash
-conda create -n obia-pointcloud -c conda-forge python=3.11 pdal python-pdal
-conda activate obia-pointcloud
-pip install obia
-```
-
-### Docker
-
-Build the image from the repository root:
-
-```bash
-docker build -t obia .
-```
-
-Release images are published to Docker Hub as `iosefa/obia`:
-
-```bash
-docker pull iosefa/obia:latest
-```
-
-The image includes OBIA, PDAL, the PDAL Python bindings, and `pyforestscan`.
-
-### Developer install
-
-```bash
-git clone https://github.com/iosefa/obia.git
-cd obia
-conda env create -f environment.yml
-conda activate obia
-```
-
-The development environment installs the package in editable mode with documentation and optional workflow dependencies.
-
-## Basic Segmentation
+This example assumes at least four loaded bands. Adjust the numeric band indices
+to match your image; `0` refers to the first loaded band.
 
 ```python
+from obia.datasets import chesapeake_sample
 from obia.handlers.geotif import open_geotiff
 from obia.segmentation.segment import segment
 
-image = open_geotiff("/path/to/image.tif")
+image = open_geotiff(chesapeake_sample("train")["image"])
 
 objects = segment(
     image,
     segmentation_bands=[0, 1, 2],
     statistics_bands=[0, 1, 2, 3],
     method="slic",
-    n_segments=3000,
-    compactness=10,
+    n_segments=600,
+    compactness=0.3,
+    convert2lab=False,
 )
 
 segments = objects.segments
 segments.to_file("segments.gpkg", driver="GPKG")
 ```
 
-Segmentation also accepts `method="felzenszwalb"`, `"watershed"`,
-`"random_walker"`, `"chan_vese"`, `"morphological_chan_vese"`,
-`"morphological_geodesic_active_contour"`, `"active_contour"`, and `"flood"`.
-Scalar methods require one selected band; seeded methods require markers or an
-initial contour. See the [segmentation guide](https://obia.sefa.ai/usage/segmentation/)
-for inputs, parameters, and examples for each method.
+Each row of `segments` contains a polygon, a `segment_id`, and feature columns.
+See the [segmentation guide](https://obia.sefa.ai/usage/segmentation/) for other
+algorithms, masks, and parameter examples.
 
-## Raster Object Features
+## Measure objects
 
 Calculate additional features on existing polygons without repeating segmentation.
-All bands use zero-based numeric positions in the loaded image:
+All bands use zero-based numeric positions in the loaded image. This example
+uses a projected CRS for shape measurements; use `shape_units="pixel"` if your
+raster has a geographic CRS:
 
 ```python
 from obia.features import TextureConfig, extract_features
@@ -121,29 +90,18 @@ units, or `shape_units="pixel"` for pixel measurements. See the
 [raster feature guide](https://obia.sefa.ai/usage/raster-features/) for definitions,
 masks, and texture settings.
 
-## Point-Cloud Features
+## Label and classify objects
 
-```python
-from obia.pointcloud import add_pointcloud_features
-
-segments = add_pointcloud_features(
-    segments,
-    pointcloud="/path/to/points.laz",
-    metrics=["height", "intensity", "density"],
-)
-```
-
-Point-cloud features are appended as `pc_*` columns, so the enriched segment table can be labelled and classified with the raster-derived features.
-
-## Segment Classification
+Provide labelled points with a `class` column, using the same coordinate system
+as the segments:
 
 ```python
 import geopandas as gpd
 
-from obia.classification.classify import classify
+from obia.classification import classify
 from obia.utils.utils import label_segments
 
-labelled_points = gpd.read_file("/path/to/labelled_points.gpkg")
+labelled_points = gpd.read_file("/path/to/labelled_points.gpkg").to_crs(segments.crs)
 training_segments, mixed_segments = label_segments(
     segments,
     labelled_points,
@@ -178,23 +136,19 @@ cross-validation folds are also supported. See the
 [validation guide](https://obia.sefa.ai/usage/validation/) for examples and the
 literature behind choosing a design that matches the prediction task.
 
-Choose from 39 named methods, including `"extra_trees"`, `"svc"`, `"knn"`,
-`"logistic_regression"`, `"hist_gradient_boosting"`, `"gaussian_nb"`, `"lda"`,
-and `"xgboost"`, or pass a scikit-learn classifier or pipeline as `method`.
-Install `pip install "obia[xgboost]"` for XGBoost. Feature scaling is fitted on
-training objects and reused for predictions; classifiers without probabilities
-return a missing prediction margin. See the
-[classification guide](https://obia.sefa.ai/usage/classification/) for the full
-method list, custom pipelines, class constraints, and evaluation.
+Use a method name or supply a compatible estimator or pipeline. The
+[classification guide](https://obia.sefa.ai/usage/classification/) covers model
+choices, preprocessing, predictions, and evaluation.
 
-## Example Notebooks
+## Example notebooks
 
-Three small notebooks generate their own synthetic raster and run independently:
+The notebooks run independently using the bundled Chesapeake imagery and
+reference maps, with plots and GIS exports:
 
 - [Raster segmentation](docs/examples/01_segmentation.ipynb): compare algorithms,
   create object polygons, and export segment IDs and a GeoPackage.
 - [Raster object features](docs/examples/02_raster_features.ipynb): spectral
-  summaries, indices, shape, texture, and quality masks.
+  summaries, indices, shape, texture, and analysis masks.
 - [Object classification](docs/examples/03_classification.ipynb): label objects
   from points, compare models, and save predictions and a reusable classifier.
 
@@ -205,17 +159,20 @@ python -m pip install -e ".[notebooks]"
 jupyter lab
 ```
 
-Open `docs/examples/` in JupyterLab. Add the `xgboost` extra to run that optional
-classifier too: `python -m pip install -e ".[notebooks,xgboost]"`.
+Open `docs/examples/` in JupyterLab.
 See the [notebook setup guide](docs/examples/index.md) for details.
 
 ## Documentation
 
-Published documentation is available at `https://obia.sefa.ai`.
+Read the [documentation](https://obia.sefa.ai) for the full workflow. Optional
+guides cover [point-cloud features](https://obia.sefa.ai/usage/pointcloud/),
+[large rasters](https://obia.sefa.ai/usage/large-rasters/), and
+[experimental detection](https://obia.sefa.ai/usage/detection/).
 
-Preview the docs locally:
+To preview the docs from a repository checkout:
 
 ```bash
+python -m pip install -e ".[docs]"
 mkdocs serve
 ```
 

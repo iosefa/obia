@@ -1,9 +1,13 @@
 # Segmentation
 
-OBIA wraps scikit-image's region-segmentation algorithms with a common raster,
-label-image, polygon, and feature-table interface.
+Segmentation divides an image into regions that can be measured and classified
+as objects. OBIA connects image segmentation algorithms to geospatial rasters,
+returning object IDs, polygon boundaries, and feature tables.
 
-## Load a Raster
+## Load a raster
+
+The examples use numeric band indices. Adjust them to the bands in your raster;
+the first example assumes at least four loaded bands.
 
 ```python
 from obia.handlers.geotif import open_geotiff
@@ -16,7 +20,30 @@ image = open_geotiff("/path/to/image.tif")
 Rasterio band numbers. Once loaded, `segmentation_bands` and `statistics_bands`
 use zero-based indexes into the loaded image.
 
-## Choose an Algorithm
+## Create segment objects
+
+Use `segment()` to create boundaries and calculate features in one call:
+
+```python
+objects = segment(
+    image,
+    segmentation_bands=[0, 1, 2],
+    statistics_bands=[0, 1, 2, 3],
+    method="slic",
+    n_segments=3000,
+    compactness=10,
+    convert2lab=False,
+)
+
+objects.segments.to_file("segments.gpkg", driver="GPKG")
+```
+
+`objects.segments` is the polygon table with one row per object.
+`objects.labels` is a raster of the corresponding object IDs. SLIC's `n_segments`
+sets an approximate number of regions; inspect the boundaries and adjust it for
+the sizes of objects you want to distinguish.
+
+## Choose an algorithm
 
 The `method` names match the functions in
 [scikit-image's segmentation API](https://scikit-image.org/docs/stable/api/skimage.segmentation.html).
@@ -42,27 +69,16 @@ from obia.segmentation import SEGMENTATION_METHODS
 print(SEGMENTATION_METHODS)
 ```
 
-SLIC is the default. Algorithm-specific keyword arguments are passed to
-scikit-image, with the input/output adaptations described below. Helpers such as
-`find_boundaries`, `clear_border`, and `join_segmentations` are available directly
-from scikit-image. `flood_fill` paints the region found by `flood`; use `method="flood"`
-to turn that same region-growing algorithm into OBIA objects.
+SLIC is the default. Algorithm-specific keyword arguments are passed to the
+underlying function. The examples below explain the required inputs and how
+OBIA converts each result to objects.
 
-## Superpixels and Graph Segmentation
+## Superpixels and graph segmentation
 
 ```python
-objects = segment(
-    image,
-    segmentation_bands=[0, 1, 2],
-    statistics_bands=[0, 1, 2, 3],
-    method="slic",
-    n_segments=3000,
-    compactness=10,
-)
-
 quickshift_objects = segment(
     image, segmentation_bands=[0, 1, 2], method="quickshift",
-    kernel_size=3, max_dist=6, ratio=0.5,
+    kernel_size=3, max_dist=6, ratio=0.5, convert2lab=False,
 )
 
 felzenszwalb_objects = segment(
@@ -71,13 +87,13 @@ felzenszwalb_objects = segment(
 )
 ```
 
-SLIC controls approximate object count with `n_segments`. Felzenszwalb controls
-object size indirectly: larger `scale` generally produces larger regions.
+Felzenszwalb controls object size indirectly: larger `scale` generally produces
+larger regions.
 Quickshift's `convert2lab` defaults to True for three selected bands and False
 otherwise. For three bands that are not RGB, pass `convert2lab=False`; the same
 option is available for SLIC. Channels are always stored last in OBIA.
 
-## Seeded Segmentation
+## Seeded segmentation
 
 Markers use pixel positions, not map coordinates. Random walker requires an
 integer array: positive values identify seed classes, zero means unlabelled,
@@ -108,7 +124,7 @@ precomputed gradient or other elevation surface, put that surface in a raster
 band and select it. `watershed_line=True` leaves separating pixels as background.
 Random walker's `mode="cg_mg"` requires the optional upstream dependency `pyamg`.
 
-## Level Sets and Active Contours
+## Level sets and active contours
 
 ```python
 chan_vese_objects = segment(
@@ -156,7 +172,7 @@ contour_objects = segment(
 OBIA fills the fitted closed contour to create objects. Open snakes do not define
 an enclosed region, so use scikit-image directly for nonperiodic boundary conditions.
 
-## Flood Region Growing
+## Flood region growing
 
 ```python
 flood_objects = segment(
@@ -168,7 +184,7 @@ flood_objects = segment(
 The tolerance is in normalized [0, 1] units by default. To use the raster's
 original units, pass `normalize=False` and a tolerance in those units.
 
-## Band Values, Masks, and Output
+## Band values, masks, and output
 
 By default, OBIA normalizes each selected band independently to [0, 1]. Constant
 bands become zero. The source raster is never modified. `normalize=False` preserves
@@ -196,7 +212,6 @@ no objects.
 The returned `Segments` object stores:
 
 - `objects.labels`: an int32 array with a unique positive ID per connected object.
-- `objects._segments`: the same label image, retained for compatibility.
 - `objects.segments`: a GeoDataFrame whose `segment_id` values match the label image.
 - `objects.method` and `objects.params`: the method and explicitly supplied parameters.
 
@@ -210,7 +225,10 @@ Scikit-image options that change the return type (`return_tree=True`,
 `extended_output=True`, `return_full_prob=True`) raise a clear error. Use the
 upstream functions for trees, energies, probability maps, or open contour coordinates.
 
-For labels or polygons without feature calculation:
+## Create labels or polygons without features
+
+Use the individual operations when you want to inspect boundaries or calculate
+features separately:
 
 ```python
 from obia.segmentation import create_labels, create_segments, labels_to_segments
@@ -221,19 +239,16 @@ polygons = labels_to_segments(labels, image)
 polygons = create_segments(image, segmentation_bands=[0], method="felzenszwalb", scale=100)
 ```
 
-## Save and Enrich Objects
+Boundary-processing helpers such as `find_boundaries`, `clear_border`, and
+`join_segmentations` can be used directly from scikit-image. For region growing
+that produces object polygons, use `method="flood"`; `flood_fill` instead paints
+the selected region into an image.
 
-```python
-objects.segments.to_file("segments.gpkg", driver="GPKG")
+## Continue with object analysis
 
-from obia.pointcloud import add_pointcloud_features
+Inspect the boundaries, then [add raster features](raster-features.md) or
+[label and classify the objects](classification.md). You can also add
+[point-cloud features](pointcloud.md) to the same polygon table.
 
-enriched = add_pointcloud_features(
-    objects.segments, pointcloud="/path/to/points.laz",
-    metrics=["height", "intensity", "density"],
-)
-```
-
-Inspect object boundaries before training a classifier. The separate
-[large-raster tiling workflow](large-rasters.md) still supports SLIC only; its
-stitching logic does not yet handle the other methods.
+For images that are impractical to process in memory, the
+[large-raster workflow](large-rasters.md) provides tiled SLIC segmentation.

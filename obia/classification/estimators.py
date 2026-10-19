@@ -86,21 +86,15 @@ def create_classifier(method="rf", **kwargs):
     ``method`` accepts a name in ``CLASSIFICATION_METHODS``, a scikit-learn
     class name (for example ``"SVC"``), or a classifier instance. Keyword
     arguments are constructor parameters for named methods and ``set_params``
-    overrides for instances. XGBoost is imported only when requested and
-    requires ``pip install 'obia[xgboost]'``. Composite classifiers such as
+    overrides for instances. XGBoost ships with OBIA and is imported only when
+    requested. Composite classifiers such as
     voting and stacking require their usual ``estimators`` argument.
     """
     if isinstance(method, str):
         name = method.lower().replace("-", "_")
         name = _ALIASES.get(name, name)
         if name in _XGBOOST_METHODS:
-            try:
-                import xgboost
-            except ImportError as exc:
-                raise ImportError(
-                    "XGBoost classification requires the optional 'xgboost' dependency. "
-                    "Install with `pip install 'obia[xgboost]'`."
-                ) from exc
+            import xgboost
             estimator = getattr(xgboost, _XGBOOST_METHODS[name])(**kwargs)
         elif name in _CLASSIFIERS:
             estimator = _CLASSIFIERS[name](**kwargs)
@@ -138,7 +132,7 @@ def _requires_pairwise_input(estimator):
 
 
 def _is_xgboost_classifier(estimator):
-    # Inspect the MRO so subclasses work without importing the optional dependency.
+    # Inspect the MRO so subclasses work without eagerly importing XGBoost.
     return any(base.__module__.split(".")[0] == "xgboost" and base.__name__ == "XGBClassifier"
                for base in type(estimator).__mro__)
 

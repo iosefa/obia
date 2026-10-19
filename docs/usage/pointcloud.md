@@ -1,6 +1,8 @@
 # Point Clouds
 
-Point-cloud features are added to existing segment objects. Raster features and point-cloud features live on the same rows, which keeps labelling, review, and classification focused on one object table.
+Point-cloud measurements describe height, intensity, and point density within
+object polygons. Add them to the same table as your raster features, then use
+the combined measurements for classification.
 
 The recommended order is:
 
@@ -9,9 +11,10 @@ The recommended order is:
 3. label training segments
 4. classify the enriched segment table
 
-## Install Point-Cloud Dependencies
+## Install file readers
 
-Point-cloud workflows need PDAL. Install PDAL in a conda environment first, then install OBIA with `pip` inside that environment:
+For LAS/LAZ files, install PDAL in a conda environment, then install OBIA with
+`pip` in that environment. In-memory arrays and tables do not need file readers.
 
 ```bash
 conda create -n obia-pointcloud -c conda-forge python=3.11 pdal python-pdal
@@ -34,7 +37,7 @@ To include the optional `pyforestscan` reader, install the point-cloud extra aft
 pip install "obia[pointcloud]"
 ```
 
-## Add Features to Segments
+## Add features to objects
 
 ```python
 import geopandas as gpd
@@ -64,7 +67,7 @@ segments = add_pointcloud_features(
 )
 ```
 
-## In-Memory Point Clouds
+## Use in-memory points
 
 Point clouds can also be passed as a DataFrame:
 
@@ -95,7 +98,7 @@ Structured arrays can use `X`, `Y`, `Z`, and `Intensity` fields. Plain NumPy arr
 x, y, z, intensity
 ```
 
-## Feature Columns
+## Feature columns
 
 Height metrics use the `pc_z_*` prefix:
 
@@ -111,9 +114,9 @@ Intensity metrics use the `pc_intensity_*` prefix. Density features include:
 - `pc_point_count`
 - `pc_density`
 
-## Use in Classification
+## Use the features in classification
 
-After enrichment, label the enriched segment table:
+Label the object table after adding the measurements:
 
 ```python
 from obia.utils.utils import label_segments
@@ -124,10 +127,10 @@ training_segments, mixed_segments = label_segments(
 )
 ```
 
-After labelling, train the classifier with the enriched segment table:
+Then train a classifier:
 
 ```python
-from obia.classification.classify import classify
+from obia.classification import classify
 
 result = classify(
     segments,

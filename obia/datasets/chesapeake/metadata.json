@@ -1,0 +1,127 @@
+{
+  "dataset": "Chesapeake Land Cover (CVPR 2019)",
+  "source_page": "https://lila.science/datasets/chesapeakelandcover/",
+  "citation": "Robinson et al. (2019). Large Scale High-Resolution Land Cover Mapping with Multi-Resolution Data. CVPR.",
+  "doi": "10.1109/CVPR.2019.01301",
+  "imagery_year": 2013,
+  "band_indices": [
+    0,
+    1,
+    2,
+    3
+  ],
+  "class_names": {
+    "1": "water",
+    "2": "tree canopy / forest",
+    "3": "low vegetation / field",
+    "4": "barren land",
+    "5": "impervious (other)",
+    "6": "impervious (road)"
+  },
+  "reference_nodata": 15,
+  "selection": "Crops chosen for class diversity from separate upstream Maryland training and test tiles; no model scores used.",
+  "samples": {
+    "train": {
+      "upstream_split": "md-train",
+      "tile_id": "m_3807625_sw_18_1",
+      "window": {
+        "row_off": 0,
+        "col_off": 1536,
+        "height": 1024,
+        "width": 1024
+      },
+      "files": {
+        "image": {
+          "filename": "train_image.tif",
+          "url": "https://lilawildlife.blob.core.windows.net/lila-wildlife/lcmcvpr2019/cvpr_chesapeake_landcover/md_1m_2013_extended-debuffered-train_tiles/m_3807625_sw_18_1_naip-new.tif",
+          "sha256": "5c058cf92852f5bb8190133878341675ba996c3220ad16d6a0ad18a9ae86371a",
+          "pixel_sha256": "06d39b05efccff3cfb7f2241b431ddff3064569db11fc6a4ae3470af6cf7ea3f",
+          "bytes": 2843460
+        },
+        "reference": {
+          "filename": "train_reference.tif",
+          "url": "https://lilawildlife.blob.core.windows.net/lila-wildlife/lcmcvpr2019/cvpr_chesapeake_landcover/md_1m_2013_extended-debuffered-train_tiles/m_3807625_sw_18_1_lc.tif",
+          "sha256": "2ec0df80414ceb4e5c08d76b03f22ec5f836482f4914b828d623736e7edd1ca2",
+          "pixel_sha256": "ed858870b3ccc0ae30ab4ed5cbd16b5e1699807cf824a9df6f4d6f5cf6598d2b",
+          "bytes": 55480
+        }
+      },
+      "crs": "EPSG:26918",
+      "transform": [
+        1.0,
+        0.0,
+        327432.0,
+        0.0,
+        -1.0,
+        4269825.0
+      ],
+      "resolution": [
+        1.0,
+        1.0
+      ],
+      "shape": [
+        1024,
+        1024
+      ],
+      "class_pixel_counts": {
+        "1": 37272,
+        "2": 530492,
+        "3": 239777,
+        "4": 45447,
+        "5": 146980,
+        "6": 48608
+      }
+    },
+    "test": {
+      "upstream_split": "md-test",
+      "tile_id": "m_3807608_nw_18_1",
+      "window": {
+        "row_off": 5120,
+        "col_off": 2560,
+        "height": 1024,
+        "width": 1024
+      },
+      "files": {
+        "image": {
+          "filename": "test_image.tif",
+          "url": "https://lilawildlife.blob.core.windows.net/lila-wildlife/lcmcvpr2019/cvpr_chesapeake_landcover/md_1m_2013_extended-debuffered-test_tiles/m_3807608_nw_18_1_naip-new.tif",
+          "sha256": "66bf69f4b4ee2425f453ab749a9dca16eed087a8cea407f9dc971d2d7ad9554c",
+          "pixel_sha256": "768ea79d6df636fa5c4dd28ebddc49c270113c137b7510a9c13e81aa997f0d1a",
+          "bytes": 2602742
+        },
+        "reference": {
+          "filename": "test_reference.tif",
+          "url": "https://lilawildlife.blob.core.windows.net/lila-wildlife/lcmcvpr2019/cvpr_chesapeake_landcover/md_1m_2013_extended-debuffered-test_tiles/m_3807608_nw_18_1_lc.tif",
+          "sha256": "7cd55f7faaac41d65dfb5226415f0c147063ea592149504f41c3593b97fb2b57",
+          "pixel_sha256": "20d69134f9cd9fe8975c0e58de317c573f57558976ec1cbcb90da3ead85e70e1",
+          "bytes": 39226
+        }
+      },
+      "crs": "EPSG:26918",
+      "transform": [
+        1.0,
+        0.0,
+        405357.0,
+        0.0,
+        -1.0,
+        4311959.0
+      ],
+      "resolution": [
+        1.0,
+        1.0
+      ],
+      "shape": [
+        1024,
+        1024
+      ],
+      "class_pixel_counts": {
+        "1": 13469,
+        "2": 320806,
+        "3": 666852,
+        "4": 1174,
+        "5": 36275,
+        "6": 10000
+      }
+    }
+  }
+}

@@ -1,46 +1,67 @@
 # Concepts
 
-Object-based image analysis treats groups of pixels as analysis units. Instead of classifying every pixel independently, OBIA first partitions an image into spatial objects and then summarizes each object with features such as band means, variance, texture, and shape-related measurements.
+Object-based image analysis uses regions of an image as the units of analysis.
+A region might represent a field, tree crown, canopy gap, or patch of land cover.
+Segmentation defines these regions; their measurements become inputs to a
+classifier.
 
-This is useful when the target classes are better represented by patches, crowns, fields, canopy gaps, or other spatial units than by individual pixels.
+The raster workflow is:
 
-## Image Representation
+1. **Segment the image** into objects and convert their boundaries to polygons.
+2. **Measure the objects**, using band values, spectral indices, shape, or texture.
+3. **Label a sample of objects** and choose training and test subsets.
+4. **Train and evaluate a classifier**, then predict classes for the object map.
 
-`obia.handlers.geotif.open_geotiff` reads a raster into an `Image` object. The object stores:
+The same polygon table carries geometry, measurements, labels, and predictions
+through these steps. You can save it between steps or start with polygons you
+already have. The [example notebooks](examples/index.md) demonstrate the workflow.
+
+## Raster data and band indices
+
+`obia.handlers.geotif.open_geotiff` returns an instance of OBIA's own
+[`Image` class](api/handlers.md#obia.handlers.geotif.Image). It stores:
 
 - `img_data`: raster values as a NumPy array with shape `(height, width, bands)`
 - `crs`: the raster coordinate reference system
 - `transform`: the Rasterio affine transform
 - `rasterio_obj`: the source Rasterio dataset
+- `valid_mask`: which pixels are valid in each loaded band
 
-Band indexes in OBIA are zero-based after loading. If a GeoTIFF has bands 1, 2, and 3, they are referenced in OBIA as `0`, `1`, and `2`.
+`image.to_image([0, 1, 2])` creates a Pillow image for display.
 
-## Segments And Objects
+Band indices are zero-based after loading: `0` is the first loaded band. The
+loader's optional `bands` argument uses one-based file band numbers. For example,
+after `open_geotiff(path, bands=[4, 1, 2])`, OBIA indices `0`, `1`, and `2` refer
+to file bands 4, 1, and 2, respectively.
 
-Segmentation converts raster pixels into polygon geometries. The public `segment()` function runs three steps:
+## Segments and objects
 
-1. `create_labels()` produces an object-label image.
-2. `labels_to_segments()` produces georeferenced segment polygons.
-3. `create_objects()` calculates segment-level statistics.
+Segmentation groups pixels into connected regions. Each region becomes an object
+with a polygon boundary and a unique `segment_id`. The `segment()` function
+combines three operations:
 
-`create_segments()` combines the first two steps when no feature calculation is needed.
+1. `create_labels()` creates a raster of integer object IDs.
+2. `labels_to_segments()` converts the regions to georeferenced polygons.
+3. `create_objects()` adds measurements to the polygon table.
 
-The result is a `Segments` object. The main table is `Segments.segments`, a GeoDataFrame with one row per segment.
+`segment()` returns a `Segments` result. Its `.segments` attribute is the
+GeoDataFrame, and `.labels` is the object-ID raster. If you only need polygons,
+`create_segments()` combines the first two operations and returns a GeoDataFrame
+directly. Use `extract_features()` to add measurements later.
 
-OBIA supports ten scikit-image region-segmentation methods: SLIC, quickshift,
-Felzenszwalb, watershed, random walker, Chan-Vese, morphological Chan-Vese,
-morphological geodesic active contours, closed parametric active contours, and
-flood region growing. See the [segmentation guide](usage/segmentation.md) for
-method names and required inputs.
+The [segmentation guide](usage/segmentation.md) explains how to choose an algorithm
+and adjust its inputs.
 
 Each connected object has a positive label ID matching its polygon's
 `segment_id`; zero is background or excluded data. Binary methods create objects
 from foreground pixels. Segmentation works on a copy of the selected bands, so
 the original raster values remain available for feature calculation.
 
-## Feature Sources
+## Object features
 
-The classification workflow expects a segment table with numeric feature columns. Geometry and identifier columns are kept for geospatial output, but the classifier is trained on the remaining feature columns.
+Features are numeric measurements used to distinguish classes. The classifier
+learns from selected feature columns; geometry and object IDs remain in the
+table for mapping and export.
 
 Common feature groups include:
 
@@ -48,8 +69,7 @@ Common feature groups include:
 - spectral indices calculated from explicit numeric band positions
 - polygon size and shape measurements
 - texture statistics from masked gray-level co-occurrence matrices and local entropy
-- point-cloud height, intensity, and density metrics
-- segment identifiers and geometry for output
+- optional point-cloud height, intensity, and density measurements
 
 Raster features can be created during segmentation or recalculated independently
 with `obia.features.extract_features()`, using the same polygons. See
@@ -57,61 +77,60 @@ with `obia.features.extract_features()`, using the same polygons. See
 formulas, and units. Point-cloud features are added later as an enrichment step,
 using the same segment polygons.
 
-Feature calculation can be expensive on large rasters or dense point clouds. Start with a small representative area before scaling up to a full scene.
+Start with a small representative area when choosing features. Texture and
+point-cloud measurements can be expensive over a full scene.
 
 ## Labels
 
-`label_segments()` joins labelled points to segment polygons. A segment receives a class when all intersecting label points agree. Segments intersecting multiple classes are returned separately as mixed segments so they can be inspected or excluded.
+Training labels identify known classes, such as forest, water, or soil.
+`label_segments()` transfers labels from points to polygons. An object receives
+a class when its intersecting points agree. The function also returns the IDs
+of objects with conflicting labels, so you can review them.
 
-The labelled point table must contain:
+The point table needs a `geometry` column and a `class` column, with coordinates
+in the same CRS as the objects.
 
-- `geometry`
-- `class`
-
-The labelled segment table produced by `label_segments()` contains `feature_class`, which is the target column expected by `classify()`.
+The returned labelled objects have a `feature_class` column, which is the target
+expected by `classify()`. These class labels are separate from the numeric
+`segment_id` values used to identify objects.
 
 ## Classification
 
-`classify()` supports:
+`classify()` fits a model to labelled objects and predicts a class for each object
+in the prediction table. Choose a method such as random forest, logistic
+regression, or support vector machines, or supply a compatible estimator or
+pipeline. See the [classification guide](usage/classification.md) for model
+choices and preprocessing.
 
-- `method="rf"` for random forests
-- `method="mlp"` for multi-layer perceptrons
+The result retains the fitted model and feature order. Its `.classified`
+attribute contains the object polygons with `predicted_class` and
+`prediction_margin` columns. The margin is the gap between the two largest class
+probabilities; it is missing for models without probability estimates.
 
-The function returns a `ClassifiedImage` object. Its `classified` attribute is the classified GeoDataFrame with predicted classes and prediction margins.
+## Training and validation
 
-SHAP explanations are optional. Install the `explain` extra and pass `compute_shap=True` when feature-attribution output is needed.
+Training objects fit the model. Held-out objects measure how well it predicts
+labels it has not seen during fitting. For predictions in new fields or sites,
+keep those units separate when splitting data. Nearby objects can share enough
+information to make a random split look overly optimistic.
 
-## Detection
+Use `split_objects()` to define and inspect a partition, then pass it to
+`classify(split=...)`. For model selection, `cross_validation_splits()` provides
+reusable folds. The [validation guide](usage/validation.md) explains spatial
+blocks, buffers, explicit test sets, and final evaluation.
 
-The experimental `obia.detection` package contains a RetinaNet-based training and inference path for raster object detection. It is separate from the segmentation/classification workflow and depends on PyTorch, Torchvision, Albumentations, and Matplotlib.
+## Other workflows
 
-Use the detection module when the desired output is bounding boxes rather than segment polygons.
+- [Point-cloud features](usage/pointcloud.md) add height, intensity, and density
+  measurements to the same polygon table as `pc_*` columns.
+- [Large rasters](usage/large-rasters.md) covers tiled SLIC processing when a
+  full image is impractical to process in memory.
+- [Experimental detection](usage/detection.md) produces bounding boxes with a
+  separate model-training workflow.
 
-## Large Rasters
+## Check the inputs
 
-Large rasters should be processed in smaller pieces. `obia.utils.tiling.create_tiled_segments()` runs SLIC segmentation over tiles and merges the resulting polygons. This path requires GDAL Python bindings and should be treated as an advanced workflow.
-
-Use the standard `segment()` path first. Move to tiled processing when memory use or runtime becomes impractical.
-
-## Point Clouds
-
-Point-cloud feature extraction is an optional segment enrichment step. Raster segmentation creates the object geometry and raster feature table first. Point-cloud metrics are then calculated inside each segment polygon and appended as `pc_*` columns.
-
-This keeps the workflow simple: one segment table, multiple feature sources.
-
-Point-cloud path inputs require optional dependencies such as PDAL or pyforestscan. In-memory point clouds can be passed as DataFrames, GeoDataFrames, or NumPy arrays.
-
-Typical point-cloud columns include:
-
-- `pc_point_count`
-- `pc_density`
-- `pc_z_mean`
-- `pc_z_p95`
-- `pc_intensity_mean`
-
-## Practical Limits
-
-OBIA does not solve every remote-sensing classification problem. It works best when:
+Results depend on the quality of the objects, features, and labels. Check that:
 
 - raster metadata is correct
 - class boundaries are reasonably represented by image segments
@@ -119,9 +138,9 @@ OBIA does not solve every remote-sensing classification problem. It works best w
 - training labels are spatially accurate
 - classes have enough examples for supervised learning
 
-Poor segmentation usually leads to poor classification. Tune segmentation parameters before investing heavily in classifier settings.
+Inspect object boundaries and class coverage before comparing classifiers.
 
-## Further Reading
+## Further reading
 
 For background on object-based and geographic object-based image analysis:
 

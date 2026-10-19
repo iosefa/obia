@@ -23,6 +23,7 @@ dependencies = [
   "scikit-image>=0.23.2",
   "tqdm>=4.66.2",
   "scikit-learn>=1.4.2",
+  "xgboost>=2.1.4",
   "affine>=2.4.0",
   "pyproj>=3.6.1",
   "opencv-python>=4.10"
@@ -39,9 +40,6 @@ notebooks = [
   "ipykernel>=6.29",
   "nbconvert>=7.16",
   "matplotlib>=3.8"
-]
-xgboost = [
-  "xgboost>=2.1.4"
 ]
 docs = [
   "mkdocs>=1.6,<2",
@@ -75,6 +73,9 @@ Issues = "https://github.com/iosefa/obia/issues"
 [tool.setuptools.packages.find]
 include = ["obia*"]
 exclude = ["notebooks*", "tests*", "archive*"]
+
+[tool.setuptools.package-data]
+"obia.datasets" = ["chesapeake/*.tif", "chesapeake/*.json", "chesapeake/*.md"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

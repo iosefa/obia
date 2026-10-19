@@ -1,58 +1,47 @@
 # Raster Object Features
 
-Feature extraction attaches measurements to existing segment polygons. It can
-be repeated with new settings without rerunning segmentation. The output is a
-GeoDataFrame with the original geometry, IDs, index, and attributes, plus the
-requested numeric feature columns.
+Features describe each object's raster values, shape, and texture. Add them to
+segment polygons with `extract_features()`. You can change the measurements
+without repeating segmentation; the result preserves the original geometry and
+attributes and adds numeric feature columns.
 
 All feature inputs use **zero-based integer band indices into the loaded image**.
-There are no band-name aliases or automatic sensor mappings. If a file was loaded
-with `open_geotiff(path, bands=[4, 1, 2])`, feature bands `0`, `1`, and `2` refer to
-those three loaded bands in that order. The loader's file-band argument remains
-one-based, following Rasterio.
+If a file was loaded with `open_geotiff(path, bands=[4, 1, 2])`, feature bands
+`0`, `1`, and `2` refer to those loaded bands in that order. The loader's file-band
+argument is one-based. Choose band positions explicitly for your raster.
 
-## Extract Features from Existing Segments
+## Extract object features
 
-This example assumes a raster with at least four loaded bands. Choose the index
-tuples to match the band order and spectral content of your own raster.
+This example uses a raster with at least four loaded bands and a projected CRS.
+Choose the band positions for your image. For a geographic CRS, use
+`shape_units="pixel"` to measure shape relative to the raster grid.
 
 ```python
-import numpy as np
-
-from obia.features import TextureConfig, extract_features
+from obia.features import extract_features
 from obia.handlers.geotif import open_geotiff
 from obia.segmentation import create_segments
 
 image = open_geotiff("image.tif")
 polygons = create_segments(
     image, segmentation_bands=[0, 1, 2], method="slic", n_segments=1000,
+    convert2lab=False,
 )
 
 objects = extract_features(
     polygons,
     image,
     bands=[0, 1, 2, 3],
-    spectral=("mean", "std", "median", "iqr", "mad", "valid_count", "valid_fraction"),
-    percentiles=(10, 25, 75, 90),
-    indices={"ndvi": (3, 0), "vari": (0, 1, 2)},
-    shape=True,
-    texture=TextureConfig(
-        bands=(0, 3),
-        features=("contrast", "homogeneity", "entropy"),
-        distances=(1, 2, 4),
-        angles=(0, np.pi / 4, np.pi / 2, 3 * np.pi / 4),
-        levels=32,
-        entropy_radii=(1, 3),
-    ),
+    spectral=("mean", "std", "median"),
+    percentiles=(10, 90),
+    indices={"normalized_difference": (3, 0)},
+    shape=("area", "circularity"),
 )
 
 objects.to_file("objects.gpkg", driver="GPKG")
 ```
 
-`shape=True` uses projected map coordinates by default. For a geographic CRS or
-measurements relative to the raster grid, select `shape_units="pixel"`.
-
-Output names record the calculation and band positions, for example:
+Feature column names record the calculation and band positions. Depending on
+the measurements you request, examples include:
 
 - `b0_median`, `b3_p90`, `b0_valid_fraction`
 - `index_ndvi_b3_b0_mean`, `index_vari_b0_b1_b2_std`
@@ -67,7 +56,7 @@ table or raster. `spectral=(), percentiles=()` disables distributions;
 are opt-in. Without options, extraction returns all spectral statistics below
 and the 10th and 90th percentiles for all loaded bands.
 
-## Spectral Distributions
+## Band statistics
 
 | Feature | Definition |
 | --- | --- |
@@ -90,7 +79,7 @@ skewness and kurtosis are undefined and returned as NaN. Objects with no valid
 samples have count 0 and NaN distribution measurements. Their valid fraction is
 0 when they cover raster pixels, and NaN when they cover none.
 
-## Spectral Indices and Color
+## Spectral indices and color
 
 `indices` maps each calculation name to an ordered tuple of band indices. For
 example, `{"ndvi": (3, 0)}` means `(b3 - b0) / (b3 + b0)`. The caller chooses the
@@ -143,7 +132,7 @@ the `Image` source validity masks automatically.
 Index definitions can be compared with the original references collected in
 [Awesome Spectral Indices](https://www.nature.com/articles/s41597-023-02096-0).
 
-## Size and Shape
+## Size and shape
 
 Pass `shape=True` for all measurements, or a list such as
 `shape=("area", "circularity", "solidity")`.
@@ -175,8 +164,28 @@ names such as compactness and roundness. Compare [ENVI's shape definitions](http
 
 ## Texture
 
-`TextureConfig` supports selected bands, GLCM measures, distances, angles,
-quantization, and local entropy radii. All distances and radii are in **pixels**.
+Texture describes spatial variation within an object. A gray-level co-occurrence
+matrix (GLCM) counts pairs of pixel values at specified distances and directions.
+Local entropy measures variation within a neighborhood.
+
+Add texture measurements to an object table with `TextureConfig`. All distances
+and radii are in **pixels**:
+
+```python
+from obia.features import TextureConfig
+
+objects = extract_features(
+    objects, image,
+    spectral=(), percentiles=(),  # Keep the measurements already in the table.
+    texture=TextureConfig(
+        bands=(0, 3),
+        features=("contrast", "homogeneity", "entropy"),
+        distances=(1, 2, 4),
+        levels=32,
+        entropy_radii=(1, 3),
+    ),
+)
+```
 
 GLCM pairs count only when **both endpoints** are finite valid pixels inside the
 same object. Polygon holes, other objects, NoData, and pixels outside a supplied
@@ -220,17 +229,17 @@ centers become object features. Set `features=()` for local entropy alone.
 Configuration and fitted bounds are available in `objects.attrs["obia_features"]`.
 This is in-memory metadata; save it separately if needed alongside a GeoPackage.
 
-## Existing Segmentation Workflow
+## Extract features during segmentation
 
-`segment()` still combines segmentation and feature calculation. Pass
-`feature_options` for additional measurements:
+`segment()` combines boundary creation and feature extraction. Pass
+`feature_options` to choose measurements in the same call:
 
 ```python
 from obia.segmentation.segment import segment
 
 result = segment(
     image, segmentation_bands=[0, 1, 2], statistics_bands=[0, 1, 2, 3],
-    method="slic", n_segments=1000,
+    method="slic", n_segments=1000, convert2lab=False,
     feature_options={
         "spectral_features": ("mean", "std", "median", "valid_count"),
         "percentiles": (10, 90),
@@ -242,19 +251,19 @@ result = segment(
 objects = result.segments
 ```
 
-These options are forwarded to `create_objects()` and override its legacy feature
-flags. With no new options, the original spectral columns and `bN_contrast`-style
-texture column names are retained. Their texture values now correctly use band-first
-data, exclude invalid pairs, and use consistent image-wide quantization.
+These options are forwarded to `create_objects()`. They take precedence over
+individual `calc_*` switches. Without `feature_options`, `segment()` uses its
+default statistics and texture measurements, with names such as `b0_mean` and
+`b0_contrast`.
 
 For `create_objects()`, `calculate_spectral=False` disables band and index
 distributions, and `calculate_textural=False` disables texture. This permits
-shape-only extraction. `texture_config` replaces the six old texture flags;
-`spectral_features` replaces the old spectral-statistic flags. Without an explicit
+shape-only extraction. `texture_config` selects texture measurements;
+`spectral_features` selects spectral statistics. Without an explicit
 texture band list, `create_objects()` uses `textural_bands` or all loaded bands;
 the standalone `extract_features()` instead defaults texture to its `bands` selection.
 
-## Validity and Spatial Alignment
+## Missing data and spatial alignment
 
 Features are calculated from `image.img_data`, so they also work with in-memory
 images and after the source file has been closed. `open_geotiff()` retains source
@@ -268,6 +277,6 @@ sampling uses pixel centers and honors holes. Segments must have the same CRS as
 the raster; reproject them explicitly before extraction. Polygons outside the
 raster retain their geometry and receive undefined raster measurements.
 
-The result can be passed to the existing [labelling and classification workflow](classification.md).
+Pass the result to the [labelling and classification workflow](classification.md).
 Inspect missing values before training; tiny objects may have no texture pairs,
 and some indices are undefined where their denominators vanish.

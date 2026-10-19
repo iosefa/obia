@@ -33,4 +33,4 @@ from model selection.
 ::: obia.classification.estimators.CLASSIFICATION_METHODS
 
 See the [classification guide](../usage/classification.md) for the complete
-estimator table, scaling rules, optional XGBoost setup, and pipeline examples.
+estimator table, scaling rules, XGBoost options, and pipeline examples.

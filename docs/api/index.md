@@ -1,13 +1,15 @@
 # API Reference
 
-This section lists the main import paths documented for OBIA.
+Use the reference pages for function arguments, return values, and class
+attributes. For a walkthrough, start with the [usage guides](../index.md#continue-the-workflow)
+or [example notebooks](../examples/index.md).
 
-- Handlers: `obia.handlers.geotif`
-- Segmentation: `obia.segmentation.segment`, `obia.segmentation.segment_boundaries`, `obia.segmentation.segment_statistics`
-- Raster features: `obia.features`
-- Experimental detection: `obia.detection.*`
-- Point clouds: `obia.pointcloud.*`
-- Classification and validation splits: `obia.classification`
-- Utilities: `obia.utils.image`, `obia.utils.tiling`, `obia.utils.training`, `obia.utils.utils`
-
-For current function/class signatures, see the module pages below.
+| Task | Reference |
+| --- | --- |
+| Load GeoTIFFs and inspect raster data | [Raster loading](handlers.md) |
+| Create labels, polygons, and object tables | [Segmentation](segmentation.md) |
+| Calculate band statistics, indices, shape, and texture | [Raster features](features.md) |
+| Train classifiers and create validation splits | [Classification](classification.md) |
+| Add point-cloud measurements | [Point clouds](pointcloud.md) |
+| Work with labels, image processing, and tiles | [Utilities](utils.md) |
+| Train experimental bounding-box detectors | [Detection](detection.md) |

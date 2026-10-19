@@ -1,4 +1,4 @@
-"""Object classification with scikit-learn and optional XGBoost estimators."""
+"""Object classification with scikit-learn and XGBoost estimators."""
 
 from obia.classification.classify import ClassifiedImage, classify
 from obia.classification.estimators import CLASSIFICATION_METHODS, create_classifier

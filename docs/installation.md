@@ -1,25 +1,13 @@
 # Installation
 
-OBIA is installed with `pip`. The core package includes the raster, vector, segmentation, and classification dependencies used by the standard OBIA workflow.
+OBIA requires Python 3.11 or newer. The core installation includes the
+dependencies for loading rasters, creating objects, extracting features, and
+training classifiers, including XGBoost.
 
-## Requirements
-
-OBIA requires Python 3.11 or newer.
-
-Runtime dependencies are installed with the package, including:
-
-- `rasterio`
-- `geopandas`
-- `numpy`
-- `scikit-image`
-- `scikit-learn`
-
-For most users, installing from PyPI is the right starting point.
-
-## Install From PyPI
+## Install a release
 
 ```bash
-pip install obia
+python -m pip install obia
 ```
 
 Verify the install:
@@ -28,9 +16,51 @@ Verify the install:
 python -c "import obia; print(obia.__name__)"
 ```
 
-## Install With Point-Cloud Support
+## Install from source
 
-Point-cloud workflows need PDAL. Install PDAL in a conda environment first, then install OBIA with `pip` inside that environment:
+This documentation follows the repository's `main` branch. To use the same code
+as the guides and notebooks, install from a checkout:
+
+```bash
+git clone https://github.com/iosefa/obia.git
+cd obia
+python -m pip install -e .
+```
+
+The `-e` option makes this an editable installation: changes in the checkout are
+available without reinstalling the package.
+
+## Run the notebooks
+
+From the repository root, install the notebook dependencies and launch JupyterLab:
+
+```bash
+python -m pip install -e ".[notebooks]"
+jupyter lab
+```
+
+Open a notebook under `docs/examples/`. See the
+[notebook guide](examples/index.md) for kernel setup and the available workflows.
+
+## Optional dependencies
+
+Install an extra for the workflow you need. In an editable source installation,
+replace `obia[extra]` with `-e ".[extra]"` in these commands.
+
+| Extra | Install command | Purpose |
+| --- | --- | --- |
+| SHAP | `python -m pip install "obia[explain]"` | Feature-attribution explanations |
+| Documentation | `python -m pip install "obia[docs]"` | Build and preview these docs |
+| Detection | `python -m pip install "obia[detection]"` | Experimental bounding-box detection |
+
+SHAP requires version 0.51 or newer. Point-cloud file readers also need system
+libraries, so follow the setup below if you plan to use them.
+
+## Point-cloud support
+
+For LAS/LAZ files, install PDAL in a conda environment, then install OBIA with
+`pip` in that environment. In-memory point arrays and tables do not need these
+file-reading dependencies.
 
 ```bash
 conda create -n obia-pointcloud -c conda-forge python=3.11 pdal python-pdal
@@ -44,46 +74,6 @@ If you also want the optional `pyforestscan` reader, install the point-cloud ext
 
 ```bash
 pip install "obia[pointcloud]"
-```
-
-## Optional Extras
-
-To run the [example notebooks](examples/index.md), install from the matching
-repository checkout:
-
-```bash
-python -m pip install -e ".[notebooks]"
-jupyter lab
-```
-
-This includes JupyterLab, a Python kernel, notebook execution tools, and
-Matplotlib. Use `.[notebooks,xgboost]` to include the optional XGBoost example.
-
-Install XGBoost classifiers with:
-
-```bash
-pip install "obia[xgboost]"
-```
-
-The scikit-learn classifiers are included in the core installation. XGBoost is
-loaded only when selected; see the [classification guide](usage/classification.md).
-
-Install documentation dependencies with:
-
-```bash
-pip install "obia[docs]"
-```
-
-Install SHAP explanation dependencies (SHAP 0.51 or newer) with:
-
-```bash
-pip install "obia[explain]"
-```
-
-Install experimental object-detection dependencies with:
-
-```bash
-pip install "obia[detection]"
 ```
 
 ## Docker
@@ -102,10 +92,10 @@ docker pull iosefa/obia:latest
 
 The Docker image includes OBIA, PDAL, the PDAL Python bindings, and `pyforestscan`.
 
-Start a Python session inside the image:
+Start a Python session in the downloaded image:
 
 ```bash
-docker run --rm -it obia
+docker run --rm -it iosefa/obia:latest
 ```
 
 Mount a local data directory when working with rasters, vectors, or point clouds:
@@ -113,10 +103,13 @@ Mount a local data directory when working with rasters, vectors, or point clouds
 ```bash
 docker run --rm -it \
   -v "$PWD:/data" \
-  obia
+  iosefa/obia:latest
 ```
 
-## Developer Install
+If you built the image locally with `docker build -t obia .`, use `obia` as the
+image name instead.
+
+## Development environment
 
 For local development, clone the repository and create the conda environment:
 
@@ -129,19 +122,14 @@ conda activate obia
 
 The environment installs OBIA in editable mode and includes the notebook, documentation, point-cloud, detection, explanation, XGBoost, and test dependencies used during development.
 
-If you already have a compatible environment and only want the editable package install:
+For a smaller development setup, install documentation and test dependencies
+into your own Python environment from the repository root:
 
 ```bash
-pip install -e .
+python -m pip install -e ".[docs,test]"
 ```
 
-To include documentation and test dependencies in an existing environment:
-
-```bash
-pip install -e ".[docs,test]"
-```
-
-## Preview The Documentation
+## Preview the documentation
 
 Run the local documentation server from the repository root:
 
