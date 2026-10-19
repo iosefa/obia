@@ -15,7 +15,8 @@ OBIA segments a raster into image objects, summarizes each object with feature c
 The library supports:
 
 - GeoTIFF loading with Rasterio metadata
-- SLIC and quickshift segmentation
+- ten scikit-image segmentation methods, including superpixels, watershed,
+  seeded regions, active contours, and flood region growing
 - spectral and texture summaries for segment objects
 - optional point-cloud height, intensity, and density features
 - point-to-segment labelling for training data

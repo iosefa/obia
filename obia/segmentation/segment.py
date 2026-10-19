@@ -3,7 +3,7 @@ from PIL.Image import fromarray
 from PIL.Image import Image as PILImage
 from skimage.segmentation import mark_boundaries
 
-from obia.segmentation.segment_boundaries import create_segments
+from obia.segmentation.segment_boundaries import create_labels, labels_to_segments
 from obia.segmentation.segment_statistics import create_objects
 
 
@@ -12,7 +12,7 @@ class Segments:
     Segments class for handling and processing image segments.
 
     Attributes:
-        _segments: Internal representation of segments data.
+        _segments: Integer object labels (also available as ``labels``).
         segments: Public representation of segments data.
         method: Method used for segmentation.
         params: Additional parameters for segmentation.
@@ -30,13 +30,13 @@ class Segments:
     _segments = None
     segments = None
     method = None
-    params = {}
 
     def __init__(self, _segments, segments, method, **kwargs):
         self._segments = _segments
+        self.labels = _segments
         self.segments = segments
         self.method = method
-        self.params.update(kwargs)
+        self.params = dict(kwargs)
 
     def to_segmented_image(self, image):
         """
@@ -69,7 +69,7 @@ def segment(image, segmentation_bands=None, statistics_bands=None,
     :param image: Input image for segmentation and feature extraction.
     :param segmentation_bands: Bands to be used for segmentation. Default is None.
     :param statistics_bands: Bands to be used for statistical calculations. Default is None.
-    :param method: Segmentation method to be used. Default is "slic".
+    :param method: Scikit-image region method from ``SEGMENTATION_METHODS``. Default is "slic".
     :param calc_mean: Flag to calculate mean of segments. Default is True.
     :param calc_variance: Flag to calculate variance of segments. Default is True.
     :param calc_skewness: Flag to calculate skewness of segments. Default is True.
@@ -80,14 +80,15 @@ def segment(image, segmentation_bands=None, statistics_bands=None,
     :param calc_ASM: Flag to calculate angular second moment of segments. Default is True.
     :param calc_energy: Flag to calculate energy of segments. Default is True.
     :param calc_correlation: Flag to calculate correlation of segments. Default is True.
-    :param kwargs: Additional parameters for segmentation and feature extraction.
+    :param kwargs: Segmentation parameters; see ``create_labels`` for supported methods and inputs.
     :return: Segments object containing the segmented image and statistics.
     """
-    segments_gdf = create_segments(image, segmentation_bands=segmentation_bands, method=method, **kwargs)
+    labels = create_labels(image, segmentation_bands=segmentation_bands, method=method, **kwargs)
+    segments_gdf = labels_to_segments(labels, image)
     objects_gdf = create_objects(segments_gdf, image, spectral_bands=statistics_bands, calc_mean=calc_mean,
                                  calc_variance=calc_variance, calc_skewness=calc_skewness, calc_kurtosis=calc_kurtosis,
                                  calc_contrast=calc_contrast, calc_dissimilarity=calc_dissimilarity,
                                  calc_homogeneity=calc_homogeneity, calc_ASM=calc_ASM, calc_energy=calc_energy,
                                  calc_correlation=calc_correlation)
 
-    return Segments(segments_gdf, objects_gdf, method, **kwargs)
+    return Segments(labels, objects_gdf, method, **kwargs)
