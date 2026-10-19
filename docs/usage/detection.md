@@ -1,12 +1,10 @@
 # Experimental Detection
 
-`obia.detection` is experimental. Its interfaces and workflow may change in future releases.
+Use `obia.detection` to train a RetinaNet model that locates objects with bounding
+boxes. This is an experimental workflow, separate from segmenting and classifying
+polygon objects; its interfaces may change.
 
-The package provides a RetinaNet-based object detection path for raster imagery. It is separate from the segmentation/classification workflow.
-
-Use detection when the target output is bounding boxes. Use segmentation when the target output is image objects and object-level feature tables.
-
-## Install Experimental Detection Dependencies
+## Install detection dependencies
 
 Install the detection extra:
 
@@ -16,24 +14,32 @@ pip install "obia[detection]"
 
 The detection extra includes PyTorch, Torchvision, Albumentations, and Matplotlib.
 
-## Dataset
+## Prepare image chips and annotations
 
 `TreeDetectionDataset` reads raster chips and JSON annotations:
 
 ```python
 from obia.detection.dataset import TreeDetectionDataset
-from obia.detection.utils import get_transforms
-
 dataset = TreeDetectionDataset(
-    image_dir="/path/to/chips",
-    annotations_file="/path/to/annotations.json",
-    transforms=get_transforms(train=True),
+    images_dir="/path/to/chips",
+    annotations_path="/path/to/annotations.json",
 )
 ```
 
-Annotations should provide bounding boxes and labels for each image.
+The JSON file maps image IDs to filenames, boxes, and class labels. Box
+coordinates are `[xmin, ymin, xmax, ymax]` in pixels. For example:
 
-## Build A Model
+```json
+{
+  "chip_01": {
+    "file_name": "chip_01.tif",
+    "boxes": [[20, 30, 80, 95]],
+    "labels": [1]
+  }
+}
+```
+
+## Build a model
 
 ```python
 from obia.detection.models import build_detection_model
@@ -65,11 +71,12 @@ model = train_model(
     model,
     loader,
     num_epochs=20,
-    device="cuda",
+    device="cpu",
 )
 ```
 
-Use `device="mps"` on Apple Silicon when the local PyTorch installation supports it.
+Use `device="cuda"` for a supported NVIDIA GPU, or `device="mps"` for a supported
+Apple Silicon installation. The CPU example works without GPU support.
 
 ## Predict
 
@@ -79,13 +86,11 @@ from obia.detection.predict import predict
 detections = predict(
     model,
     image_path="/path/to/image.tif",
-    device="cuda",
+    device="cpu",
     score_threshold=0.5,
 )
 ```
 
-The result is a dictionary with `boxes`, `scores`, and `labels` arrays.
-
-## Current Limits
-
-Detection expects prepared chips and annotations. It is best treated as a model-building workflow for bounding boxes, while segmentation is the starting point for object maps and object-level classification.
+The result contains `boxes`, `scores`, and `labels` arrays. Boxes use pixel
+coordinates; convert them with the source raster's transform if you need map
+coordinates.

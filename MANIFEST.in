@@ -1,2 +1,4 @@
 include README.md
 include LICENSE
+recursive-include obia/datasets/chesapeake *.tif *.json *.md
+include scripts/prepare_chesapeake_sample.py

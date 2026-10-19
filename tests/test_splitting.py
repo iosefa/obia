@@ -207,7 +207,6 @@ def test_excluded_objects_are_not_used_to_fit_preprocessing(objects):
 
 
 def test_xgboost_reuses_grouped_split_with_original_string_classes(objects):
-    pytest.importorskip("xgboost")
     plan = split_objects(objects, method="grouped", groups="site")
     result = classify(objects, objects, method="xgboost", split=plan, compute_reports=True,
                       n_estimators=5, max_depth=2, n_jobs=1, random_state=42)

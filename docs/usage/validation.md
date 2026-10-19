@@ -1,4 +1,4 @@
-# Training, Test Sets, and Spatial Validation
+# Training and Validation
 
 Choose a split that represents where the model will be used. For predictions in
 new fields, sites, or regions, hold out those units together. Nearby objects can
@@ -7,11 +7,12 @@ object split can give an optimistic estimate of performance in new areas.
 Validation should reflect the prediction task and dependence in the data
 ([Roberts et al., 2017](https://doi.org/10.1111/ecog.02881)).
 
-OBIA separates partitioning from model fitting. Create an `ObjectSplit`, inspect
-its assignments, then reuse it across classifiers. Existing `classify()` calls
-keep their default stratified random 80/20 split.
+Use `split_objects()` to assign labelled objects to training, test, and excluded
+subsets before fitting. It returns an `ObjectSplit` you can inspect and reuse
+across classifiers. Without a supplied split, `classify()` uses a stratified
+random 80/20 split.
 
-## Choose the Sampling Unit
+## Choose what to hold out
 
 | Intended use | Starting point |
 | --- | --- |
@@ -35,11 +36,12 @@ universal distance in metres. Geographic separation alone also cannot establish
 whether new conditions resemble the training data
 ([Meyer & Pebesma, 2021](https://doi.org/10.1111/2041-210X.13650)).
 
-## Grouped Holdout
+## Hold out groups
 
-`labelled` is a DataFrame or GeoDataFrame of labelled objects with a
-`feature_class` column. `objects` contains the polygons to classify. Both tables
-need the same predictor columns.
+The examples use `labelled`, a DataFrame or GeoDataFrame with a `feature_class`
+column, and `objects`, the polygons to classify. Both need the same feature
+columns. For this grouped example, `labelled` also needs a `site_id` column
+identifying the site or field each object belongs to.
 
 ```python
 from obia.classification import classify, split_objects
@@ -86,7 +88,7 @@ must have the same index and row order as `labelled`. When supplying an array,
 select `feature_columns` explicitly to exclude any numeric group metadata that
 also remains in the table.
 
-## Spatial Blocks and Buffers
+## Hold out spatial blocks
 
 ```python
 # Use a projected CRS appropriate to the study area before creating the split.
@@ -127,7 +129,7 @@ leaves no training objects or removes a training class. With `stratify=True`,
 grouped holdouts try other candidate partitions; cross-validation reports the
 invalid fold instead of silently skipping it.
 
-## Inspect and Reuse Assignments
+## Inspect and reuse assignments
 
 Every partition exposes:
 
@@ -161,7 +163,7 @@ after filtering or reordering the labelled table; duplicate index labels do not
 change the positional meaning of the indices. Retain stable object IDs when
 working with tables that lack geometry or unique index labels.
 
-## Predefined Partitions and Separate Test Tables
+## Use predefined training and test sets
 
 Explicit assignments accept integer row positions or boolean masks. Rows assigned
 to neither subset are excluded. Train and test cannot overlap. Supplying `groups`
@@ -203,7 +205,7 @@ classes; their test performance cannot then be estimated from that set. The
 caller remains responsible for ensuring that separate tables do not contain the
 same underlying objects or sampling units.
 
-## Cross-Validation and Model Selection
+## Compare models with cross-validation
 
 `cross_validation_splits()` returns inspectable `ObjectSplit` folds for random,
 grouped, or spatial validation. Each object appears in a test subset exactly once;
@@ -215,8 +217,10 @@ grouped/spatial folds use deterministic `GroupKFold`; `random_state` has no effe
 in that case. Every fold must retain all training classes, and stratified folds
 also require all test classes.
 
-Reserve a final test set before model selection. Build inner folds using only the
-development rows, with the same independence assumptions as the outer split:
+Reserve a final test set before choosing model settings. Use cross-validation on
+the remaining development data to compare those settings, then evaluate the
+selected model on the untouched test set. Build inner folds using only development
+rows, with the same independence assumptions as the outer split:
 
 ```python
 from sklearn.linear_model import LogisticRegression
@@ -262,7 +266,7 @@ with `test_size=None` can fit all labelled objects. That refitted model no longe
 has an untouched test subset in the same table; the earlier report describes the
 model evaluated before refitting.
 
-## Spatial Transfer and Map Accuracy Are Different Questions
+## Distinguish spatial transfer from map accuracy
 
 Spatial validation estimates performance under a specified separation from
 training data. It is not automatically an unbiased estimate of a finished map's

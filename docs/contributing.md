@@ -42,9 +42,9 @@ overwriting an already published distribution.
 
 ## Contribution focus
 
-Current high-value contributions:
+Useful contributions include:
 
-- tests for `obia/segmentation`, `obia/detection`, and `obia/classification`
+- tests for segmentation, feature extraction, classification, and validation
 - reproducible examples using small public datasets
 - API cleanup and typing improvements
 - docs improvements that match actual module behavior
