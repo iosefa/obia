@@ -48,6 +48,17 @@ pip install "obia[pointcloud]"
 
 ## Optional Extras
 
+To run the [example notebooks](examples/index.md), install from the matching
+repository checkout:
+
+```bash
+python -m pip install -e ".[notebooks]"
+jupyter lab
+```
+
+This includes JupyterLab, a Python kernel, notebook execution tools, and
+Matplotlib. Use `.[notebooks,xgboost]` to include the optional XGBoost example.
+
 Install XGBoost classifiers with:
 
 ```bash
@@ -116,7 +127,7 @@ conda env create -f environment.yml
 conda activate obia
 ```
 
-The environment installs OBIA in editable mode and includes the documentation, point-cloud, detection, explanation, XGBoost, and test dependencies used during development.
+The environment installs OBIA in editable mode and includes the notebook, documentation, point-cloud, detection, explanation, XGBoost, and test dependencies used during development.
 
 If you already have a compatible environment and only want the editable package install:
 

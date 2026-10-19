@@ -61,6 +61,7 @@ segments = add_pointcloud_features(
 
 - [Installation](installation.md): install OBIA with pip or set up a development environment.
 - [Concepts](concepts.md): understand segment objects, feature sources, labels, and classification.
+- [Example Notebooks](examples/index.md): run three self-contained raster workflows with plots and GIS exports.
 - [Segmentation](usage/segmentation.md): create object polygons and feature tables.
 - [Classification](usage/classification.md): label segments and train a classifier.
 - [Point Clouds](usage/pointcloud.md): add point-cloud metrics to segment objects.

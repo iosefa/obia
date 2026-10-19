@@ -120,3 +120,15 @@ OBIA does not solve every remote-sensing classification problem. It works best w
 - classes have enough examples for supervised learning
 
 Poor segmentation usually leads to poor classification. Tune segmentation parameters before investing heavily in classifier settings.
+
+## Further Reading
+
+For background on object-based and geographic object-based image analysis:
+
+- Blaschke, T. (2010). Object based image analysis for remote sensing. *ISPRS Journal of Photogrammetry and Remote Sensing*, 65(1), 2-16. <https://doi.org/10.1016/j.isprsjprs.2009.06.004>
+- Hay, G. J., & Castilla, G. (2008). Geographic Object-Based Image Analysis (GEOBIA): A new name for a new discipline. In T. Blaschke, S. Lang, & G. J. Hay (Eds.), *Object-Based Image Analysis: Spatial Concepts for Knowledge-Driven Remote Sensing Applications* (pp. 75-89). Springer. <https://doi.org/10.1007/978-3-540-77058-9_4>
+
+For the segmentation algorithms exposed by OBIA:
+
+- Achanta, R., Shaji, A., Smith, K., Lucchi, A., Fua, P., & Suesstrunk, S. (2012). SLIC superpixels compared to state-of-the-art superpixel methods. *IEEE Transactions on Pattern Analysis and Machine Intelligence*, 34(11), 2274-2282. <https://doi.org/10.1109/TPAMI.2012.120>
+- Vedaldi, A., & Soatto, S. (2008). Quick shift and kernel methods for mode seeking. In *Computer Vision - ECCV 2008* (pp. 705-718). Springer. <https://doi.org/10.1007/978-3-540-88693-8_52>

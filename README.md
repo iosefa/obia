@@ -168,6 +168,28 @@ return a missing prediction margin. See the
 [classification guide](https://obia.sefa.ai/usage/classification/) for the full
 method list, custom pipelines, class constraints, and evaluation.
 
+## Example Notebooks
+
+Three small notebooks generate their own synthetic raster and run independently:
+
+- [Raster segmentation](docs/examples/01_segmentation.ipynb): compare algorithms,
+  create object polygons, and export segment IDs and a GeoPackage.
+- [Raster object features](docs/examples/02_raster_features.ipynb): spectral
+  summaries, indices, shape, texture, and quality masks.
+- [Object classification](docs/examples/03_classification.ipynb): label objects
+  from points, compare models, and save predictions and a reusable classifier.
+
+From the repository root, install the notebook dependencies and launch JupyterLab:
+
+```bash
+python -m pip install -e ".[notebooks]"
+jupyter lab
+```
+
+Open `docs/examples/` in JupyterLab. Add the `xgboost` extra to run that optional
+classifier too: `python -m pip install -e ".[notebooks,xgboost]"`.
+See the [notebook setup guide](docs/examples/index.md) for details.
+
 ## Documentation
 
 Published documentation is available at `https://obia.sefa.ai`.
