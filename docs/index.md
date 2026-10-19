@@ -21,6 +21,7 @@ The library supports:
 - optional point-cloud height, intensity, and density features
 - point-to-segment labelling for training data
 - scikit-learn object classifiers and pipelines, plus optional XGBoost
+- grouped and spatial validation splits, geometry buffers, and reusable folds
 - tiled large-raster workflows for supported segmentation methods
 
 ## First Segmentation
@@ -64,6 +65,7 @@ segments = add_pointcloud_features(
 - [Example Notebooks](examples/index.md): run three self-contained raster workflows with plots and GIS exports.
 - [Segmentation](usage/segmentation.md): create object polygons and feature tables.
 - [Classification](usage/classification.md): label segments and train a classifier.
+- [Training and Validation](usage/validation.md): choose and inspect grouped, spatial, or explicit splits.
 - [Point Clouds](usage/pointcloud.md): add point-cloud metrics to segment objects.
 - [Large Rasters](usage/large-rasters.md): use tiled segmentation utilities.
 - [API Reference](api/index.md): inspect generated API documentation.
