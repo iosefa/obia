@@ -1,374 +1,143 @@
+"""Compatibility entry points for raster feature extraction.
+
+New workflows can use :func:`obia.features.extract_features` directly. The
+existing functions keep their boolean flags and legacy output column names.
+"""
+
+from dataclasses import replace
+
 import numpy as np
-import geopandas as gpd
 
-from skimage.feature import graycomatrix, graycoprops
-from tqdm import tqdm
-
-from obia.utils.utils import mask_image_with_polygon, crop_image_to_bbox
-
-from scipy.stats import skew, kurtosis
+from obia.features import TextureConfig, extract_features
+from obia.features._validation import band_indices
+from obia.features.spectral import summarize, validate_statistics
+from obia.features.texture import measure_texture
 
 
-def _create_empty_stats_columns(spectral_bands, textural_bands, calc_mean, calc_variance, calc_min, calc_max,
-                                calc_skewness, calc_kurtosis,
-                                calc_contrast, calc_dissimilarity, calc_homogeneity, calc_ASM, calc_energy,
-                                calc_correlation):
-    """
-    Generate a list of columns for statistics based on the input parameters. This function is
-    used to create column headers for spectral and textural segment statistics.
+def _spectral_selection(calc_mean, calc_variance, calc_min, calc_max, calc_skewness, calc_kurtosis):
+    return tuple(name for name, enabled in zip(
+        ("mean", "variance", "min", "max", "skewness", "kurtosis"),
+        (calc_mean, calc_variance, calc_min, calc_max, calc_skewness, calc_kurtosis)) if enabled)
 
-    :param spectral_bands: A list of indices representing the spectral bands to include in the
-        statistics. Each index corresponds to a band for which statistics may be calculated.
-    :param textural_bands: A list of indices representing the textural bands to include in the
-        statistics. Each index corresponds to a band for which statistics may be calculated.
-    :param calc_mean: A boolean indicating whether to include mean statistics for each band.
-    :param calc_variance: A boolean indicating whether to include variance statistics for each
-        band.
-    :param calc_min: A boolean indicating whether to include minimum value statistics for each
-        band.
-    :param calc_max: A boolean indicating whether to include maximum value statistics for each
-        band.
-    :param calc_skewness: A boolean indicating whether to include skewness statistics for each
-        band.
-    :param calc_kurtosis: A boolean indicating whether to include kurtosis statistics for each
-        band.
-    :param calc_contrast: A boolean indicating whether to include contrast statistics for each
-        textural band.
-    :param calc_dissimilarity: A boolean indicating whether to include dissimilarity statistics
-        for each textural band.
-    :param calc_homogeneity: A boolean indicating whether to include homogeneity statistics for
-        each textural band.
-    :param calc_ASM: A boolean indicating whether to include Angular Second Moment (ASM)
-        statistics for each textural band.
-    :param calc_energy: A boolean indicating whether to include energy statistics for each
-        textural band.
-    :param calc_correlation: A boolean indicating whether to include correlation statistics for
-        each textural band.
-    :return: A list of column names representing the structure of statistics to be collected.
-        The columns include statistical measures for each selected band.
-    """
-    columns = ['segment_id']
 
-    spectral_stats = {
-        "mean": calc_mean,
-        "variance": calc_variance,
-        "min": calc_min,
-        "max": calc_max,
-        "skewness": calc_skewness,
-        "kurtosis": calc_kurtosis
-    }
-
-    textural_stats = {
-        "contrast": calc_contrast,
-        "dissimilarity": calc_dissimilarity,
-        "homogeneity": calc_homogeneity,
-        "ASM": calc_ASM,
-        "energy": calc_energy,
-        "correlation": calc_correlation
-    }
-
-    for band_index in spectral_bands:
-        for stat, is_calculated in spectral_stats.items():
-            if is_calculated:
-                columns.append(f"b{band_index}_{stat}")
-
-    for band_index in textural_bands:
-        for stat, is_calculated in textural_stats.items():
-            if is_calculated:
-                columns.append(f"b{band_index}_{stat}")
-
-    columns.append('geometry')
-
-    return columns
+def _texture_selection(calc_contrast, calc_dissimilarity, calc_homogeneity, calc_ASM, calc_energy, calc_correlation):
+    return tuple(name for name, enabled in zip(
+        ("contrast", "dissimilarity", "homogeneity", "ASM", "energy", "correlation"),
+        (calc_contrast, calc_dissimilarity, calc_homogeneity, calc_ASM, calc_energy, calc_correlation)) if enabled)
 
 
 def calculate_spectral_stats(
-        image, statistics_bands,
-        calc_mean=True, calc_variance=True, calc_min=True, calc_max=True, calc_skewness=True, calc_kurtosis=True
+    image, statistics_bands, calc_mean=True, calc_variance=True, calc_min=True, calc_max=True,
+    calc_skewness=True, calc_kurtosis=True, *, features=None, percentiles=(), mask=None,
 ):
+    """Summarize a band-first (bands, height, width) array without modification.
+
+    Legacy flags select the original statistics; ``features`` overrides them
+    with names from ``SPECTRAL_FEATURES``. ``percentiles`` adds linear percentiles.
+    Nonfinite and masked samples are excluded. A spatial ``mask`` defines the
+    object footprint and denominator for ``valid_fraction``.
     """
-    Calculates a range of statistical measures for specific bands of a spectral image. The statistics calculated are
-    mean, variance, minimum, maximum, skewness, and kurtosis, based on the boolean flags provided. Missing or NaN
-    values are ignored when computing statistics. If all values are NaN for a band, NaN is returned for each statistic.
-
-    :param image: A multi-band spectral image where each band is represented in a separate 2D array.
-    :type image: np.ndarray
-    :param statistics_bands: List of band indices in the image for which statistics should be calculated.
-    :type statistics_bands: List[int]
-    :param calc_mean: Indicates whether to calculate the mean for the specified bands.
-    :type calc_mean: bool
-    :param calc_variance: Indicates whether to calculate the variance for the specified bands.
-    :type calc_variance: bool
-    :param calc_min: Indicates whether to calculate the minimum value for the specified bands.
-    :type calc_min: bool
-    :param calc_max: Indicates whether to calculate the maximum value for the specified bands.
-    :type calc_max: bool
-    :param calc_skewness: Indicates whether to calculate the skewness for the specified bands.
-    :type calc_skewness: bool
-    :param calc_kurtosis: Indicates whether to calculate the kurtosis for the specified bands.
-    :type calc_kurtosis: bool
-    :return: A dictionary containing the calculated statistics for each specified band, with keys formatted as
-             'b{band_index}_statistic'.
-    :rtype: dict
-    """
-    stats_dict = {}
-    for band_index in statistics_bands:
-        band_data = image[band_index, :, :]
-        valid_mask = ~np.isnan(band_data)
-        band_flat = band_data[valid_mask]
-
-        band_prefix = f"b{band_index}"
-
-        if band_flat.size == 0:
-            if calc_mean:
-                stats_dict[f"{band_prefix}_mean"] = np.nan
-            if calc_variance:
-                stats_dict[f"{band_prefix}_variance"] = np.nan
-            if calc_min:
-                stats_dict[f"{band_prefix}_min"] = np.nan
-            if calc_max:
-                stats_dict[f"{band_prefix}_max"] = np.nan
-            if calc_skewness:
-                stats_dict[f"{band_prefix}_skewness"] = np.nan
-            if calc_kurtosis:
-                stats_dict[f"{band_prefix}_kurtosis"] = np.nan
-        else:
-            if calc_mean:
-                stats_dict[f"{band_prefix}_mean"] = np.mean(band_flat)
-            if calc_variance:
-                stats_dict[f"{band_prefix}_variance"] = np.var(band_flat)
-            if calc_min:
-                stats_dict[f"{band_prefix}_min"] = np.min(band_flat)
-            if calc_max:
-                stats_dict[f"{band_prefix}_max"] = np.max(band_flat)
-            if calc_skewness:
-                stats_dict[f"{band_prefix}_skewness"] = skew(band_flat)
-            if calc_kurtosis:
-                stats_dict[f"{band_prefix}_kurtosis"] = kurtosis(band_flat)
-    return stats_dict
+    data = np.ma.asarray(image, dtype=float).filled(np.nan)
+    if data.ndim != 3:
+        raise ValueError("image must have shape (bands, height, width).")
+    bands = band_indices(statistics_bands, data.shape[0])
+    if features is None:
+        features = _spectral_selection(calc_mean, calc_variance, calc_min, calc_max, calc_skewness, calc_kurtosis)
+    features, percentiles = validate_statistics(features, percentiles)
+    inside = np.ones(data.shape[1:], dtype=bool) if mask is None else np.asarray(mask, dtype=bool)
+    if inside.shape != data.shape[1:]:
+        raise ValueError("mask must have shape (height, width).")
+    result = {}
+    for band in bands:
+        stats = summarize(data[band][inside], int(inside.sum()), features, percentiles)
+        result.update({f"b{band}_{name}": value for name, value in stats.items()})
+    return result
 
 
 def calculate_textural_stats(
-        image, textural_bands,
-        calc_contrast=True, calc_dissimilarity=True, calc_homogeneity=True,
-        calc_ASM=True, calc_energy=True, calc_correlation=True
+    image, textural_bands, calc_contrast=True, calc_dissimilarity=True,
+    calc_homogeneity=True, calc_ASM=True, calc_energy=True, calc_correlation=True,
+    *, texture_config=None, mask=None, channel_axis=0,
 ):
+    """Calculate texture from a band-first array (or explicit channel_axis=-1).
+
+    Only pixel pairs with both endpoints inside ``mask`` and finite are counted.
+    Without ``texture_config``, legacy bN_contrast etc. columns use distance 2,
+    four directions, 256 gray levels, and the valid band range of this array.
+    An explicit ``TextureConfig`` enables additional features and scale columns.
+    Use ``extract_features`` to fit quantization ranges once across all objects.
     """
-    Calculate textural statistics from a multi-band image based on specified bands.
-    This function computes various textural properties such as contrast,
-    dissimilarity, homogeneity, ASM, energy, and correlation. The calculations
-    are performed on the specified bands of the input image, with options to
-    select which statistics to compute. The results for each statistic are
-    stored in a dictionary with the band index as the prefix to the keys.
-
-    :param image: The multi-band image from which textural statistics are calculated.
-    :type image: numpy.ndarray
-    :param textural_bands: Indices of the bands to be used for calculating textural statistics.
-    :type textural_bands: list of int
-    :param calc_contrast: Flag indicating whether to calculate contrast.
-    :type calc_contrast: bool, optional
-    :param calc_dissimilarity: Flag indicating whether to calculate dissimilarity.
-    :type calc_dissimilarity: bool, optional
-    :param calc_homogeneity: Flag indicating whether to calculate homogeneity.
-    :type calc_homogeneity: bool, optional
-    :param calc_ASM: Flag indicating whether to calculate ASM (angular second moment).
-    :type calc_ASM: bool, optional
-    :param calc_energy: Flag indicating whether to calculate energy.
-    :type calc_energy: bool, optional
-    :param calc_correlation: Flag indicating whether to calculate correlation.
-    :type calc_correlation: bool, optional
-    :return: A dictionary containing the computed textural statistics for each band.
-    :rtype: dict
-    """
-    stats_dict = {}
-
-    for band_index in textural_bands:
-        band_data = image[:, :, band_index]
-        valid_mask = ~np.isnan(band_data)
-
-        if not np.any(valid_mask):
-            if calc_contrast:
-                stats_dict[f"b{band_index}_contrast"] = np.nan
-            if calc_dissimilarity:
-                stats_dict[f"b{band_index}_dissimilarity"] = np.nan
-            if calc_homogeneity:
-                stats_dict[f"b{band_index}_homogeneity"] = np.nan
-            if calc_ASM:
-                stats_dict[f"b{band_index}_ASM"] = np.nan
-            if calc_energy:
-                stats_dict[f"b{band_index}_energy"] = np.nan
-            if calc_correlation:
-                stats_dict[f"b{band_index}_correlation"] = np.nan
-            continue
-
-        if np.isnan(band_data[valid_mask]).any():
-            if calc_contrast:
-                stats_dict[f"b{band_index}_contrast"] = np.nan
-            if calc_dissimilarity:
-                stats_dict[f"b{band_index}_dissimilarity"] = np.nan
-            if calc_homogeneity:
-                stats_dict[f"b{band_index}_homogeneity"] = np.nan
-            if calc_ASM:
-                stats_dict[f"b{band_index}_ASM"] = np.nan
-            if calc_energy:
-                stats_dict[f"b{band_index}_energy"] = np.nan
-            if calc_correlation:
-                stats_dict[f"b{band_index}_correlation"] = np.nan
-            continue
-
-        band_clean = band_data.copy()
-        band_clean[~valid_mask] = 0
-
-        band_prefix = f"b{band_index}"
-
-        if np.issubdtype(band_clean.dtype, np.integer):
-            glcm_input = band_clean.astype(np.uint8)
-        else:
-            band_min, band_max = np.min(band_clean), np.max(band_clean)
-            if band_max == band_min:
-                glcm_input = np.zeros(band_clean.shape, dtype=np.uint8)
-            else:
-                glcm_input = ((band_clean - band_min) / (band_max - band_min) * 255).astype(np.uint8)
-
-        try:
-            glcm = graycomatrix(
-                glcm_input,
-                distances=[2],
-                angles=[0, np.pi / 4, np.pi / 2, 3 * np.pi / 4],
-                levels=256,
-                symmetric=True,
-                normed=True
-            )
-        except ValueError:
-            if calc_contrast:
-                stats_dict[f"{band_prefix}_contrast"] = np.nan
-            if calc_dissimilarity:
-                stats_dict[f"{band_prefix}_dissimilarity"] = np.nan
-            if calc_homogeneity:
-                stats_dict[f"{band_prefix}_homogeneity"] = np.nan
-            if calc_ASM:
-                stats_dict[f"{band_prefix}_ASM"] = np.nan
-            if calc_energy:
-                stats_dict[f"{band_prefix}_energy"] = np.nan
-            if calc_correlation:
-                stats_dict[f"{band_prefix}_correlation"] = np.nan
-            continue
-
-        if calc_contrast:
-            stats_dict[f"{band_prefix}_contrast"] = np.mean(graycoprops(glcm, 'contrast'))
-        if calc_dissimilarity:
-            stats_dict[f"{band_prefix}_dissimilarity"] = np.mean(graycoprops(glcm, 'dissimilarity'))
-        if calc_homogeneity:
-            stats_dict[f"{band_prefix}_homogeneity"] = np.mean(graycoprops(glcm, 'homogeneity'))
-        if calc_ASM:
-            stats_dict[f"{band_prefix}_ASM"] = np.mean(graycoprops(glcm, 'ASM'))
-        if calc_energy:
-            stats_dict[f"{band_prefix}_energy"] = np.mean(graycoprops(glcm, 'energy'))
-        if calc_correlation:
-            stats_dict[f"{band_prefix}_correlation"] = np.mean(graycoprops(glcm, 'correlation'))
-
-    return stats_dict
+    data = np.ma.asarray(image, dtype=float).filled(np.nan)
+    if data.ndim != 3 or channel_axis not in (0, -1, 2):
+        raise ValueError("image must be 3D; channel_axis must be 0 or -1 (2).")
+    data = np.moveaxis(data, channel_axis, 0)
+    bands = band_indices(textural_bands, data.shape[0])
+    inside = np.ones(data.shape[1:], dtype=bool) if mask is None else np.asarray(mask, dtype=bool)
+    if inside.shape != data.shape[1:]:
+        raise ValueError("mask must have shape (height, width).")
+    legacy = texture_config is None
+    if legacy:
+        features = _texture_selection(calc_contrast, calc_dissimilarity, calc_homogeneity,
+                                      calc_ASM, calc_energy, calc_correlation)
+        texture_config = TextureConfig(features=features, distances=(2,), levels=256)
+    elif not isinstance(texture_config, TextureConfig):
+        raise TypeError("texture_config must be a TextureConfig.")
+    result = {}
+    for band in bands:
+        valid = inside & np.isfinite(data[band])
+        values = data[band][valid]
+        bounds = texture_config.value_range or ((float(values.min()), float(values.max()))
+                                               if values.size else (0.0, 0.0))
+        stats = measure_texture(data[band], valid, texture_config, bounds)
+        for name, value in stats.items():
+            if legacy:
+                name = name.removeprefix("glcm_").removesuffix("_d2")
+            result[f"b{band}_{name}"] = value
+    return result
 
 
 def create_objects(
-        segments, image, spectral_bands=None, textural_bands=None,
-        calculate_spectral=True, calculate_textural=True,
-        calc_mean=True, calc_variance=True, calc_min=True, calc_max=True, calc_skewness=True, calc_kurtosis=True,
-        calc_contrast=True, calc_dissimilarity=True, calc_homogeneity=True, calc_ASM=True, calc_energy=True, calc_correlation=True
+    segments, image, spectral_bands=None, textural_bands=None,
+    calculate_spectral=True, calculate_textural=True,
+    calc_mean=True, calc_variance=True, calc_min=True, calc_max=True, calc_skewness=True, calc_kurtosis=True,
+    calc_contrast=True, calc_dissimilarity=True, calc_homogeneity=True, calc_ASM=True, calc_energy=True,
+    calc_correlation=True, *, spectral_features=None, percentiles=(), indices=None,
+    shape_features=(), shape_units="map", texture_config=None, mask=None,
 ):
+    """Enrich segment polygons with selected raster features.
+
+    Existing flags and bN_mean/bN_contrast-style columns are retained. New
+    ``spectral_features``, ``percentiles``, ``indices``, ``shape_features``,
+    ``shape_units``, ``texture_config`` and ``mask`` options correspond to
+    ``extract_features``. All bands are numeric zero-based indices into the
+    loaded image. ``calculate_spectral=False`` disables band/index distributions;
+    ``calculate_textural=False`` disables texture. Shape can be requested alone.
     """
-    :param segments: GeoDataFrame containing the segmented regions to be analyzed.
-    :param image: Object containing image data and metadata to be used for analysis. Should have 'img_data' attribute as 3D NumPy array and 'crs' attribute.
-    :param spectral_bands: Optional; List of spectral bands to be used in the analysis. Defaults to all available bands.
-    :param textural_bands: Optional; List of textural bands to be used in the analysis. Defaults to all available bands.
-    :param calculate_spectral: Boolean; Whether to calculate spectral statistics. Defaults to True.
-    :param calculate_textural: Boolean; Whether to calculate textural statistics. Defaults to True.
-    :param calc_mean: Boolean; Whether to calculate the mean of the pixel values. Defaults to True.
-    :param calc_variance: Boolean; Whether to calculate the variance of the pixel values. Defaults to True.
-    :param calc_min: Boolean; Whether to calculate the minimum of the pixel values. Defaults to True.
-    :param calc_max: Boolean; Whether to calculate the maximum of the pixel values. Defaults to True.
-    :param calc_skewness: Boolean; Whether to calculate the skewness of the pixel values. Defaults to True.
-    :param calc_kurtosis: Boolean; Whether to calculate the kurtosis of the pixel values. Defaults to True.
-    :param calc_contrast: Boolean; Whether to calculate the contrast for textural analysis. Defaults to True.
-    :param calc_dissimilarity: Boolean; Whether to calculate the dissimilarity for textural analysis. Defaults to True.
-    :param calc_homogeneity: Boolean; Whether to calculate the homogeneity for textural analysis. Defaults to True.
-    :param calc_ASM: Boolean; Whether to calculate the Angular Second Moment (ASM) for textural analysis. Defaults to True.
-    :param calc_energy: Boolean; Whether to calculate the energy for textural analysis. Defaults to True.
-    :param calc_correlation: Boolean; Whether to calculate the correlation for textural analysis. Defaults to True.
-    :return: GeoDataFrame containing the calculated statistics for each segment.
-    """
-    if not (calculate_spectral or calculate_textural):
-        raise ValueError(
-            "At least one of 'calculate_spectral' or 'calculate_textural' must be True."
-        )
-
-    if spectral_bands is None:
-        spectral_bands = list(range(image.img_data.shape[2]))
-    if textural_bands is None:
-        textural_bands = list(range(image.img_data.shape[2]))
-
-    #
-    # # ------------- KEY ADDITION -------------
-    # # Filter out any band indices that exceed the number of bands in the image.
-    # valid_spectral_bands = [b for b in spectral_bands if b < image.img_data.shape[0]]
-    # if len(valid_spectral_bands) < len(spectral_bands):
-    #     print(
-    #         "Warning: Some spectral band indices were invalid and have been removed. "
-    #         f"(Requested: {spectral_bands}, valid: {valid_spectral_bands})"
-    #     )
-    # spectral_bands = valid_spectral_bands
-    #
-    # valid_textural_bands = [b for b in textural_bands if b < image.img_data.shape[0]]
-    # if len(valid_textural_bands) < len(textural_bands):
-    #     print(
-    #         "Warning: Some textural band indices were invalid and have been removed. "
-    #         f"(Requested: {textural_bands}, valid: {valid_textural_bands})"
-    #     )
-    # textural_bands = valid_textural_bands
-    # # ------------- END KEY ADDITION ----------
-
-    columns = _create_empty_stats_columns(
-        spectral_bands, textural_bands,
-        calc_mean, calc_variance, calc_min, calc_max, calc_skewness, calc_kurtosis,
-        calc_contrast, calc_dissimilarity, calc_homogeneity, calc_ASM, calc_energy, calc_correlation
+    features = spectral_features
+    if features is None:
+        features = _spectral_selection(calc_mean, calc_variance, calc_min, calc_max, calc_skewness, calc_kurtosis)
+    if not calculate_spectral:
+        features, percentiles = (), ()
+    legacy_texture = texture_config is None
+    if calculate_textural:
+        if legacy_texture:
+            requested = _texture_selection(calc_contrast, calc_dissimilarity, calc_homogeneity,
+                                           calc_ASM, calc_energy, calc_correlation)
+            texture_config = TextureConfig(features=requested, distances=(2,), levels=256)
+        elif not isinstance(texture_config, TextureConfig):
+            raise TypeError("texture_config must be a TextureConfig.")
+        if texture_config.bands is None:
+            texture_config = replace(texture_config, bands=band_indices(textural_bands, image.img_data.shape[2]))
+    else:
+        texture_config = None
+    result = extract_features(
+        segments, image, bands=spectral_bands, spectral=features, percentiles=percentiles,
+        indices=indices, shape=shape_features, shape_units=shape_units, texture=texture_config, mask=mask,
     )
-
-    results = []
-
-    for i, (idx, segment) in enumerate(tqdm(segments.iterrows(), total=len(segments), desc="Processing Segments")):
-        geom = segment.geometry
-        segment_id = segment['segment_id']
-
-        cropped_img_data, cropped_transform = crop_image_to_bbox(image, geom)
-        masked_img_data = mask_image_with_polygon(cropped_img_data, geom, cropped_transform)
-
-        row = {
-            'segment_id': segment_id,
-            'geometry': geom
-        }
-
-        spectral_statistics = calculate_spectral_stats(
-            masked_img_data, spectral_bands,
-            calc_mean=calc_mean, calc_variance=calc_variance, calc_min=calc_min,
-            calc_max=calc_max, calc_skewness=calc_skewness, calc_kurtosis=calc_kurtosis
-        )
-        row.update(spectral_statistics)
-
-        # --- 2) Textural stats
-        if calculate_textural and textural_bands:
-            textural_statistics = calculate_textural_stats(
-                masked_img_data,
-                textural_bands,
-                calc_contrast=calc_contrast,
-                calc_dissimilarity=calc_dissimilarity,
-                calc_homogeneity=calc_homogeneity,
-                calc_ASM=calc_ASM,
-                calc_energy=calc_energy,
-                calc_correlation=calc_correlation
-            )
-            row.update(textural_statistics)
-
-        results.append(row)
-
-    gdf = gpd.GeoDataFrame(results, columns=columns, crs=segments.crs)
-    return gdf
+    if legacy_texture and texture_config is not None:
+        rename = {f"b{b}_glcm_{name}_d2": f"b{b}_{name}"
+                  for b in texture_config.bands for name in texture_config.features}
+        # Re-extraction updates legacy columns, preserving unrelated attributes.
+        result = result.drop(columns=[name for name in rename.values() if name in result], errors="ignore")
+        result = result.rename(columns=rename)
+    return result

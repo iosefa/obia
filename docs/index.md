@@ -17,10 +17,10 @@ The library supports:
 - GeoTIFF loading with Rasterio metadata
 - ten scikit-image segmentation methods, including superpixels, watershed,
   seeded regions, active contours, and flood region growing
-- spectral and texture summaries for segment objects
+- spectral distributions and indices, shape measurements, and configurable texture for segment objects
 - optional point-cloud height, intensity, and density features
 - point-to-segment labelling for training data
-- random forest and MLP segment classification
+- scikit-learn object classifiers and pipelines, plus optional XGBoost
 - tiled large-raster workflows for supported segmentation methods
 
 ## First Segmentation
@@ -61,6 +61,7 @@ segments = add_pointcloud_features(
 
 - [Installation](installation.md): install OBIA with pip or set up a development environment.
 - [Concepts](concepts.md): understand segment objects, feature sources, labels, and classification.
+- [Example Notebooks](examples/index.md): run three self-contained raster workflows with plots and GIS exports.
 - [Segmentation](usage/segmentation.md): create object polygons and feature tables.
 - [Classification](usage/classification.md): label segments and train a classifier.
 - [Point Clouds](usage/pointcloud.md): add point-cloud metrics to segment objects.

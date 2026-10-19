@@ -2,6 +2,9 @@ site_name: OBIA
 site_url: https://obia.sefa.ai
 repo_url: https://github.com/iosefa/obia
 
+exclude_docs: |
+    /examples/example_outputs/
+
 theme:
     name: material
     palette:
@@ -46,8 +49,14 @@ nav:
     - Home: index.md
     - Installation: installation.md
     - Concepts: concepts.md
+    - Example Notebooks:
+        - Getting Started: examples/index.md
+        - Raster Segmentation: examples/01_segmentation.ipynb
+        - Raster Object Features: examples/02_raster_features.ipynb
+        - Object Classification: examples/03_classification.ipynb
     - Usage:
         - Segmentation: usage/segmentation.md
+        - Raster Features: usage/raster-features.md
         - Classification: usage/classification.md
         - Point Clouds: usage/pointcloud.md
         - Large Rasters: usage/large-rasters.md
@@ -61,6 +70,7 @@ nav:
         - Overview: api/index.md
         - Handlers: api/handlers.md
         - Segmentation: api/segmentation.md
+        - Raster Features: api/features.md
         - Point Clouds: api/pointcloud.md
         - Experimental Detection: api/detection.md
         - Classification: api/classification.md

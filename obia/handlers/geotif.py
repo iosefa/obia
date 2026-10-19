@@ -22,6 +22,9 @@ class Image:
             Deprecated attribute for affine transformation.
         rasterio_obj : rasterio.io.DatasetReader
             Rasterio dataset object for the image.
+        valid_mask : numpy.ndarray or None
+            Valid source pixels in loaded band order, shaped (height, width, bands).
+            Feature extraction excludes pixels marked False by raster NoData or masks.
 
         Methods
         -------
@@ -36,12 +39,13 @@ class Image:
     affine_transformation = None
     rasterio_obj = None
 
-    def __init__(self, img_data, crs, affine_transformation, transform, rasterio_obj):
+    def __init__(self, img_data, crs, affine_transformation, transform, rasterio_obj, valid_mask=None):
         self.img_data = img_data
         self.crs = crs
         self.affine_transformation = affine_transformation
         self.transform = transform
         self.rasterio_obj = rasterio_obj
+        self.valid_mask = valid_mask
 
     def to_image(self, bands, p_min=2, p_max=98, stretch_type=None):
         """
@@ -98,12 +102,14 @@ def open_geotiff(image_path, bands=None):
         bands = list(range(1, num_bands + 1))
 
     data = np.empty((y_size, x_size, len(bands)), dtype=np.float32)
+    valid_mask = np.empty(data.shape, dtype=bool)
 
     for i, b in enumerate(bands):
-        band_array = rasterio_obj.read(b)
-        data[:, :, i] = band_array
+        band_array = rasterio_obj.read(b, masked=True)
+        data[:, :, i] = band_array.data
+        valid_mask[:, :, i] = ~np.ma.getmaskarray(band_array)
 
-    return Image(data, crs, affine_transformation, transform, rasterio_obj)
+    return Image(data, crs, affine_transformation, transform, rasterio_obj, valid_mask)
 
 
 def _write_geotiff(pil_image, output_path, crs, transform):
