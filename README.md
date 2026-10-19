@@ -15,7 +15,8 @@ OBIA groups raster pixels into spatial objects, calculates object-level features
 Current scope:
 
 - GeoTIFF loading with Rasterio metadata preserved
-- SLIC and quickshift segmentation
+- ten scikit-image region-segmentation methods, including SLIC, quickshift,
+  Felzenszwalb, watershed, random walker, active contours, and flood region growing
 - segment-level spectral and texture features
 - optional point-cloud features joined to the same segment objects
 - point-to-segment labelling utilities
@@ -88,6 +89,13 @@ objects = segment(
 segments = objects.segments
 segments.to_file("segments.gpkg", driver="GPKG")
 ```
+
+Segmentation also accepts `method="felzenszwalb"`, `"watershed"`,
+`"random_walker"`, `"chan_vese"`, `"morphological_chan_vese"`,
+`"morphological_geodesic_active_contour"`, `"active_contour"`, and `"flood"`.
+Scalar methods require one selected band; seeded methods require markers or an
+initial contour. See the [segmentation guide](https://obia.sefa.ai/usage/segmentation/)
+for inputs, parameters, and examples for each method.
 
 ## Point-Cloud Features
 

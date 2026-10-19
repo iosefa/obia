@@ -17,19 +17,26 @@ Band indexes in OBIA are zero-based after loading. If a GeoTIFF has bands 1, 2, 
 
 ## Segments And Objects
 
-Segmentation converts raster pixels into polygon geometries. The public `segment()` function runs two steps:
+Segmentation converts raster pixels into polygon geometries. The public `segment()` function runs three steps:
 
-1. `create_segments()` produces segment polygons.
-2. `create_objects()` calculates segment-level statistics.
+1. `create_labels()` produces an object-label image.
+2. `labels_to_segments()` produces georeferenced segment polygons.
+3. `create_objects()` calculates segment-level statistics.
+
+`create_segments()` combines the first two steps when no feature calculation is needed.
 
 The result is a `Segments` object. The main table is `Segments.segments`, a GeoDataFrame with one row per segment.
 
-The supported segmentation methods are:
+OBIA supports ten scikit-image region-segmentation methods: SLIC, quickshift,
+Felzenszwalb, watershed, random walker, Chan-Vese, morphological Chan-Vese,
+morphological geodesic active contours, closed parametric active contours, and
+flood region growing. See the [segmentation guide](usage/segmentation.md) for
+method names and required inputs.
 
-- `slic`
-- `quickshift`
-
-Both methods come from scikit-image. OBIA passes additional keyword arguments through to the selected algorithm.
+Each connected object has a positive label ID matching its polygon's
+`segment_id`; zero is background or excluded data. Binary methods create objects
+from foreground pixels. Segmentation works on a copy of the selected bands, so
+the original raster values remain available for feature calculation.
 
 ## Feature Sources
 
