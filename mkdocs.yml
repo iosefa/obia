@@ -54,10 +54,12 @@ nav:
         - Raster Segmentation: examples/01_segmentation.ipynb
         - Raster Object Features: examples/02_raster_features.ipynb
         - Object Classification: examples/03_classification.ipynb
+        - Pixel Classification: examples/04_pixel_classification.ipynb
     - Usage:
         - Segmentation: usage/segmentation.md
         - Raster Features: usage/raster-features.md
-        - Classification: usage/classification.md
+        - Object Classification: usage/classification.md
+        - Pixel Classification: usage/pixel-classification.md
         - Training and Validation: usage/validation.md
         - Point Clouds: usage/pointcloud.md
         - Large Rasters: usage/large-rasters.md

@@ -9,7 +9,7 @@ or [example notebooks](../examples/index.md).
 | Load GeoTIFFs and inspect raster data | [Raster loading](handlers.md) |
 | Create labels, polygons, and object tables | [Segmentation](segmentation.md) |
 | Calculate band statistics, indices, shape, and texture | [Raster features](features.md) |
-| Train classifiers and create validation splits | [Classification](classification.md) |
+| Classify objects or pixels and create validation splits | [Classification](classification.md) |
 | Add point-cloud measurements | [Point clouds](pointcloud.md) |
 | Work with labels, image processing, and tiles | [Utilities](utils.md) |
 | Train experimental bounding-box detectors | [Detection](detection.md) |

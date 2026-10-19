@@ -2,6 +2,7 @@
 
 from copy import deepcopy
 
+import numpy as np
 from sklearn.base import BaseEstimator, ClassifierMixin, clone, is_classifier
 from sklearn.calibration import CalibratedClassifierCV
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis, QuadraticDiscriminantAnalysis
@@ -20,7 +21,8 @@ from sklearn.multiclass import OneVsOneClassifier, OneVsRestClassifier, OutputCo
 from sklearn.naive_bayes import BernoulliNB, CategoricalNB, ComplementNB, GaussianNB, MultinomialNB
 from sklearn.neighbors import KNeighborsClassifier, NearestCentroid, RadiusNeighborsClassifier
 from sklearn.neural_network import MLPClassifier
-from sklearn.preprocessing import LabelEncoder
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import LabelEncoder, StandardScaler
 from sklearn.svm import LinearSVC, NuSVC, SVC
 from sklearn.tree import DecisionTreeClassifier, ExtraTreeClassifier
 
@@ -66,7 +68,7 @@ _CLASSIFIERS = {
 }
 _XGBOOST_METHODS = {"xgboost": "XGBClassifier", "xgboost_rf": "XGBRFClassifier"}
 CLASSIFICATION_METHODS = tuple(_CLASSIFIERS) + tuple(_XGBOOST_METHODS)
-"""Canonical method names accepted by :func:`classify` and :func:`create_classifier`."""
+"""Method names accepted by object and pixel classification and create_classifier."""
 
 _ALIASES = {cls.__name__.lower(): name for name, cls in _CLASSIFIERS.items()}
 _ALIASES.update({cls.lower(): name for name, cls in _XGBOOST_METHODS.items()})
@@ -129,6 +131,22 @@ def _requires_pairwise_input(estimator):
     if hasattr(BaseEstimator, "__sklearn_tags__"):
         return estimator.__sklearn_tags__().input_tags.pairwise
     return getattr(estimator, "_get_tags", lambda: {})().get("pairwise", False)
+
+
+def _classifier_pipeline(method, scale_features, **kwargs):
+    """Use identical estimator adaptation and preprocessing in both workflows."""
+    estimator = create_classifier(method, **kwargs)
+    if _requires_pairwise_input(estimator):
+        raise ValueError(
+            "Precomputed kernels/distances are not feature columns. Pass ordinary "
+            "features, or a pipeline that builds its pairwise matrices from those features."
+        )
+    params = estimator.get_params()
+    if scale_features != "auto" and not isinstance(scale_features, (bool, np.bool_)):
+        raise ValueError("scale_features must be 'auto', True, or False.")
+    scale = _scale_automatically(estimator) if scale_features == "auto" else scale_features
+    steps = [("scaler", StandardScaler())] if scale else []
+    return Pipeline(steps + [("classifier", _encode_xgboost(estimator))]), params
 
 
 def _is_xgboost_classifier(estimator):
