@@ -9,7 +9,7 @@ needed after installation.
 | --- | --- |
 | [1. Raster segmentation](01_segmentation.ipynb) | Compare SLIC, Felzenszwalb, and watershed; convert labels to object polygons; export segment IDs and a GeoPackage. |
 | [2. Raster object features](02_raster_features.ipynb) | Add spectral summaries, a normalized-difference index, shape, texture, and mask-based validity measurements to existing polygons. |
-| [3. Object classification](03_classification.ipynb) | Transfer point labels to objects, compare classifiers on a holdout, use a custom pipeline, and save a class map and fitted model. |
+| [3. Object classification](03_classification.ipynb) | Transfer point labels to objects, inspect spatial blocks and buffer exclusions, compare classifiers on the same split, and save a class map and fitted model. |
 
 ## Run Locally
 
@@ -57,8 +57,10 @@ a `class` column, reprojected to the object CRS.
 
 The loader's optional file-band selection is one-based. All subsequent OBIA band
 selections are zero-based positions in the loaded image. Synthetic class scores
-are demonstrations, not estimates of accuracy on real imagery; use independent
-spatial areas or scenes for validation.
+are demonstrations, not estimates of accuracy on real imagery. Choose sampling
+units and separation distances for your prediction task; the
+[validation guide](../usage/validation.md) covers grouped, spatial, and explicit
+splits, model selection, and map accuracy assessment, with literature references.
 
 ## Check Notebook Changes
 

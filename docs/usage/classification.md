@@ -57,6 +57,8 @@ The result contains:
   without `predict_proba`.
 - `confusion_matrix` and `report`: held-out metrics when requested.
 - `params`: the classifier's parameters.
+- `split`: the reusable partition, with train/test/excluded row positions,
+  map-ready assignments, and class counts.
 
 If `feature_columns` is omitted, OBIA selects numeric training columns except
 `segment_id`, `feature_class`, `predicted_class`, and `prediction_margin`. Text
@@ -282,13 +284,25 @@ occur in its training partition. Set `test_size=None` to fit all labelled object
 held-out reports are unavailable in that mode. OBIA does not refit automatically
 on the full labelled table after evaluation.
 
-Random object holdouts do not provide spatially independent validation. For a
-spatial assessment, reserve separate areas and evaluate predictions on those
-objects using the retained model:
+For predictions in new sites or areas, create a grouped or spatial split before
+fitting. Reuse it across models and inspect class coverage and exclusions:
 
 ```python
-new_predictions = result.model.predict(new_segments.loc[:, list(result.feature_columns)])
+from obia.classification import split_objects
+
+partition = split_objects(training_segments, method="grouped", groups="site_id",
+                          test_size=0.2, random_state=42)
+result = classify(segments_gdf, training_segments, method="rf", split=partition,
+                  compute_reports=True, random_state=42)
+print(result.split.class_counts)
 ```
+
+This example requires a `site_id` column identifying independent sampling units.
+A named grouping column is excluded from predictors. Supplying `split` overrides
+the random split options on `classify()`. See
+[training, test sets, and spatial validation](validation.md) for spatial blocks,
+geometry buffers, explicit test sets, cross-validation, and the distinction
+between spatial transfer and map accuracy assessment, with literature references.
 
 ## Probabilities and Spatial Class Constraints
 

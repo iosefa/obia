@@ -21,6 +21,7 @@ Current scope:
 - optional point-cloud features joined to the same segment objects
 - point-to-segment labelling utilities
 - scikit-learn object classifiers and pipelines, plus optional XGBoost
+- grouped and spatial validation splits, geometry buffers, and reusable folds
 - tiled SLIC utilities for large rasters
 - experimental RetinaNet-based detection modules
 
@@ -158,6 +159,24 @@ result = classify(
 
 result.classified.to_file("classified_segments.gpkg", driver="GPKG")
 ```
+
+For validation in new sites or areas, create and inspect a partition before
+fitting. For example, with a `site_id` column identifying independent sites:
+
+```python
+from obia.classification import split_objects
+
+partition = split_objects(training_segments, method="grouped", groups="site_id",
+                          test_size=0.2, random_state=42)
+print(partition.class_counts)
+result = classify(segments, training_segments, method="rf", split=partition,
+                  compute_reports=True, random_state=42)
+```
+
+Spatial blocks, geometry buffers, explicit train/test sets, and reusable
+cross-validation folds are also supported. See the
+[validation guide](https://obia.sefa.ai/usage/validation/) for examples and the
+literature behind choosing a design that matches the prediction task.
 
 Choose from 39 named methods, including `"extra_trees"`, `"svc"`, `"knn"`,
 `"logistic_regression"`, `"hist_gradient_boosting"`, `"gaussian_nb"`, `"lda"`,

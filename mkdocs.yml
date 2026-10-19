@@ -58,6 +58,7 @@ nav:
         - Segmentation: usage/segmentation.md
         - Raster Features: usage/raster-features.md
         - Classification: usage/classification.md
+        - Training and Validation: usage/validation.md
         - Point Clouds: usage/pointcloud.md
         - Large Rasters: usage/large-rasters.md
         - Experimental Detection: usage/detection.md

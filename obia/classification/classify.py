@@ -12,17 +12,16 @@ from pandas.api.types import is_complex_dtype, is_numeric_dtype
 from sklearn.base import BaseEstimator
 from sklearn.ensemble import ExtraTreesClassifier, RandomForestClassifier
 from sklearn.metrics import classification_report, confusion_matrix
-from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 from sklearn.tree import DecisionTreeClassifier, ExtraTreeClassifier
-from sklearn.utils.multiclass import check_classification_targets
 
 from obia.classification.estimators import (
     CLASSIFICATION_METHODS, _EncodedClassifier, _encode_xgboost,
     _is_xgboost_classifier, _requires_pairwise_input, _scale_automatically, create_classifier,
 )
 from obia.handlers.geotif import _write_geotiff
+from obia.classification.splitting import ObjectSplit, _labels, split_objects
 
 
 _RESERVED = {"feature_class", "segment_id", "predicted_class", "prediction_margin"}
@@ -42,10 +41,11 @@ class ClassifiedImage:
         report: Held-out classification report, or None.
         params: Classifier parameters, excluding OBIA preprocessing options.
         shap_values: SHAP values for training features, or None.
+        split: ObjectSplit with positional training/test/excluded assignments and class counts.
     """
 
     def __init__(self, classified, confusion_matrix, report, shap_values, transform, crs,
-                 params, *, model=None, feature_columns=(), classes=None, probabilities=None):
+                 params, *, model=None, feature_columns=(), classes=None, probabilities=None, split=None):
         self.classified = classified
         self.confusion_matrix = confusion_matrix
         self.report = report
@@ -58,26 +58,28 @@ class ClassifiedImage:
         self.classes = classes
         self.probabilities = probabilities
         self.margin_kind = "probability" if probabilities is not None else None
+        self.split = split
 
     def write_geotiff(self, output_path):
         """Write raster-valued classified data; polygon outputs must be rasterized first."""
         _write_geotiff(self.classified, output_path, self.crs, self.transform)
 
 
-def _features(training, segments, columns):
+def _features(training, segments, columns, exclusions=()):
     if not training.columns.is_unique or not segments.columns.is_unique:
         raise ValueError("Training and segment column names must be unique.")
+    reserved = _RESERVED.union(exclusions)
     if columns is None:
         columns = [name for name in training.columns
-                   if name not in _RESERVED and is_numeric_dtype(training[name].dtype)]
+                   if name not in reserved and is_numeric_dtype(training[name].dtype)]
     else:
         if isinstance(columns, str):
             raise TypeError("feature_columns must be a sequence of column names.")
         columns = list(columns)
     if not columns or len(set(columns)) != len(columns):
         raise ValueError("feature_columns must select at least one feature, without duplicates.")
-    if _RESERVED.intersection(columns):
-        raise ValueError("Labels, segment IDs, and previous predictions cannot be used as features.")
+    if reserved.intersection(columns):
+        raise ValueError("Labels, segment IDs, previous predictions, and grouping columns cannot be used as features.")
     frames = []
     for name, table in (("training_classes", training), ("segments", segments)):
         missing = [column for column in columns if column not in table]
@@ -191,7 +193,7 @@ def classify(segments: gpd.GeoDataFrame, training_classes: pd.DataFrame,
              compute_reports: bool = False, compute_shap: bool = False,
              sample_shap: bool = False, *, feature_columns: Sequence[str] | None = None,
              scale_features: bool | Literal["auto"] = "auto", split_random_state: int | None = 42,
-             stratify: bool = True, **kwargs: Any) -> ClassifiedImage:
+             stratify: bool = True, split: ObjectSplit | None = None, **kwargs: Any) -> ClassifiedImage:
     """Fit a classifier on labelled objects and predict classes for segment polygons.
 
     Args:
@@ -202,7 +204,8 @@ def classify(segments: gpd.GeoDataFrame, training_classes: pd.DataFrame,
             Requires probabilities; overlapping polygons intersect their allowed sets.
         method: Name in ``CLASSIFICATION_METHODS`` or a scikit-learn-compatible
             classifier/pipeline instance, which is cloned before fitting.
-        test_size: Holdout fraction or count; None trains on all labelled objects.
+        test_size: Random holdout fraction or count; None trains on all labelled objects.
+            Used only when split is None.
         compute_reports: Report held-out performance; requires a test split.
         compute_shap: Calculate SHAP explanations (requires the ``explain`` extra).
         sample_shap: Limit SHAP background and explained training rows to 500.
@@ -214,6 +217,10 @@ def classify(segments: gpd.GeoDataFrame, training_classes: pd.DataFrame,
             The scaler is fitted only on training rows and reused everywhere.
         split_random_state: Seed for the holdout split, independent of estimator parameters.
         stratify: Preserve class proportions in the holdout split (default True).
+        split: Optional ObjectSplit from split_objects/cross_validation_splits.
+            Reuses exactly that partition, including buffer exclusions, instead of
+            test_size, split_random_state, and stratify. Named group columns are
+            excluded from predictors. Reports require a nonempty test subset.
         **kwargs: Estimator parameters, including nested parameters for supplied pipelines.
 
     Returns:
@@ -225,18 +232,16 @@ def classify(segments: gpd.GeoDataFrame, training_classes: pd.DataFrame,
         raise TypeError("segments must be a GeoDataFrame.")
     if not training_classes.columns.is_unique or not segments.columns.is_unique:
         raise ValueError("Training and segment column names must be unique.")
-    if "feature_class" not in training_classes or not len(training_classes):
-        raise ValueError("training_classes must contain labelled rows and a feature_class column.")
-    y = training_classes["feature_class"]
-    if y.isna().any():
-        raise ValueError("Training labels cannot be missing; remove unlabelled rows before classification.")
-    string_labels = [isinstance(value, str) for value in y]
-    if any(string_labels) and not all(string_labels):
-        raise ValueError("Training labels must be all strings or all numeric class codes.")
-    # Convert pandas nullable/categorical arrays to their natural NumPy label dtype.
-    y = np.asarray(y.tolist())
-    check_classification_targets(y)
-    columns, x, x_pred = _features(training_classes, segments, feature_columns)
+    y = _labels(training_classes)
+    if split is None:
+        split = split_objects(training_classes, test_size=test_size,
+                              random_state=split_random_state, stratify=stratify)
+    elif not isinstance(split, ObjectSplit):
+        raise TypeError("split must be an ObjectSplit created by split_objects or cross_validation_splits.")
+    split.validate_for(training_classes)
+    if compute_reports and not len(split.test_indices):
+        raise ValueError("compute_reports=True requires a holdout test subset.")
+    columns, x, x_pred = _features(training_classes, segments, feature_columns, split.feature_exclusions)
     restrictions = _constraints(segments, acceptable_classes_gdf)
     estimator = create_classifier(method, **kwargs)
     if _requires_pairwise_input(estimator):
@@ -250,28 +255,13 @@ def classify(segments: gpd.GeoDataFrame, training_classes: pd.DataFrame,
     scale = _scale_automatically(estimator) if scale_features == "auto" else scale_features
     steps = [("scaler", StandardScaler())] if scale else []
     model = Pipeline(steps + [("classifier", _encode_xgboost(estimator))])
-    if test_size is None:
-        if compute_reports:
-            raise ValueError("compute_reports=True requires a holdout test_size.")
-        x_train, y_train = x, y
-    else:
-        try:
-            x_train, x_test, y_train, y_test = train_test_split(
-                x, y, test_size=test_size, random_state=split_random_state,
-                stratify=y if stratify else None,
-            )
-        except ValueError as exc:
-            raise ValueError(
-                f"Cannot create the requested holdout split: {exc} "
-                "Add labelled examples, adjust test_size, or use test_size=None to train on all rows."
-            ) from exc
-        if set(y_train) != set(y):
-            raise ValueError("The training split is missing classes; use stratify=True or test_size=None.")
+    x_train, y_train = x.iloc[split.train_indices], y[split.train_indices]
     model.fit(x_train, y_train)
     predictions, margins, probabilities = _predict(model, x_pred, segments, restrictions)
     classes = np.asarray(model.classes_)
     cm = report = None
     if compute_reports:
+        x_test, y_test = x.iloc[split.test_indices], y[split.test_indices]
         predicted_test = model.predict(x_test)
         cm = confusion_matrix(y_test, predicted_test, labels=classes)
         report = classification_report(y_test, predicted_test, labels=classes, zero_division=0)
@@ -282,5 +272,5 @@ def classify(segments: gpd.GeoDataFrame, training_classes: pd.DataFrame,
     classified["prediction_margin"] = margins
     return ClassifiedImage(
         classified, cm, report, shap_values, None, segments.crs, params,
-        model=model, feature_columns=columns, classes=classes, probabilities=probabilities,
+        model=model, feature_columns=columns, classes=classes, probabilities=probabilities, split=split,
     )
