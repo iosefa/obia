@@ -10,6 +10,7 @@ is needed after installation.
 | [1. Raster segmentation](01_segmentation.ipynb) | Compare segment boundaries, create object polygons, and export raster IDs and a GeoPackage. |
 | [2. Raster object features](02_raster_features.ipynb) | Measure band distributions, a normalized difference, shape, texture, and pixel validity within an analysis area. |
 | [3. Object classification](03_classification.ipynb) | Sample reference labels, compare classifiers with spatial validation, and evaluate and map a separate test area. |
+| [4. Pixel classification](04_pixel_classification.ipynb) | Learn band values at labelled points, predict a class raster in another area, and save georeferenced results. |
 
 ## Run a notebook
 

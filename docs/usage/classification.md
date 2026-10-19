@@ -1,8 +1,12 @@
-# Classification
+# Object classification
 
 Classification learns from labelled objects and predicts a class for each object
 in your map. Start with polygons containing numeric feature columns, then choose
 a classifier and the objects to use for training and evaluation.
+
+For direct classification from labelled pixel samples, see
+[pixel classification](pixel-classification.md). Both workflows use the same
+classifiers and model parameters.
 
 ## Prepare training labels
 

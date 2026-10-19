@@ -1,5 +1,20 @@
 # Classification API
 
+## Classify pixels
+
+::: obia.classification.classify_pixels
+
+## Sample labelled pixels
+
+::: obia.classification.sample_pixels
+
+## Raster results
+
+::: obia.classification.ClassifiedRaster
+
+See [pixel classification](../usage/pixel-classification.md) for sampling rules,
+class codes, raster exports, and prediction on another image.
+
 ## Classify Objects
 
 ::: obia.classification.classify

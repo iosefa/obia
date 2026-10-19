@@ -20,6 +20,7 @@ With OBIA, you can:
 - Segment imagery into object polygons.
 - Measure each object's band statistics, spectral indices, shape, and texture.
 - Transfer point labels to objects and train a classifier.
+- Train on labelled point pixels and produce a raster class map.
 - Evaluate models with grouped or spatial splits, buffers, and cross-validation.
 - Add point-cloud measurements or process large rasters in tiles when needed.
 
@@ -66,6 +67,7 @@ which bands are measured within each object.
 - [Segmentation](usage/segmentation.md): choose an algorithm and adjust boundaries.
 - [Raster features](usage/raster-features.md): add or change object measurements.
 - [Classification](usage/classification.md): label objects, fit a model, and save predictions.
+- [Pixel classification](usage/pixel-classification.md): learn from point samples and classify raster pixels.
 - [Training and validation](usage/validation.md): choose held-out data and compare models.
 
 For other workflows, see [point-cloud features](usage/pointcloud.md),

@@ -16,6 +16,11 @@ The same polygon table carries geometry, measurements, labels, and predictions
 through these steps. You can save it between steps or start with polygons you
 already have. The [example notebooks](examples/index.md) demonstrate the workflow.
 
+You can also classify individual pixels. `classify_pixels()` reads band values at
+labelled points, trains a classifier, and predicts a class raster.
+Its `ClassifiedRaster` result stores class codes, their original labels, the fitted
+model, and raster metadata. See [pixel classification](usage/pixel-classification.md).
+
 ## Raster data and band indices
 
 `obia.handlers.geotif.open_geotiff` returns an instance of OBIA's own

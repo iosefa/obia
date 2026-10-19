@@ -20,6 +20,7 @@ With OBIA, you can:
 - Segment imagery into object polygons.
 - Measure each object's band statistics, spectral indices, shape, and texture.
 - Transfer point labels to objects and train a classifier.
+- Train on labelled point pixels and produce a raster class map.
 - Evaluate models with grouped or spatial splits, buffers, and cross-validation.
 - Add point-cloud measurements or process large rasters in tiles when needed.
 
@@ -140,6 +141,26 @@ Use a method name or supply a compatible estimator or pipeline. The
 [classification guide](https://obia.sefa.ai/usage/classification/) covers model
 choices, preprocessing, predictions, and evaluation.
 
+## Classify pixels
+
+Read raster values at labelled points and predict a georeferenced class map:
+
+```python
+from obia.classification import classify_pixels
+
+points = gpd.read_file("labelled_points.gpkg")  # A CRS and a `class` column are required.
+result = classify_pixels(
+    image, points, bands=[0, 1, 2, 3], method="xgboost",
+    n_estimators=100, max_depth=4, n_jobs=1, random_state=42, test_size=None,
+)
+result.write_geotiff("pixel_classes.tif")
+print(result.class_mapping)
+```
+
+The same classifier names and pipelines work for object and pixel classification.
+See [pixel classification](https://obia.sefa.ai/usage/pixel-classification/) for
+sampling rules, validation, masks, and prediction on another image.
+
 ## Example notebooks
 
 The notebooks run independently using the bundled Chesapeake imagery and
@@ -151,6 +172,8 @@ reference maps, with plots and GIS exports:
   summaries, indices, shape, texture, and analysis masks.
 - [Object classification](docs/examples/03_classification.ipynb): label objects
   from points, compare models, and save predictions and a reusable classifier.
+- [Pixel classification](docs/examples/04_pixel_classification.ipynb): learn from
+  labelled pixels, predict another area, and export a raster class map.
 
 From the repository root, install the notebook dependencies and launch JupyterLab:
 

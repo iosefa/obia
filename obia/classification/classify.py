@@ -12,13 +12,10 @@ from pandas.api.types import is_complex_dtype, is_numeric_dtype
 from sklearn.base import BaseEstimator
 from sklearn.ensemble import ExtraTreesClassifier, RandomForestClassifier
 from sklearn.metrics import classification_report, confusion_matrix
-from sklearn.pipeline import Pipeline
-from sklearn.preprocessing import StandardScaler
 from sklearn.tree import DecisionTreeClassifier, ExtraTreeClassifier
 
 from obia.classification.estimators import (
-    CLASSIFICATION_METHODS, _EncodedClassifier, _encode_xgboost,
-    _is_xgboost_classifier, _requires_pairwise_input, _scale_automatically, create_classifier,
+    CLASSIFICATION_METHODS, _EncodedClassifier, _classifier_pipeline, _is_xgboost_classifier,
 )
 from obia.handlers.geotif import _write_geotiff
 from obia.classification.splitting import ObjectSplit, _labels, split_objects
@@ -127,7 +124,7 @@ def _predict(model, features, segments, restrictions):
         )
     predictions = model.predict(features) if len(features) else np.array([], dtype=classes.dtype)
     if np.asarray(predictions).ndim != 1:
-        raise ValueError("OBIA requires one predicted class per segment, not multioutput predictions.")
+        raise ValueError("OBIA requires one predicted class per row, not multioutput predictions.")
     predictions = np.asarray(predictions, dtype=object)
     margins = np.full(len(features), np.nan)
     probabilities = None
@@ -135,7 +132,7 @@ def _predict(model, features, segments, restrictions):
         values = model.predict_proba(features) if len(features) else np.empty((0, len(classes)))
         values = np.asarray(values)
         if values.shape != (len(features), len(classes)):
-            raise ValueError("predict_proba must return one column per class and one row per segment.")
+            raise ValueError("predict_proba must return one column per class and one row per sample.")
         probabilities = pd.DataFrame(values, index=segments.index, columns=classes)
         if len(classes) > 1:
             top = np.sort(values, axis=1)[:, -2:]
@@ -243,18 +240,7 @@ def classify(segments: gpd.GeoDataFrame, training_classes: pd.DataFrame,
         raise ValueError("compute_reports=True requires a holdout test subset.")
     columns, x, x_pred = _features(training_classes, segments, feature_columns, split.feature_exclusions)
     restrictions = _constraints(segments, acceptable_classes_gdf)
-    estimator = create_classifier(method, **kwargs)
-    if _requires_pairwise_input(estimator):
-        raise ValueError(
-            "Precomputed kernels/distances are not object feature columns. Pass ordinary "
-            "features, or a pipeline that builds its pairwise matrices from those features."
-        )
-    params = estimator.get_params()
-    if scale_features != "auto" and not isinstance(scale_features, (bool, np.bool_)):
-        raise ValueError("scale_features must be 'auto', True, or False.")
-    scale = _scale_automatically(estimator) if scale_features == "auto" else scale_features
-    steps = [("scaler", StandardScaler())] if scale else []
-    model = Pipeline(steps + [("classifier", _encode_xgboost(estimator))])
+    model, params = _classifier_pipeline(method, scale_features, **kwargs)
     x_train, y_train = x.iloc[split.train_indices], y[split.train_indices]
     model.fit(x_train, y_train)
     predictions, margins, probabilities = _predict(model, x_pred, segments, restrictions)
