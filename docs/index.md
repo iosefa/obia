@@ -20,7 +20,7 @@ The library supports:
 - spectral distributions and indices, shape measurements, and configurable texture for segment objects
 - optional point-cloud height, intensity, and density features
 - point-to-segment labelling for training data
-- random forest and MLP segment classification
+- scikit-learn object classifiers and pipelines, plus optional XGBoost
 - tiled large-raster workflows for supported segmentation methods
 
 ## First Segmentation

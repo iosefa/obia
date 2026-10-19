@@ -29,7 +29,8 @@ dependencies:
   - pip:
       - albumentations>=1.4
       - pyforestscan
-      - shap>=0.46.0
+      - shap>=0.51.0
+      - xgboost>=2.1.4
       - mkdocstrings[python]>=0.26
       - mkdocs-jupyter>=0.24
       - mkdocs-git-revision-date-localized-plugin>=1.2

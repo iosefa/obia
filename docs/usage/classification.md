@@ -1,17 +1,12 @@
 # Classification
 
-Classification assigns class labels to segment objects. The classifier uses segment-level features rather than raw pixels.
-
-Raster-derived features and point-cloud-derived features can be used together. The classifier only requires one segment table with numeric feature columns.
+Classification assigns one class label to each segment object, using its numeric
+feature columns. OBIA supports scikit-learn classifiers and pipelines, plus optional
+XGBoost models. Existing `method="rf"` and `method="mlp"` calls still work.
 
 ## Prepare Training Labels
 
-Start with:
-
-- a segment GeoDataFrame from `segment(...).segments`
-- a labelled point GeoDataFrame with a `class` column
-
-If point-cloud features are needed, add them before labelling so the labelled training segments and prediction segments have the same feature columns.
+Start with segment polygons and labelled points with a `class` column:
 
 ```python
 import geopandas as gpd
@@ -20,113 +15,348 @@ from obia.utils.utils import label_segments
 
 segments_gdf = gpd.read_file("segments.gpkg")
 labelled_points = gpd.read_file("labelled_points.gpkg")
-
-training_segments, mixed_segments = label_segments(
-    segments_gdf,
-    labelled_points,
-)
+training_segments, mixed_segments = label_segments(segments_gdf, labelled_points)
 ```
 
-`training_segments` contains a `feature_class` column. `mixed_segments` contains segment IDs that intersected more than one class.
+`training_segments` has a `feature_class` column. Labels can be strings such as
+`"forest"` or numeric class codes such as `10`, `30`, and `80`. Remove unlabelled
+rows before classification. `mixed_segments` lists IDs that intersect multiple
+classes; review these objects before training.
 
-Review mixed segments before training. They often indicate label noise, poor segmentation, or sample points near class boundaries.
+Calculate the features you need before labelling, or recalculate them on both
+training and prediction polygons with the same settings. See
+[raster object features](raster-features.md).
 
 ## Train and Predict
 
 ```python
-from obia.classification.classify import classify
+from obia.classification import classify
 
 result = classify(
     segments_gdf,
     training_segments,
     method="rf",
+    feature_columns=["b0_mean", "b1_mean", "b2_mean"],
     n_estimators=300,
     random_state=42,
+    compute_reports=True,
 )
 
 classified = result.classified
-```
-
-The classified GeoDataFrame includes:
-
-- `predicted_class`
-- `prediction_margin`
-- original segment geometry
-- original feature columns
-
-## Random Forest
-
-Random forest is the default starting point:
-
-```python
-result = classify(
-    segments_gdf,
-    training_segments,
-    method="rf",
-    n_estimators=300,
-    max_depth=None,
-    random_state=42,
-)
-```
-
-Use it before trying neural-network classification. It is usually easier to diagnose on small tabular feature sets.
-
-## MLP
-
-Use `method="mlp"` for scikit-learn's multi-layer perceptron classifier:
-
-```python
-result = classify(
-    segments_gdf,
-    training_segments,
-    method="mlp",
-    hidden_layer_sizes=(100, 50),
-    max_iter=500,
-    random_state=42,
-)
-```
-
-MLP classification is more sensitive to feature scaling, class balance, and training size.
-
-## Reports and Explanations
-
-Set `compute_reports=True` to calculate a confusion matrix and classification report on the train/test split:
-
-```python
-result = classify(
-    segments_gdf,
-    training_segments,
-    method="rf",
-    compute_reports=True,
-    n_estimators=300,
-)
-
-print(result.confusion_matrix)
 print(result.report)
 ```
 
-SHAP explanations require the optional `explain` dependency group:
+The result contains:
+
+- `classified`: a copy of the input GeoDataFrame with `predicted_class` and
+  `prediction_margin`; geometry, CRS, row indices, and other columns are retained.
+- `model`: the fitted scikit-learn pipeline, including any OBIA scaler.
+- `feature_columns`: the ordered feature names used during training.
+- `classes`: labels in probability-column and confusion-matrix order.
+- `probabilities`: a DataFrame with one column per class, or `None` for classifiers
+  without `predict_proba`.
+- `confusion_matrix` and `report`: held-out metrics when requested.
+- `params`: the classifier's parameters.
+
+If `feature_columns` is omitted, OBIA selects numeric training columns except
+`segment_id`, `feature_class`, `predicted_class`, and `prediction_margin`. Text
+metadata and geometry are excluded. Prediction columns are selected in the same
+order, regardless of the segment table's column order. Missing required columns
+raise an error; extra prediction columns are ignored. Use an explicit list when
+numeric metadata should not be used as a feature.
+
+Selected feature dtypes are preserved, including integer and nullable numeric
+columns, so dtype-based selectors in custom pipelines work as expected.
+
+## Available Classifiers
+
+Pass a method name and its scikit-learn constructor parameters to `classify()`.
+The class names in the right column also work as method strings, ignoring case.
+
+| Method | Estimator |
+| --- | --- |
+| `rf` | `RandomForestClassifier` |
+| `extra_trees` | `ExtraTreesClassifier` |
+| `decision_tree` | `DecisionTreeClassifier` |
+| `extra_tree` | `ExtraTreeClassifier` |
+| `gradient_boosting` | `GradientBoostingClassifier` |
+| `hist_gradient_boosting` | `HistGradientBoostingClassifier` |
+| `adaboost` | `AdaBoostClassifier` |
+| `bagging` | `BaggingClassifier` |
+| `mlp` | `MLPClassifier` |
+| `logistic_regression` | `LogisticRegression` |
+| `logistic_regression_cv` | `LogisticRegressionCV` |
+| `ridge` | `RidgeClassifier` |
+| `ridge_cv` | `RidgeClassifierCV` |
+| `sgd` | `SGDClassifier` |
+| `perceptron` | `Perceptron` |
+| `passive_aggressive` | `PassiveAggressiveClassifier` |
+| `svc` | `SVC` |
+| `nu_svc` | `NuSVC` |
+| `linear_svc` | `LinearSVC` |
+| `knn` | `KNeighborsClassifier` |
+| `radius_neighbors` | `RadiusNeighborsClassifier` |
+| `nearest_centroid` | `NearestCentroid` |
+| `gaussian_nb` | `GaussianNB` |
+| `bernoulli_nb` | `BernoulliNB` |
+| `multinomial_nb` | `MultinomialNB` |
+| `complement_nb` | `ComplementNB` |
+| `categorical_nb` | `CategoricalNB` |
+| `lda` | `LinearDiscriminantAnalysis` |
+| `qda` | `QuadraticDiscriminantAnalysis` |
+| `gaussian_process` | `GaussianProcessClassifier` |
+| `dummy` | `DummyClassifier` |
+| `voting` | `VotingClassifier` |
+| `stacking` | `StackingClassifier` |
+| `calibrated` | `CalibratedClassifierCV` |
+| `one_vs_rest` | `OneVsRestClassifier` |
+| `one_vs_one` | `OneVsOneClassifier` |
+| `output_code` | `OutputCodeClassifier` |
+| `xgboost` | `XGBClassifier` (optional) |
+| `xgboost_rf` | `XGBRFClassifier` (optional) |
+
+Additional aliases are `random_forest`, `svm`, `xgb`, and `xgbrf`. Discover the
+canonical names or create an unfitted estimator directly:
+
+```python
+from obia.classification import CLASSIFICATION_METHODS, create_classifier
+
+print(CLASSIFICATION_METHODS)
+estimator = create_classifier("extra_trees", n_estimators=300, random_state=42)
+```
+
+The named classifiers use their upstream defaults. Their data requirements still
+apply: multinomial/complement Naive Bayes need nonnegative features, categorical
+Naive Bayes needs nonnegative integer categories, and radius neighbors needs an
+appropriate radius or outlier policy. `passive_aggressive` follows the upstream
+class, which is deprecated in newer scikit-learn releases. See the
+[scikit-learn supervised learning guide](https://scikit-learn.org/stable/supervised_learning.html)
+for estimator parameters and assumptions.
+
+### SVM, Nearest Neighbors, and MLP
+
+```python
+svm_result = classify(segments_gdf, training_segments, method="svc", C=10, kernel="rbf")
+knn_result = classify(segments_gdf, training_segments, method="knn", n_neighbors=7)
+mlp_result = classify(
+    segments_gdf, training_segments, method="mlp",
+    hidden_layer_sizes=(100, 50), max_iter=500, random_state=42,
+)
+```
+
+SVC and LinearSVC work without probability estimates. In that case,
+`prediction_margin` is `NaN` and `probabilities` is `None`. To add probabilities,
+use a calibrated estimator as shown below.
+
+### XGBoost
+
+Install the optional dependency:
+
+```bash
+pip install "obia[xgboost]"
+```
+
+```python
+xgb_result = classify(
+    segments_gdf, training_segments,
+    method="xgboost",
+    n_estimators=300,
+    max_depth=6,
+    learning_rate=0.05,
+    tree_method="hist",
+    n_jobs=4,
+    random_state=42,
+)
+```
+
+Use `method="xgboost_rf"` for XGBoost's random-forest classifier. OBIA encodes class
+labels internally and restores the original strings or codes in predictions,
+probability columns, and reports. XGBoost is imported only when requested.
+Constructor options follow the
+[XGBoost scikit-learn interface](https://xgboost.readthedocs.io/en/stable/python/sklearn_estimator.html).
+The `XGBRFClassifier` wrapper is deprecated in newer XGBoost releases.
+OBIA does not supply an `eval_set`; manage early stopping through a separately
+configured training workflow.
+
+### Custom Estimators and Pipelines
+
+Pass any scikit-learn-compatible classifier instance as `method`. OBIA clones it,
+so your supplied object remains unchanged. Pipelines support feature imputation,
+selection, transformations, calibrated classifiers, and other installed
+scikit-learn classifiers. The target remains one `feature_class` per object;
+multioutput/multilabel targets are outside this API.
+
+XGBoost subclasses, feature-importance selectors, and parameter searches are
+supported too. Existing parameter paths such as `max_depth` or
+`tree__max_depth` remain valid inside `GridSearchCV`.
+
+On scikit-learn versions that provide `FrozenEstimator`, a supplied frozen model
+retains its fitted state. OBIA does not refit it or add a label encoder inside it;
+its existing class labels must already match your objects' labels. Any evaluation
+of a frozen model must use objects excluded from its original training data.
+
+```python
+from sklearn.impute import SimpleImputer
+from sklearn.linear_model import LogisticRegression
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import StandardScaler
+
+pipeline = Pipeline([
+    ("impute", SimpleImputer(strategy="median")),
+    ("scale", StandardScaler()),
+    ("classifier", LogisticRegression(max_iter=1000)),
+])
+
+pipeline_result = classify(
+    segments_gdf, training_segments,
+    method=pipeline,
+    classifier__C=0.5,
+    test_size=None,
+)
+```
+
+Additional keyword arguments use `set_params` for supplied estimators, including
+nested names such as `classifier__C`. Missing feature values are retained for
+native estimator support or an imputer pipeline. OBIA rejects infinities and
+does not silently fill missing values. Estimators without missing-value support
+raise their normal scikit-learn error.
+
+The input contract is a table of real numeric object features and one class label
+per object. Native pandas categorical/string feature columns must be encoded
+before calling `classify()`. Estimators must follow scikit-learn's classifier
+interface, including fitted `classes_` and one prediction per row.
+This does not guarantee that every estimator parameter combination is suitable
+for every object table: class counts, nonnegative feature requirements, valid
+neighbor counts, and missing-value support still matter.
+
+Raw precomputed kernels or distance matrices are outside this input contract and
+raise an explicit error. A custom pipeline may build its own Gram and cross-kernel
+matrices from the object features; that keeps matrix construction inside each
+training split. See the [SVC input requirements](https://scikit-learn.org/stable/modules/generated/sklearn.svm.SVC.html).
+
+Composite named methods require their usual estimator arguments:
+
+```python
+from sklearn.calibration import CalibratedClassifierCV
+from sklearn.svm import LinearSVC
+from sklearn.tree import DecisionTreeClassifier
+
+calibrated_svm = CalibratedClassifierCV(
+    Pipeline([("scale", StandardScaler()), ("svc", LinearSVC())]), cv=3,
+)
+calibrated_result = classify(segments_gdf, training_segments, method=calibrated_svm)
+
+voting_result = classify(
+    segments_gdf, training_segments, method="voting", voting="soft",
+    estimators=[
+        ("tree", DecisionTreeClassifier(random_state=42)),
+        ("linear", pipeline),
+    ],
+)
+```
+
+## Scaling and Evaluation
+
+`scale_features="auto"` applies `StandardScaler` to the named linear, SVM,
+neighbor, MLP, discriminant-analysis, and Gaussian-process classifiers, including
+instances of those same classes. Tree models, Naive Bayes, XGBoost, custom
+pipelines, and composite estimators receive features without an added scaler.
+Pipelines and composite estimators should include their own preprocessing,
+especially when it needs to be fitted inside cross-validation folds.
+`scale_features=True` or `False` overrides the automatic choice.
+
+OBIA fits preprocessing only on the training partition and reuses it for test and
+prediction data, following
+[scikit-learn's preprocessing guidance](https://scikit-learn.org/stable/common_pitfalls.html).
+
+By default, `test_size=0.2` holds out 20% of labelled objects, with a stratified
+split and `split_random_state=42`. The classifier fits the remaining 80%, whether
+or not reports are requested. `random_state` in additional keyword arguments
+controls the estimator separately. Set `compute_reports=True` for a confusion
+matrix and text classification report; their class order is `result.classes`.
+
+Each class needs enough examples for the requested stratified split. Adjust
+`test_size` or collect more labels when a split cannot represent every class.
+`stratify=False` requests an ordinary random split, but all classes must still
+occur in its training partition. Set `test_size=None` to fit all labelled objects;
+held-out reports are unavailable in that mode. OBIA does not refit automatically
+on the full labelled table after evaluation.
+
+Random object holdouts do not provide spatially independent validation. For a
+spatial assessment, reserve separate areas and evaluate predictions on those
+objects using the retained model:
+
+```python
+new_predictions = result.model.predict(new_segments.loc[:, list(result.feature_columns)])
+```
+
+## Probabilities and Spatial Class Constraints
+
+`prediction_margin` is the difference between the two largest class
+probabilities. It is a probability gap, not a calibrated accuracy estimate.
+Models without probabilities retain their normal `predict` result and get a
+`NaN` margin. For SVC configurations that expose probabilities, the most probable
+class can differ from `predict`; OBIA preserves the estimator's prediction when
+there are no spatial restrictions.
+
+An optional `acceptable_classes_gdf` limits classes within polygons:
+
+```python
+allowed = gpd.GeoDataFrame(
+    {"acceptable_classes": [["forest", "soil"]]},
+    geometry=[study_area_polygon],
+    crs=segments_gdf.crs,
+)
+constrained = classify(
+    segments_gdf, training_segments,
+    method="rf", acceptable_classes_gdf=allowed,
+)
+```
+
+Constraint polygons must use the segments' CRS and their lists must contain the
+original class labels. For each intersecting segment, OBIA chooses the largest
+probability among permitted learned classes. Overlapping polygons intersect
+their allowed-class sets. An unmatched segment is unrestricted; no permitted
+learned classes produces a missing prediction. A single permitted class produces
+that class and a `NaN` margin. With two or more permitted classes, the margin uses
+the original probabilities without renormalizing. `result.probabilities` always
+contains the original, unrestricted probabilities.
+
+Spatial restrictions require `predict_proba`; use `CalibratedClassifierCV` for a
+classifier that lacks it. The returned model represents the statistical
+classifier; calling `result.model.predict()` does not apply polygon restrictions.
+
+## SHAP Explanations
+
+The `explain` extra requires SHAP 0.51 or newer for compatibility with the supported
+NumPy and XGBoost versions.
 
 ```bash
 pip install "obia[explain]"
 ```
 
-Then run:
-
 ```python
-result = classify(
-    segments_gdf,
-    training_segments,
-    method="rf",
-    compute_shap=True,
-    n_estimators=300,
+explained = classify(
+    segments_gdf, training_segments, method="rf",
+    n_estimators=300, compute_shap=True, sample_shap=True,
 )
 ```
+
+Random forests, extra trees, decision trees, and XGBoost tree models use
+`TreeExplainer` when they are the final classifier in OBIA's pipeline. Other
+probabilistic estimators and supplied pipelines use model-agnostic
+`KernelExplainer`, which can be expensive. Models without probabilities require
+calibration for this path. `sample_shap=True` limits both the background and the
+explained training rows to at most 500. Explaining a model does not change the
+rows used to fit it. Values are returned in `result.shap_values`; tree explanations
+use the classifier's input feature space, including scaling when enabled.
 
 ## Save Output
 
 ```python
-classified.to_file("classified_segments.gpkg", driver="GPKG")
+result.classified.to_file("classified_segments.gpkg", driver="GPKG")
 ```
 
-The output remains a vector object map. If a raster classification map is required, rasterize the classified polygons onto the source raster grid as a separate post-processing step.
+The output is a vector object map. To create a raster map, rasterize the predicted
+polygons onto the source grid. The GeoPackage does not store the fitted model or
+its preprocessing pipeline.

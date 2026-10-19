@@ -34,6 +34,9 @@ classifiers = [
 ]
 
 [project.optional-dependencies]
+xgboost = [
+  "xgboost>=2.1.4"
+]
 docs = [
   "mkdocs>=1.6,<2",
   "mkdocs-material>=9.5",
@@ -52,7 +55,7 @@ pointcloud = [
   "pyforestscan"
 ]
 explain = [
-  "shap>=0.46.0"
+  "shap>=0.51.0"
 ]
 test = [
   "pytest>=7.4"

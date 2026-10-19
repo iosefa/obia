@@ -20,7 +20,7 @@ Current scope:
 - segment-level spectral distributions and indices, shape features, and configurable texture
 - optional point-cloud features joined to the same segment objects
 - point-to-segment labelling utilities
-- random forest and MLP segment classification
+- scikit-learn object classifiers and pipelines, plus optional XGBoost
 - tiled SLIC utilities for large rasters
 - experimental RetinaNet-based detection modules
 
@@ -158,6 +158,15 @@ result = classify(
 
 result.classified.to_file("classified_segments.gpkg", driver="GPKG")
 ```
+
+Choose from 39 named methods, including `"extra_trees"`, `"svc"`, `"knn"`,
+`"logistic_regression"`, `"hist_gradient_boosting"`, `"gaussian_nb"`, `"lda"`,
+and `"xgboost"`, or pass a scikit-learn classifier or pipeline as `method`.
+Install `pip install "obia[xgboost]"` for XGBoost. Feature scaling is fitted on
+training objects and reused for predictions; classifiers without probabilities
+return a missing prediction margin. See the
+[classification guide](https://obia.sefa.ai/usage/classification/) for the full
+method list, custom pipelines, class constraints, and evaluation.
 
 ## Documentation
 
