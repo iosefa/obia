@@ -205,9 +205,13 @@ An optional boolean `mask` with shape `(height, width)` restricts output to True
 pixels. SLIC, watershed, and random walker use the mask during segmentation.
 Other algorithms operate on the full prepared image, then their output is clipped;
 the mask is not a barrier to their evolution or region growing. Excluded input
-pixels are set to zero in the working copy. Nonfinite values inside the mask are
-rejected; nonfinite values outside it are ignored. An entirely empty mask returns
-no objects.
+pixels are set to zero in the working copy, except for Quickshift, which uses a
+distinct finite fill after normalization and colour conversion. Quickshift smoothing
+uses only valid pixels before adding that fill. Mixed Quickshift labels are clipped
+at the saved mask boundary, keeping all their valid pixels and splitting disconnected
+pieces. This does not prevent the fill from influencing nearby segment boundaries.
+Nonfinite values inside the mask are rejected; nonfinite values outside it are
+ignored. An entirely empty mask returns no objects.
 
 The returned `Segments` object stores:
 
@@ -251,4 +255,5 @@ Inspect the boundaries, then [add raster features](raster-features.md) or
 [point-cloud features](pointcloud.md) to the same polygon table.
 
 For images that are impractical to process in memory, the
-[large-raster workflow](large-rasters.md) provides tiled SLIC segmentation.
+[large-raster workflow](large-rasters.md) provides checkerboard tiling for SLIC and
+Quickshift.

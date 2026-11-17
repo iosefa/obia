@@ -290,3 +290,51 @@ def test_result_parameters_are_not_shared():
     second = Segments(np.ones((2, 2)), None, "watershed", markers=2)
     assert first.params == {"n_segments": 10}
     assert second.params == {"markers": 2}
+
+
+@pytest.mark.parametrize("convert2lab", [False, True])
+@pytest.mark.parametrize("sigma", [0, 1])
+def test_quickshift_pseudomask_keeps_mixed_labels_and_splits_disconnected_pieces(
+        monkeypatch, convert2lab, sigma):
+    data = np.full((12, 12, 3), 0.25)
+    mask = np.ones((12, 12), dtype=bool)
+    mask[:, 5:7] = False
+    data[~mask] = np.nan
+    image = make_image(data)
+    before = data.copy()
+
+    def mixed_labels(prepared, **kwargs):
+        assert np.isfinite(prepared).all()
+        assert kwargs["convert2lab"] is False
+        assert kwargs.get("sigma", 0) == 0
+        # Smoothing a constant valid area must not blend in the artificial fill.
+        from skimage.color import rgb2lab
+        expected = rgb2lab(np.full((1, 1, 3), 0.25))[0, 0] if convert2lab else [0.25] * 3
+        np.testing.assert_allclose(prepared[mask], np.broadcast_to(expected, (mask.sum(), 3)))
+        assert (prepared[~mask] < prepared[mask].min(axis=0)).all()
+        return np.zeros(mask.shape, dtype=int)  # One mixed valid/NoData segment.
+
+    monkeypatch.setattr(skseg, "quickshift", mixed_labels)
+    labels = create_labels(image, method="quickshift", mask=mask, normalize=False,
+                           convert2lab=convert2lab, sigma=sigma)
+    np.testing.assert_array_equal(labels > 0, mask)
+    assert labels.max() == 2
+    assert labels[0, 0] != labels[0, -1]
+    np.testing.assert_array_equal(data, before)
+
+
+def test_quickshift_fill_is_added_after_normalization(monkeypatch):
+    data = np.arange(144, dtype=float).reshape(12, 12)
+    mask = np.ones(data.shape, dtype=bool)
+    mask[:, :3] = False
+    data[~mask] = -1e20
+    image = make_image(data)
+
+    def inspect_prepared(prepared, **kwargs):
+        np.testing.assert_allclose(prepared[:, :, 0][mask], normalize_band(data[mask]))
+        assert (prepared[~mask] < -10).all()  # Beyond the default linking distance.
+        return np.zeros(mask.shape, dtype=int)
+
+    monkeypatch.setattr(skseg, "quickshift", inspect_prepared)
+    labels = create_labels(image, method="quickshift", mask=mask)
+    np.testing.assert_array_equal(labels > 0, mask)

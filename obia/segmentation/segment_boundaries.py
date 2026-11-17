@@ -10,7 +10,9 @@ from geopandas import GeoDataFrame
 from rasterio.features import shapes
 from shapely.geometry import shape
 from skimage import segmentation
+from skimage.color import rgb2lab
 from skimage.draw import polygon2mask
+from skimage.filters import gaussian
 from skimage.measure import label
 
 if TYPE_CHECKING:
@@ -93,6 +95,47 @@ def _check_markers(markers, image_shape, name):
     return markers.astype(np.int64, copy=True)
 
 
+def _prepare_masked_quickshift(data, valid, params):
+    """Apply a finite pseudo-mask after colour conversion and mask-aware smoothing.
+
+    Quickshift has no native mask. Keep the boolean mask separately: even a
+    distinct fill can share a label with real pixels, particularly at ratio=0.
+    The caller clips *every* returned label and splits disconnected remnants.
+    """
+    if params.get("convert2lab", False):
+        data = rgb2lab(data)
+        params["convert2lab"] = False
+
+    sigma = params.get("sigma", 0)
+    if not np.isscalar(sigma) or not np.isfinite(sigma) or sigma < 0:
+        raise ValueError("Quickshift sigma must be a finite nonnegative number.")
+    if sigma:
+        # A normalized convolution prevents the artificial fill from bleeding
+        # into real pixels. Smooth before introducing the fill value.
+        weights = gaussian(valid.astype(float), sigma=sigma, mode="reflect")
+        data = gaussian(np.where(valid[:, :, None], data, 0),
+                        sigma=[sigma, sigma, 0], mode="reflect", channel_axis=-1)
+        np.divide(data, weights[:, :, None], out=data, where=weights[:, :, None] > 0)
+        params["sigma"] = 0
+
+    values = data[valid]
+    low, high = values.min(axis=0), values.max(axis=0)
+    # Put the fill beyond the linking distance and well outside the density
+    # kernel in Quickshift's weighted colour space. At ratio=0 colour cannot
+    # separate it at all, which is why clipping must always use the saved mask.
+    separation = max(1, params.get("max_dist", 10), 3 * params.get("kernel_size", 5)) + 1
+    ratio = params.get("ratio", 1)
+    with np.errstate(over="ignore", invalid="ignore"):
+        if ratio > 0:
+            separation = separation / ratio
+        fill = low - np.maximum(high - low, separation)
+    if not np.isfinite(fill).all():
+        raise ValueError("Cannot choose a finite Quickshift fill; rescale the input "
+                         "or use less extreme segmentation parameters.")
+    data[~valid] = fill
+    return data
+
+
 def create_labels(image: Image, segmentation_bands: Sequence[int] | None = None,
                   method: str = "slic", *, mask: np.ndarray | None = None,
                   normalize: bool = True, **kwargs: Any) -> np.ndarray:
@@ -106,6 +149,9 @@ def create_labels(image: Image, segmentation_bands: Sequence[int] | None = None,
         mask: Boolean (height, width) array of included pixels. SLIC, watershed,
             and random walker respect it during segmentation. Other methods run
             on the prepared image and their results are clipped to the mask.
+            Quickshift uses a finite fill outside the mask, after normalization,
+            colour conversion, and smoothing using only included pixels. Mixed
+            labels retain their included pixels; disconnected pieces get new IDs.
         normalize: Scale each selected band to [0, 1] using included pixels.
             Set False for physical-unit flood tolerances or preprocessed data.
         **kwargs: Parameters for the chosen scikit-image function. Random walker
@@ -157,6 +203,8 @@ def create_labels(image: Image, segmentation_bands: Sequence[int] | None = None,
 
     if method == "slic" and mask is not None:
         params["mask"] = valid
+    elif method == "quickshift" and not valid.all():
+        source = _prepare_masked_quickshift(source, valid, params)
     elif method == "watershed":
         params["mask"] = valid
         if params.get("markers") is not None and not np.isscalar(params["markers"]):
